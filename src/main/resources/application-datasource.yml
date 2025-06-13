@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: "datasource"
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:}?useSSL=false
+    username: ${MYSQL_USERNAME:}
+    password: ${MYSQL_PASSWORD:}
