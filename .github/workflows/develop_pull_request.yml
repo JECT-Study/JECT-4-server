@@ -1,0 +1,49 @@
+name: develop pull request Check and Test
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: ${{ secrets.DATABASE_NAME }}
+      DB_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+
+    strategy:
+      matrix:
+        java-version: [ 17 ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Run MySQL with Docker
+        run: |
+          docker run -d \
+          --name mysql \
+          -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD \
+          -e MYSQL_DATABASE=$DB_NAME \
+          -p 3306:3306 \
+          mysql:8.0
+
+      - name: Run Redis with Docker
+        run: |
+          docker run -d \
+          --name redis \
+          -p 6379:6379 \
+          redis:7.0
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Gradle Check
+        run: ./gradlew check

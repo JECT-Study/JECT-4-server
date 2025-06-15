@@ -34,10 +34,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // Flyway (Database Migration Tools)
-    //implementation 'org.flywaydb:flyway-core'
-    //implementation 'org.flywaydb:flyway-mysql'
-
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -57,11 +53,6 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // AWS
-    //implementation 'software.amazon.awssdk:s3:2.20.140' // 최신 버전 확인 후 적용
-    //implementation 'software.amazon.awssdk:auth:2.20.140' // IAM 인증 관련
-    //implementation 'software.amazon.awssdk:sts:2.20.140'  // STS (IAM Role 인증 필요시)
 
     // Firebase-admin
     implementation 'com.google.firebase:firebase-admin:9.2.0'
