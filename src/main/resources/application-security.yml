@@ -2,3 +2,16 @@ spring:
   config:
     activate:
       on-profile: "security"
+
+jwt:
+  secret: ${JWT_SECRET:}
+  access-expiration-time: ${JWT_ACCESS_EXPIRATION_TIME:7200}
+  refresh-expiration-time: ${JWT_REFRESH_EXPIRATION_TIME:604800}
+
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID:}
+    client-secret: ${KAKAO_CLIENT_SECRET:}
+    redirect-uri: ${KAKAO_REDIRECT_URI:}
+    token-uri: "https://kauth.kakao.com/oauth/token"
+    user-info-uri: "https://kapi.kakao.com/v2/user/me"
