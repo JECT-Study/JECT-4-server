@@ -1,7 +1,7 @@
 ---
 name: "✨ Feature"
-description: "새로운 기능 개발 및 수정"
-title: "✨[Feature]: "
+about: "새로운 기능 개발 및 수정"
+title: "✨[FEAT]: "
 labels: "✨feature"
 assignees: ''
 

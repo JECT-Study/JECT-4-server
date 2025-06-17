@@ -1,6 +1,6 @@
 ---
 name: "🪄 Refactor"
-description: "기능 개선 및 기존 코드 리팩토링"
+about: "기능 개선 및 기존 코드 리팩토링"
 title: "🪄[REFACTOR]: "
 labels: "🪄refactor"
 assignees: ''

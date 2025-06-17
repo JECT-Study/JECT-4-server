@@ -1,6 +1,6 @@
 ---
 name: "🐛️ Bug"
-description: "버그 발견 및 수정/해결"
+about: "버그 발견 및 수정/해결"
 title: "🐛️[BUG]:  "
 labels: "🐛bug"
 assignees: ''

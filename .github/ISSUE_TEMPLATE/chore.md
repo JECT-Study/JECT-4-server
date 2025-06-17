@@ -1,6 +1,6 @@
 ---
 name: "⚙️ Chore"
-description: "세팅 및 설정, 빌드, CICD 관련 작업"
+about: "세팅 및 설정, 빌드, CICD 관련 작업"
 title: "⚙️[CHORE]: "
 labels: "⚙️chore"
 assignees: ''

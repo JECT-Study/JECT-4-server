@@ -1,6 +1,6 @@
 ---
 name: "📄 Documentation"
-description: "문서화 작업"
+about: "문서화 작업"
 title: "📄[DOCS]: "
 labels: "📃docs"
 assignees: ''
