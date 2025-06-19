@@ -1,0 +1,35 @@
+name: develop Deploy
+
+on:
+  # 워크플로우를 수동으로 트리거, 수동 배포
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: "commit hash"
+        required: true
+
+env:
+  DOCKERHUB_USERNAME: ject4tserver
+  DOCKERHUB_IMAGE_NAME: studytrip-server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: DEV
+
+    steps:
+      - name: Deploy to EC2 Server
+        uses: appleboy/ssh-action@1.0.3
+        env:
+          DOCKERHUB_IMAGE_FULL_PATH: ${{ env.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}:${{ github.event.inputs.commit_hash }}
+          DOCKERHUB_IMAGE_NAME: ${{ env.DOCKERHUB_IMAGE_NAME }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: DOCKERHUB_IMAGE_FULL_PATH, DOCKERHUB_IMAGE_NAME
+          debug: true
+          script: |
+            echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+            docker compose up -d
+            docker image prune -a -f
