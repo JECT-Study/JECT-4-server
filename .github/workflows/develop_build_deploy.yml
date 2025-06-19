@@ -63,7 +63,7 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
 
       - name: Deploy to EC2 Server
-        uses: appleboy/ssh-action@1.0.3
+        uses: appleboy/ssh-action@v1.0.3
         env:
           DOCKERHUB_IMAGE_FULL_PATH: ${{ steps.metadata.outputs.tags }}
           DOCKERHUB_IMAGE_NAME: ${{ env.DOCKERHUB_IMAGE_NAME }}
