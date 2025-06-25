@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         java-version: [ 17 ]
+        distribution: [ 'temurin' ]
 
     steps:
       - name: Checkout code
@@ -24,7 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'temurin'
+          distribution: ${{ matrix.distribution }}
 
       - name: Run MySQL with Docker
         run: |
@@ -47,3 +48,33 @@ jobs:
 
       - name: Run Gradle Check
         run: ./gradlew check
+
+      # 슬랙으로 알림 전송
+      - name: Send to slack notification
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            text: "PR event"
+            blocks: 
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "${{ secrets.SLACK_GROUP_MENTION }}\n\n📌 *PR 이벤트 알림 (<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }}>)*"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "> PR 이벤트 알림입니다.\n> *최신 변경 사항 검토*, *코드 리뷰* 부탁드립니다."
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*PR:* 🔗 <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>"
+              - type: context
+                elements:
+                  - type: mrkdwn
+                    text: "*브랜치:* `${{ github.head_ref }}` -> `${{ github.base_ref }}`"
+                  - type: mrkdwn
+                    text: "*작성자:* ${{ github.event.pull_request.user.login }}"
+              - type: divider

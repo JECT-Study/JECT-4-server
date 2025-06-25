@@ -77,3 +77,29 @@ jobs:
             echo "${{ secrets.DOCKERHUB_ACCESS_TOKEN }}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
             docker compose up -d
             docker image prune -a -f
+
+      # 슬랙으로 알림 전송
+      - name: Send to slack notification
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel: ${{ secrets.SLACK_CHANNEL_ID }}
+            text: "Build and Deploy result"
+            blocks: 
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*✅ 배포 완료 알림*"
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: "*실행 로그:* 🔗 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
+              - type: context
+                elements:
+                  - type: mrkdwn
+                    text: "*브랜치:* `${{ github.ref_name }}`"
+                  - type: mrkdwn
+                    text: "*커밋:* `${{ github.sha }}`"
+              - type: divider
