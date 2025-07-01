@@ -1,0 +1,11 @@
+package com.ject.studytrip.member.infra.jpa;
+
+import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.entity.SocialProvider;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MemberJpaRepository extends JpaRepository<Member, Long> {
+    Optional<Member> findBySocialProviderAndSocialId(
+            SocialProvider socialProvider, String socialId);
+}
