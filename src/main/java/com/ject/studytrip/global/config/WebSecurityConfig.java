@@ -1,10 +1,13 @@
 package com.ject.studytrip.global.config;
 
+import com.ject.studytrip.auth.infra.filter.JwtFilter;
 import com.ject.studytrip.global.common.constants.SwaggerUrlConstants;
+import com.ject.studytrip.global.config.properties.TokenProperties;
 import com.ject.studytrip.global.security.CustomAccessDeniedHandler;
 import com.ject.studytrip.global.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -19,8 +23,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(TokenProperties.class)
 public class WebSecurityConfig {
-
+    private final JwtFilter jwtFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
@@ -44,13 +49,16 @@ public class WebSecurityConfig {
 
         defaultFilterChain(http);
 
+        // JWT 필터 등록 : 인증 이전에 동작해야 하므로 UsernamePasswordAuthenticationFilter 앞에 삽입
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         // 경로 인가 설정
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
                                 .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
                                 .permitAll() // Swagger 경로
-                                .requestMatchers("/api/sample/**")
+                                .requestMatchers("/api/sample/**", "/api/auth/**")
                                 .permitAll() // 샘플 api 경로
                                 .anyRequest()
                                 .authenticated()); // 그 외 요청은 모두 인증 수행

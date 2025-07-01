@@ -1,6 +1,6 @@
 package com.ject.studytrip.global.security;
 
-import com.ject.studytrip.global.exception.error.AuthErrorCode;
+import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.global.exception.error.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
