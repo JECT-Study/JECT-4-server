@@ -43,6 +43,10 @@ jobs:
           -p 6379:6379 \
           redis:7.0
 
+      - name: Setup .env
+        run: |
+          echo "${{ secrets.TEST_ENV }}" >> .env
+
       - name: Grant Execute Permission for Gradlew
         run: chmod +x ./gradlew
 
