@@ -60,6 +60,8 @@ public class WebSecurityConfig {
                                 .permitAll() // Swagger 경로
                                 .requestMatchers("/api/sample/**", "/api/auth/**")
                                 .permitAll() // 샘플 api 경로
+                                .requestMatchers("/api/trips/categories")
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated()); // 그 외 요청은 모두 인증 수행
 
