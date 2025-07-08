@@ -15,8 +15,13 @@ public class MemberTestHelper {
         this.memberRepository = memberRepository;
     }
 
-    public void saveMember() {
+    public Member saveMember() {
         Member member = MemberFixture.createMemberFromKakao();
-        memberRepository.save(member);
+        return memberRepository.save(member);
+    }
+
+    public Member saveMember(String email, String nickname) {
+        Member member = MemberFixture.createMemberFromKakao(email, nickname);
+        return memberRepository.save(member);
     }
 }
