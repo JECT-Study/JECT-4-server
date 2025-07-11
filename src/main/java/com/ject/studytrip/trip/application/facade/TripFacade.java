@@ -1,7 +1,7 @@
 package com.ject.studytrip.trip.application.facade;
 
 import com.ject.studytrip.member.application.service.MemberService;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.stamp.application.dto.StampInfo;
 import com.ject.studytrip.stamp.application.service.StampService;
 import com.ject.studytrip.stamp.domain.model.Stamp;

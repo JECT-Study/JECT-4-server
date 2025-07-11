@@ -3,7 +3,7 @@ package com.ject.studytrip.trip.domain.model;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

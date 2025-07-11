@@ -10,7 +10,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.auth.helper.TokenTestHelper;
 import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.global.exception.error.CommonErrorCode;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.helper.MemberTestHelper;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;

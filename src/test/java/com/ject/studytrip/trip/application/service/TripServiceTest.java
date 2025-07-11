@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;

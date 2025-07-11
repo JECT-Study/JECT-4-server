@@ -1,7 +1,7 @@
 package com.ject.studytrip.trip.application.service;
 
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.factory.TripFactory;
 import com.ject.studytrip.trip.domain.model.Trip;

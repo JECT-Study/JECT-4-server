@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.factory.StampFactory;

@@ -1,12 +1,11 @@
 package com.ject.studytrip.member.application.service;
 
-import static io.jsonwebtoken.lang.Strings.hasText;
-
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.member.domain.entity.Member;
-import com.ject.studytrip.member.domain.entity.MemberCategory;
-import com.ject.studytrip.member.domain.entity.SocialProvider;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
+import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.member.domain.model.MemberCategory;
+import com.ject.studytrip.member.domain.model.SocialProvider;
+import com.ject.studytrip.member.domain.policy.MemberPolicy;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.factory.MemberFactory;
 import lombok.RequiredArgsConstructor;
@@ -36,33 +35,15 @@ public class MemberService {
     @Transactional
     public Member createMemberFromKakao(
             String kakaoId, String email, String profileImage, String category, String nickname) {
-        validateNewMember(kakaoId);
-        MemberCategory parsedCategory = parseCategory(category);
-        validateMemberNickname(nickname);
+        boolean exists =
+                memberRepository.existsBySocialProviderAndSocialId(SocialProvider.KAKAO, kakaoId);
+        MemberPolicy.validateNickname(nickname);
+        MemberPolicy.validateNewMember(exists);
+
+        MemberCategory memberCategory = MemberCategory.from(category);
         Member member =
-                MemberFactory.fromKakao(kakaoId, email, profileImage, nickname, parsedCategory);
+                MemberFactory.fromKakao(kakaoId, email, profileImage, nickname, memberCategory);
+
         return memberRepository.save(member);
-    }
-
-    private MemberCategory parseCategory(String category) {
-        try {
-            return MemberCategory.valueOf(category);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            throw new CustomException(MemberErrorCode.MEMBER_CATEGORY_REQUIRED);
-        }
-    }
-
-    private void validateNewMember(String socialId) {
-        if (memberRepository
-                .findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId)
-                .isPresent()) {
-            throw new CustomException(MemberErrorCode.MEMBER_ALREADY_EXISTS);
-        }
-    }
-
-    private void validateMemberNickname(String nickname) {
-        if (!hasText(nickname)) {
-            throw new CustomException(MemberErrorCode.MEMBER_NICKNAME_REQUIRED);
-        }
     }
 }

@@ -6,8 +6,8 @@ import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest;
 import com.ject.studytrip.auth.presentation.dto.response.TokenResponse;
 import com.ject.studytrip.member.application.service.MemberService;
-import com.ject.studytrip.member.domain.entity.Member;
-import com.ject.studytrip.member.domain.entity.SocialProvider;
+import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.member.domain.model.SocialProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

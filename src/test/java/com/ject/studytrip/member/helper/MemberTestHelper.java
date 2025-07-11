@@ -1,6 +1,6 @@
 package com.ject.studytrip.member.helper;
 
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import org.springframework.beans.factory.annotation.Autowired;

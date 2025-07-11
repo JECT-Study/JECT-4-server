@@ -5,9 +5,9 @@ import static org.mockito.BDDMockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.member.domain.entity.Member;
-import com.ject.studytrip.member.domain.entity.SocialProvider;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
+import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.member.domain.model.SocialProvider;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import java.util.Optional;
@@ -109,8 +109,10 @@ class MemberServiceTest extends BaseUnitTest {
         @DisplayName("이미 존재하는 멤버라면 예외가 발생한다.")
         void shouldThrowExceptionWhenMemberAlreadyExists() {
             // given
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, KAKAO_ID))
-                    .willReturn(Optional.of(member));
+            given(
+                            memberRepository.existsBySocialProviderAndSocialId(
+                                    SocialProvider.KAKAO, KAKAO_ID))
+                    .willReturn(true);
 
             // when & then
             assertThatThrownBy(
@@ -127,13 +129,13 @@ class MemberServiceTest extends BaseUnitTest {
     class CreateMemberFromKakao {
 
         @Test
-        @DisplayName("카테고리가 유효하지 않으면 예외가 발생한다.")
-        void shouldThrowExceptionWhenCategoryIsInvalid() {
+        @DisplayName("카테고리가 비어 있으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenCategoryIsBlank() {
             // when & then
             assertThatThrownBy(
                             () ->
                                     memberService.createMemberFromKakao(
-                                            KAKAO_ID, EMAIL, PROFILE_IMAGE, "INVALID", NICKNAME))
+                                            KAKAO_ID, EMAIL, PROFILE_IMAGE, " ", NICKNAME))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MemberErrorCode.MEMBER_CATEGORY_REQUIRED.getMessage());
         }
@@ -154,8 +156,10 @@ class MemberServiceTest extends BaseUnitTest {
         @DisplayName("모든 정보가 유효하면 Member를 생성하고 반환한다.")
         void shouldCreateMemberWhenAllDataIsValid() {
             // given
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, KAKAO_ID))
-                    .willReturn(Optional.empty());
+            given(
+                            memberRepository.existsBySocialProviderAndSocialId(
+                                    SocialProvider.KAKAO, KAKAO_ID))
+                    .willReturn(false);
             given(memberRepository.save(any(Member.class))).willReturn(member);
 
             // when
@@ -171,8 +175,10 @@ class MemberServiceTest extends BaseUnitTest {
         @DisplayName("프로필 이미지가 없어도 Member를 생성하고 반환한다.")
         void shouldCreateMemberWhenProfileImageIsNull() {
             // given
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, KAKAO_ID))
-                    .willReturn(Optional.empty());
+            given(
+                            memberRepository.existsBySocialProviderAndSocialId(
+                                    SocialProvider.KAKAO, KAKAO_ID))
+                    .willReturn(false);
             given(memberRepository.save(any(Member.class))).willReturn(memberWithoutProfileImage);
 
             // when
