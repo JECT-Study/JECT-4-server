@@ -1,4 +1,4 @@
-package com.ject.studytrip.member.domain.entity;
+package com.ject.studytrip.member.domain.model;
 
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

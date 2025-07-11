@@ -1,6 +1,6 @@
 package com.ject.studytrip.trip.helper;
 
-import com.ject.studytrip.member.domain.entity.Member;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.domain.repository.TripRepository;
