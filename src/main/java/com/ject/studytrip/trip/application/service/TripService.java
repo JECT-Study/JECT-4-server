@@ -47,15 +47,25 @@ public class TripService {
 
         TripPolicy.validateOwner(memberId, trip);
         TripPolicy.validateEndDateIsNotBeforeStartDate(trip.getStartDate(), request.endDate());
-        TripPolicy.validateDeleted(trip);
+        TripPolicy.validateNotDeleted(trip);
 
         trip.update(request.name(), request.memo(), category, request.endDate());
+    }
+
+    public void increaseTotalStamps(Trip trip) {
+        trip.increaseTotalStamps();
+    }
+
+    public void decreaseTotalStamps(Trip trip) {
+        trip.decreaseTotalStamps();
     }
 
     public void deleteTrip(Long memberId, Trip trip) {
         TripPolicy.validateOwner(memberId, trip);
 
         trip.updateDeletedAt();
+
+        // TODO : 삭제는 로직을 더 구상해본 후 추후 리팩토링
     }
 
     public Trip getTrip(Long tripId) {
@@ -64,7 +74,19 @@ public class TripService {
                         .findById(tripId)
                         .orElseThrow(() -> new CustomException(TripErrorCode.TRIP_NOT_FOUND));
 
-        TripPolicy.validateDeleted(trip);
+        TripPolicy.validateNotDeleted(trip);
+
+        return trip;
+    }
+
+    public Trip getValidTrip(Long memberId, Long tripId) {
+        Trip trip =
+                tripRepository
+                        .findById(tripId)
+                        .orElseThrow(() -> new CustomException(TripErrorCode.TRIP_NOT_FOUND));
+
+        TripPolicy.validateOwner(memberId, trip);
+        TripPolicy.validateNotDeleted(trip);
 
         return trip;
     }

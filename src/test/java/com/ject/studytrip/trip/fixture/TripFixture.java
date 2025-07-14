@@ -19,15 +19,10 @@ public class TripFixture {
                 member, TRIP_NAME, TRIP_MEMO, category, TRIP_END_DATE, TRIP_TOTAL_STAMPS);
     }
 
-    public static Trip createTripWithId(Long id, Member member) {
+    public static Trip createTripWithId(Long id, Member member, TripCategory category) {
         Trip trip =
                 TripFactory.create(
-                        member,
-                        TRIP_NAME,
-                        TRIP_MEMO,
-                        TRIP_CATEGORY_COURSE,
-                        TRIP_END_DATE,
-                        TRIP_TOTAL_STAMPS);
+                        member, TRIP_NAME, TRIP_MEMO, category, TRIP_END_DATE, TRIP_TOTAL_STAMPS);
         ReflectionTestUtils.setField(trip, "id", id);
 
         return trip;

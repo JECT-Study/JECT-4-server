@@ -86,6 +86,14 @@ public class Trip extends BaseTimeEntity {
     //        if (Objects.nonNull(deadline)) this.deadline = deadline;
     //    }
 
+    public void increaseTotalStamps() {
+        this.totalStamps += 1;
+    }
+
+    public void decreaseTotalStamps() {
+        this.totalStamps -= 1;
+    }
+
     public void updateIsComplete(boolean completed) {
         this.completed = completed;
     }
