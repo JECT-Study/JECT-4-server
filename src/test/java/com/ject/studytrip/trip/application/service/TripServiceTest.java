@@ -49,7 +49,7 @@ public class TripServiceTest extends BaseUnitTest {
     @BeforeEach
     void setup() {
         member = MemberFixture.createMemberFromKakaoWithId(1L);
-        trip = TripFixture.createTripWithId(1L, member);
+        trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
     }
 
     @Nested
@@ -198,6 +198,32 @@ public class TripServiceTest extends BaseUnitTest {
             assertThatThrownBy(() -> tripService.updateTrip(member.getId(), deleted, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(TripErrorCode.TRIP_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("여행의 총 스탬프 수를 +1 증가시킨다")
+        void shouldIncreaseTotalStamps() {
+            // given
+            int tripTotalStamps = trip.getTotalStamps();
+
+            // when
+            trip.increaseTotalStamps();
+
+            // then
+            assertThat(trip.getTotalStamps()).isEqualTo(tripTotalStamps + 1);
+        }
+
+        @Test
+        @DisplayName("여행의 총 스탬프 수를 -1 감소시킨다")
+        void shouldDecreaseTotalStamps() {
+            // given
+            int tripTotalStamps = trip.getTotalStamps();
+
+            // when
+            trip.decreaseTotalStamps();
+
+            // then
+            assertThat(trip.getTotalStamps()).isEqualTo(tripTotalStamps - 1);
         }
     }
 

@@ -13,6 +13,16 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StampPolicy {
+    public static void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
+        if (!stamp.getTrip().getId().equals(tripId))
+            throw new CustomException(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP);
+    }
+
+    public static void validateNotDeleted(Stamp stamp) {
+        if (stamp.getDeletedAt() != null)
+            throw new CustomException(StampErrorCode.STAMP_ALREADY_DELETED);
+    }
+
     public static void validateStampDeadline(LocalDate tripEndDate, List<Stamp> stamps) {
         if (tripEndDate == null || stamps.isEmpty()) return;
 
@@ -50,5 +60,14 @@ public class StampPolicy {
                     throw new CustomException(StampErrorCode.DUPLICATE_STAMP_ORDER_FOR_COURSE_TRIP);
             }
         }
+    }
+
+    public static void validateUpdateStampOrders(
+            TripCategory tripCategory, List<Long> orderedStampIds, List<Stamp> savedStamps) {
+        if (tripCategory == TripCategory.EXPLORE && !orderedStampIds.isEmpty())
+            throw new CustomException(StampErrorCode.CANNOT_UPDATE_ORDER_FOR_EXPLORATION_TRIP);
+
+        if (orderedStampIds.size() != savedStamps.size())
+            throw new CustomException(StampErrorCode.INVALID_STAMP_ID_IN_REQUEST);
     }
 }

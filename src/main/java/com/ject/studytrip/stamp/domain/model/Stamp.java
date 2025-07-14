@@ -1,9 +1,13 @@
 package com.ject.studytrip.stamp.domain.model;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.trip.domain.model.Trip;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.*;
 
 @Entity
@@ -41,7 +45,16 @@ public class Stamp extends BaseTimeEntity {
                 .build();
     }
 
+    public void update(String name, LocalDate deadline) {
+        if (hasText(name)) this.name = name;
+        if (Objects.nonNull(deadline)) this.deadline = deadline;
+    }
+
     public void updateStampOrder(int newOrder) {
         this.stampOrder = newOrder;
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

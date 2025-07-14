@@ -1,7 +1,7 @@
 package com.ject.studytrip.trip.presentation.dto.response;
 
 import com.ject.studytrip.stamp.application.dto.StampInfo;
-import com.ject.studytrip.stamp.presentation.dto.response.LoadStampDetailResponse;
+import com.ject.studytrip.stamp.presentation.dto.response.LoadStampInfoResponse;
 import com.ject.studytrip.trip.application.dto.TripInfo;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +19,7 @@ public record LoadTripDetailResponse(
         @Schema(description = "완료된 총 스탬프 수") int completedStamps,
         @Schema(description = "진행률") Integer progress,
         @Schema(description = "여행 완료 여부") boolean completed,
-        @Schema(description = "여행에 속한 스탬프 목록") List<LoadStampDetailResponse> stamps) {
+        @Schema(description = "여행에 속한 스탬프 목록") List<LoadStampInfoResponse> stamps) {
     public static LoadTripDetailResponse of(TripInfo tripInfo, List<StampInfo> stampInfos) {
         return new LoadTripDetailResponse(
                 tripInfo.tripId(),
@@ -33,6 +33,6 @@ public record LoadTripDetailResponse(
                 tripInfo.completedStamps(),
                 tripInfo.progress(),
                 tripInfo.completed(),
-                stampInfos.stream().map(LoadStampDetailResponse::of).toList());
+                stampInfos.stream().map(LoadStampInfoResponse::of).toList());
     }
 }

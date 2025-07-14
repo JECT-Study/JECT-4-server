@@ -33,7 +33,7 @@ public class TripPolicy {
             throw new CustomException(TripErrorCode.TRIP_STAMP_REQUIRED);
     }
 
-    public static void validateDeleted(Trip trip) {
+    public static void validateNotDeleted(Trip trip) {
         if (trip.getDeletedAt() != null)
             throw new CustomException(TripErrorCode.TRIP_ALREADY_DELETED);
     }
