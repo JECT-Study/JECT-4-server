@@ -47,7 +47,7 @@ public class TripFacade {
     @Transactional
     public void updateTrip(Long memberId, Long tripId, UpdateTripRequest request) {
         Member member = memberService.getMember(memberId);
-        Trip trip = tripService.getTrip(tripId);
+        Trip trip = tripService.getValidTrip(member.getId(), tripId);
 
         tripService.updateTrip(member.getId(), trip, request);
 
@@ -59,7 +59,7 @@ public class TripFacade {
     @Transactional
     public void deleteTrip(Long memberId, Long tripId) {
         Member member = memberService.getMember(memberId);
-        Trip trip = tripService.getTrip(tripId);
+        Trip trip = tripService.getValidTrip(member.getId(), tripId);
         tripService.deleteTrip(member.getId(), trip);
 
         // TODO : 추후 엔티티가 생성되면, 여행과 관련된 엔티티를 모두 soft delete 하는 로직 추가
@@ -88,8 +88,10 @@ public class TripFacade {
         return new SliceImpl<>(tripInfos, tripSlice.getPageable(), tripSlice.hasNext());
     }
 
-    public TripDetail getTrip(Long tripId) {
-        Trip trip = tripService.getTrip(tripId);
+    public TripDetail getTrip(Long memberId, Long tripId) {
+        Member member = memberService.getMember(memberId);
+        Trip trip = tripService.getValidTrip(member.getId(), tripId);
+
         int dDay = calculateDDay(trip.getEndDate());
         int progress = calculateProgress(trip.getTotalStamps(), trip.getCompletedStamps());
 

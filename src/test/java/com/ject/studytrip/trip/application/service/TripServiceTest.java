@@ -159,19 +159,6 @@ public class TripServiceTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("수정할 권한이 없는 사용자일 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenNoPermission() {
-            // given
-            Member newMember = MemberFixture.createMemberFromKakao();
-            UpdateTripRequest request = new UpdateTripRequestFixture().build();
-
-            // When & Then
-            assertThatThrownBy(() -> tripService.updateTrip(newMember.getId(), trip, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(TripErrorCode.NOT_TRIP_OWNER.getMessage());
-        }
-
-        @Test
         @DisplayName("여행 종료일이 시작일보다 이전일 경우 예외가 발생한다")
         void shouldThrowExceptionWhenEndDateIsBeforeStartDate() {
             // given
@@ -185,19 +172,6 @@ public class TripServiceTest extends BaseUnitTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(
                             TripErrorCode.TRIP_END_DATE_BEFORE_START_DATE.getMessage());
-        }
-
-        @Test
-        @DisplayName("이미 삭제된 여행일 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenAlreadyDeleted() {
-            // given
-            Trip deleted = TripFixture.createDeletedTrip(member);
-            UpdateTripRequest request = new UpdateTripRequestFixture().build();
-
-            // When & Then
-            assertThatThrownBy(() -> tripService.updateTrip(member.getId(), deleted, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(TripErrorCode.TRIP_ALREADY_DELETED.getMessage());
         }
 
         @Test
@@ -240,18 +214,6 @@ public class TripServiceTest extends BaseUnitTest {
             // then
             assertThat(trip.getDeletedAt()).isNotNull();
         }
-
-        @Test
-        @DisplayName("삭제할 권한이 없는 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenNoPermission() {
-            // given
-            Member newMember = MemberFixture.createMemberFromKakao();
-
-            // when & then
-            assertThatThrownBy(() -> tripService.deleteTrip(newMember.getId(), trip))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(TripErrorCode.NOT_TRIP_OWNER.getMessage());
-        }
     }
 
     @Nested
@@ -273,6 +235,33 @@ public class TripServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("특정 여행 ID로 DB에서 조회한 후 유효한 여행을 반환한다")
+        void shouldGetTripByTripIdReturnValidTrip() {
+            // given
+            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
+
+            // when
+            Trip result = tripService.getValidTrip(member.getId(), trip.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(trip.getId());
+        }
+
+        @Test
+        @DisplayName("여행의 소유자가 아닐 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenNotTripOwner() {
+            // given
+            Member newMember = MemberFixture.createMemberFromKakao();
+            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
+
+            // When & Then
+            assertThatThrownBy(() -> tripService.getValidTrip(newMember.getId(), trip.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(TripErrorCode.NOT_TRIP_OWNER.getMessage());
+        }
+
+        @Test
         @DisplayName("이미 삭제된 여행일 경우 예외가 발생한다")
         void shouldThrowExceptionWhenAlreadyTrip() {
             // given
@@ -280,7 +269,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripRepository.findById(any())).willReturn(Optional.of(deleted));
 
             // when & then
-            assertThatThrownBy(() -> tripService.getTrip(trip.getId()))
+            assertThatThrownBy(() -> tripService.getValidTrip(member.getId(), deleted.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(TripErrorCode.TRIP_ALREADY_DELETED.getMessage());
         }

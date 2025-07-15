@@ -102,8 +102,9 @@ public class TripController {
     @Operation(summary = "여행 상세 조회", description = "특정 여행을 조회하는 API 입니다.")
     @GetMapping("/{tripId}")
     public ResponseEntity<StandardResponse> loadTripDetail(
+            @AuthenticationPrincipal String memberId,
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId) {
-        TripDetail result = tripFacade.getTrip(tripId);
+        TripDetail result = tripFacade.getTrip(Long.valueOf(memberId), tripId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
