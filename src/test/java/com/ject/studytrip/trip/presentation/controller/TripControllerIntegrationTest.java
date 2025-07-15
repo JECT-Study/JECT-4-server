@@ -582,6 +582,20 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("여행의 소유자가 아닐 경우 403 예외가 발생한다")
+        void shouldThrowExceptionWhenNotTripOwner() throws Exception {
+            // given
+            Member newMember = memberTestHelper.saveMember("test@gmail.com", "test");
+            Trip newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE);
+
+            // when
+            ResultActions resultActions = getResultActions(token, newTrip.getId());
+
+            // then
+            resultActions.andExpect(status().is(TripErrorCode.NOT_TRIP_OWNER.getStatus().value()));
+        }
+
+        @Test
         @DisplayName("이미 삭제된 여행일 경우 400 예외가 발생한다")
         void shouldThrowExceptionWhenAlreadyDeleted() throws Exception {
             // given
