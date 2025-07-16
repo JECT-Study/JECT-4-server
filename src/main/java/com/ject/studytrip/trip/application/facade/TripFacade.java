@@ -52,7 +52,7 @@ public class TripFacade {
         tripService.updateTrip(member.getId(), trip, request);
 
         if (request.category() != null)
-            stampService.updateStampsOrderByTripCategoryChange(
+            stampService.updateStampOrdersByTripCategoryChange(
                     trip.getId(), TripCategory.from(request.category()));
     }
 

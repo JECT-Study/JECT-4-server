@@ -46,7 +46,7 @@ public class StampFacade {
     public void updateStampOrders(Long memberId, Long tripId, UpdateStampOrderRequest request) {
         Trip trip = tripService.getValidTrip(memberId, tripId);
 
-        stampService.updateStampsOrders(trip, request);
+        stampService.updateStampOrders(trip, request);
     }
 
     @Transactional

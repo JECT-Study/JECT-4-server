@@ -331,7 +331,7 @@ public class StampServiceTest extends BaseUnitTest {
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when
-                stampService.updateStampsOrders(courseTrip, request);
+                stampService.updateStampOrders(courseTrip, request);
 
                 // then
                 assertThat(courseStamp2.getStampOrder()).isEqualTo(1);
@@ -345,7 +345,7 @@ public class StampServiceTest extends BaseUnitTest {
                 UpdateStampOrderRequest request = fixture.buildUpdateOrders();
 
                 // when & then
-                assertThatThrownBy(() -> stampService.updateStampsOrders(exploreTrip, request))
+                assertThatThrownBy(() -> stampService.updateStampOrders(exploreTrip, request))
                         .isInstanceOf(CustomException.class)
                         .hasMessage(
                                 StampErrorCode.CANNOT_UPDATE_ORDER_FOR_EXPLORATION_TRIP
@@ -360,7 +360,7 @@ public class StampServiceTest extends BaseUnitTest {
                         fixture.withOrderedStampIds(List.of(1000L, 1001L)).buildUpdateOrders();
 
                 // when & then
-                assertThatThrownBy(() -> stampService.updateStampsOrders(courseTrip, request))
+                assertThatThrownBy(() -> stampService.updateStampOrders(courseTrip, request))
                         .isInstanceOf(CustomException.class)
                         .hasMessage(StampErrorCode.INVALID_STAMP_ID_IN_REQUEST.getMessage());
             }
@@ -376,7 +376,7 @@ public class StampServiceTest extends BaseUnitTest {
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when & then
-                assertThatThrownBy(() -> stampService.updateStampsOrders(newTrip, request))
+                assertThatThrownBy(() -> stampService.updateStampOrders(newTrip, request))
                         .isInstanceOf(CustomException.class)
                         .hasMessage(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP.getMessage());
             }
@@ -392,7 +392,7 @@ public class StampServiceTest extends BaseUnitTest {
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when & then
-                assertThatThrownBy(() -> stampService.updateStampsOrders(courseTrip, request))
+                assertThatThrownBy(() -> stampService.updateStampOrders(courseTrip, request))
                         .isInstanceOf(CustomException.class)
                         .hasMessage(StampErrorCode.STAMP_ALREADY_DELETED.getMessage());
             }
@@ -410,7 +410,7 @@ public class StampServiceTest extends BaseUnitTest {
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when
-                stampService.updateStampsOrderByTripCategoryChange(
+                stampService.updateStampOrdersByTripCategoryChange(
                         courseTrip.getId(), TripCategory.EXPLORE);
 
                 // then
@@ -429,7 +429,7 @@ public class StampServiceTest extends BaseUnitTest {
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when
-                stampService.updateStampsOrderByTripCategoryChange(
+                stampService.updateStampOrdersByTripCategoryChange(
                         exploreTrip.getId(), TripCategory.COURSE);
 
                 // then

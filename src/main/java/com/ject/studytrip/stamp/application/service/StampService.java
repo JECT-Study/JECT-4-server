@@ -68,7 +68,7 @@ public class StampService {
         StampPolicy.validateStampDeadline(trip.getEndDate(), List.of(stamp));
     }
 
-    public void updateStampsOrders(Trip trip, UpdateStampOrderRequest request) {
+    public void updateStampOrders(Trip trip, UpdateStampOrderRequest request) {
         // 배치 조회 (ID 목록 기준으로 조회하지만 순서는 보장되지 않음)
         List<Stamp> stamps = stampRepository.findAllByIdIn(request.orderedStampIds());
 
@@ -93,7 +93,7 @@ public class StampService {
         }
     }
 
-    public void updateStampsOrderByTripCategoryChange(Long tripId, TripCategory newCategory) {
+    public void updateStampOrdersByTripCategoryChange(Long tripId, TripCategory newCategory) {
         List<Stamp> stamps = stampRepository.findAllByTripIdOrderByDeadlineAsc(tripId);
 
         if (newCategory == TripCategory.EXPLORE) {
