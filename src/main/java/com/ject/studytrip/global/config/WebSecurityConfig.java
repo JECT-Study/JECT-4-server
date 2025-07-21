@@ -2,9 +2,12 @@ package com.ject.studytrip.global.config;
 
 import com.ject.studytrip.auth.infra.filter.JwtFilter;
 import com.ject.studytrip.global.common.constants.SwaggerUrlConstants;
+import com.ject.studytrip.global.common.constants.UrlConstants;
 import com.ject.studytrip.global.config.properties.TokenProperties;
 import com.ject.studytrip.global.security.CustomAccessDeniedHandler;
 import com.ject.studytrip.global.security.CustomAuthenticationEntryPoint;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -89,6 +92,9 @@ public class WebSecurityConfig {
         //  - prod: PROD_DOMAIN 만 허용
         //  - Spring Active Profile 기반 분기 필요
         //  - 서비스 도메인, 서버 운영 환경 설정 완료 시 작업
+        List<String> allowedOrigins =
+                Arrays.stream(UrlConstants.values()).map(UrlConstants::getValue).toList();
+        config.setAllowedOrigins(allowedOrigins);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
