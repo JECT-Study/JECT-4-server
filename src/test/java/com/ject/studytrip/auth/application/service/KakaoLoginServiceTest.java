@@ -6,7 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.auth.domain.error.AuthErrorCode;
-import com.ject.studytrip.auth.fixture.KakaoOauthFixture;
+import com.ject.studytrip.auth.fixture.KakaoTokenResponseFixture;
+import com.ject.studytrip.auth.fixture.KakaoUserInfoResponseFixture;
 import com.ject.studytrip.auth.infra.dto.KakaoTokenResponse;
 import com.ject.studytrip.auth.infra.dto.KakaoUserInfoResponse;
 import com.ject.studytrip.auth.infra.provider.KakaoOauthProvider;
@@ -55,7 +56,7 @@ class KakaoLoginServiceTest extends BaseUnitTest {
         @DisplayName("카카오 토큰 응답은 왔지만 사용자 정보 조회에 실패하면 예외가 발생한다.")
         void shouldThrowExceptionWhenFetchingKakaoUserInfoFails() {
             // given
-            KakaoTokenResponse tokenResponse = KakaoOauthFixture.createTokenResponse();
+            KakaoTokenResponse tokenResponse = new KakaoTokenResponseFixture().build();
             when(kakaoOauthProvider.getKakaoTokens(VALID_CODE)).thenReturn(tokenResponse);
             when(kakaoOauthProvider.getKakaoUserInfo(tokenResponse.accessToken()))
                     .thenThrow(new CustomException(AuthErrorCode.KAKAO_USER_INFO_FETCH_FAILED));
@@ -70,9 +71,9 @@ class KakaoLoginServiceTest extends BaseUnitTest {
         @DisplayName("유효한 인가 코드를 전달하면 사용자 정보를 반환한다.")
         void shouldReturnKakaoUserInfoResponseWhenCodeIsValid() {
             // given
-            KakaoTokenResponse kakaoTokenResponse = KakaoOauthFixture.createTokenResponse();
+            KakaoTokenResponse kakaoTokenResponse = new KakaoTokenResponseFixture().build();
             KakaoUserInfoResponse kakaoUserInfoResponse =
-                    KakaoOauthFixture.createKakaoUserInfoResponse();
+                    new KakaoUserInfoResponseFixture().build();
             when(kakaoOauthProvider.getKakaoTokens(VALID_CODE)).thenReturn(kakaoTokenResponse);
             when(kakaoOauthProvider.getKakaoUserInfo("access-token"))
                     .thenReturn(kakaoUserInfoResponse);

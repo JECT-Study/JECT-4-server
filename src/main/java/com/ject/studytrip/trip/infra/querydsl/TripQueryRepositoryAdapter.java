@@ -2,9 +2,11 @@ package com.ject.studytrip.trip.infra.querydsl;
 
 import com.ject.studytrip.trip.domain.model.QTrip;
 import com.ject.studytrip.trip.domain.model.Trip;
+import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.domain.repository.TripQueryRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -34,5 +36,20 @@ public class TripQueryRepositoryAdapter implements TripQueryRepository {
         }
 
         return new SliceImpl<>(result, pageable, hasNext);
+    }
+
+    @Override
+    public long countActiveTripsByMemberIdAndCategory(Long memberId, TripCategory category) {
+        Long count =
+                queryFactory
+                        .select(trip.count())
+                        .from(trip)
+                        .where(
+                                trip.member.id.eq(memberId),
+                                trip.deletedAt.isNull(),
+                                trip.category.eq(category))
+                        .fetchOne();
+
+        return Optional.ofNullable(count).orElse(0L);
     }
 }

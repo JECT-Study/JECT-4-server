@@ -33,4 +33,9 @@ public class MemberRepositoryAdapter implements MemberRepository {
     public Member save(Member member) {
         return memberJpaRepository.save(member);
     }
+
+    @Override
+    public Optional<Member> findByIdAndDeletedAtIsNull(Long id) {
+        return memberJpaRepository.findByIdAndDeletedAtIsNull(id);
+    }
 }

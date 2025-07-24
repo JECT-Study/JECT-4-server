@@ -6,12 +6,18 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
-    MEMBER_CATEGORY_REQUIRED(HttpStatus.BAD_REQUEST, "멤버 카테고리는 필수입니다."),
-    MEMBER_NICKNAME_REQUIRED(HttpStatus.BAD_REQUEST, "멤버 닉네임은 필수입니다."),
+    // 400
+    INVALID_MEMBER_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 멤버 카테고리입니다."),
+    MEMBER_NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임입니다."),
+    MEMBER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "해당 멤버는 이미 삭제되었습니다."),
+
+    // 404
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버를 찾을 수 없습니다."),
+
+    // 409
     MEMBER_NEED_SIGNUP(HttpStatus.CONFLICT, "회원가입이 필요한 사용자입니다."),
     MEMBER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 가입된 사용자입니다."),
-    INVALID_MEMBER_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 멤버 카테고리입니다.");
+    ;
 
     private final HttpStatus status;
     private final String message;

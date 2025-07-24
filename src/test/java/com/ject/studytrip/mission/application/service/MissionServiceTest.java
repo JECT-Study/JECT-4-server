@@ -35,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@DisplayName("MissionService 단위 테스트")
 class MissionServiceTest extends BaseUnitTest {
     private static final String NEW_MISSION_NAME = "NEW MISSION NAME";
     private static final String NEW_MISSION_MEMO = "NEW MISSION MEMO";
@@ -260,7 +261,7 @@ class MissionServiceTest extends BaseUnitTest {
 
         @Test
         @DisplayName("중복된 미션 ID가 존재하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenDuplicatedIds() {
+        void shouldThrowExceptionWhenIdsDuplicated() {
             // given
             Long stampId = exploreStamp.getId();
             List<Long> ids = List.of(1L, 1L);
@@ -442,7 +443,7 @@ class MissionServiceTest extends BaseUnitTest {
 
         @Test
         @DisplayName("특정 스탬프에 속하고 삭제되지 않은 미션이 존재하면, 해당 미션을 반환한다.")
-        void shouldReturnMissionWhenValid() {
+        void shouldReturnValidMission() {
             // given
             Long missionId = exploreMission1.getId();
             Long stampId = exploreStamp.getId();

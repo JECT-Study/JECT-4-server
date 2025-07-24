@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ public class AuthController {
     public ResponseEntity<StandardResponse> kakaoLogin(
             @Valid @RequestBody KakaoLoginRequest request) {
         TokenResponse response = authFacade.kakaoLogin(request);
-        return ResponseEntity.ok(StandardResponse.success(200, response));
+        return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
     }
 
     @Operation(
@@ -37,6 +38,6 @@ public class AuthController {
     public ResponseEntity<StandardResponse> kakaoSignup(
             @Valid @RequestBody KakaoSignupRequest request) {
         TokenResponse response = authFacade.kakaoSignup(request);
-        return ResponseEntity.ok(StandardResponse.success(200, response));
+        return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
     }
 }
