@@ -22,4 +22,11 @@ public class StampTestHelper {
 
         return stampRepository.save(stamp);
     }
+
+    public Stamp saveCompletedStamp(Trip trip, int order) {
+        Stamp stamp = StampFixture.createStamp(trip, order);
+        stamp.updateCompleted();
+
+        return stampRepository.save(stamp);
+    }
 }

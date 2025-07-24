@@ -3,6 +3,7 @@ package com.ject.studytrip.mission.domain.model;
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -26,5 +27,9 @@ public class DailyMission extends BaseTimeEntity {
 
     public static DailyMission of(Mission mission, DailyGoal dailyGoal) {
         return DailyMission.builder().mission(mission).dailyGoal(dailyGoal).build();
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

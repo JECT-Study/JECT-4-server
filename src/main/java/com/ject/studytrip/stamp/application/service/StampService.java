@@ -131,6 +131,16 @@ public class StampService {
         return stamp;
     }
 
+    public Stamp getFirstInCompleteStampForCourseTrip(Long tripId) {
+        return stampQueryRepository
+                .findFirstIncompleteStampByTripId(tripId)
+                .orElseThrow(() -> new CustomException(StampErrorCode.STAMP_NOT_FOUND));
+    }
+
+    public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
+        StampPolicy.validateStampBelongsToTrip(tripId, stamp);
+    }
+
     private void shiftStampOrdersAfterDeleted(Long tripId, int deletedStampOrder) {
         List<Stamp> affectedStamps =
                 stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedStampOrder);

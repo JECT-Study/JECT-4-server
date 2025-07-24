@@ -6,6 +6,7 @@ import com.ject.studytrip.mission.domain.error.MissionErrorCode;
 import com.ject.studytrip.mission.domain.factory.MissionFactory;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.domain.policy.MissionPolicy;
+import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.MissionRepository;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionOrderRequest;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MissionService {
     private final MissionRepository missionRepository;
+    private final MissionQueryRepository missionQueryRepository;
 
     @Transactional
     public Mission createMission(Stamp stamp, CreateMissionRequest request) {
@@ -96,6 +98,23 @@ public class MissionService {
         validateMissionIsActiveAndBelongsToStamp(stampId, mission);
 
         return mission;
+    }
+
+    public List<Mission> getValidMissionsWithStamp(List<Long> missionIds) {
+        List<Mission> missions = missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds);
+
+        MissionPolicy.validateExistAll(missions, missionIds);
+        missions.forEach(
+                mission -> {
+                    MissionPolicy.validateNotDeleted(mission);
+                    MissionPolicy.validateCompleted(mission);
+                });
+
+        return missions;
+    }
+
+    public void validateMissionBelongsToStamp(Long stampId, Mission mission) {
+        MissionPolicy.validateMissionBelongsToStamp(stampId, mission);
     }
 
     private void validateMissionIsActiveAndBelongsToStamp(Long stampId, Mission mission) {

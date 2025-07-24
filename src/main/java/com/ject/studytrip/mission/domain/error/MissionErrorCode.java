@@ -12,6 +12,7 @@ public enum MissionErrorCode implements ErrorCode {
     MISSION_ORDER_IDS_NOT_MATCHED(HttpStatus.BAD_REQUEST, "요청한 미션 ID 목록이 기존 미션 목록과 일치하지 않습니다."),
     MISSION_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "해당 미션은 이미 삭제되었습니다."),
     MISSION_ORDER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 미션 순서입니다."),
+    MISSION_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 미션입니다."),
 
     // 403
     MISSION_NOT_BELONGS_TO_STAMP(HttpStatus.FORBIDDEN, "해당 미션은 요청한 스탬프에 속하지 않습니다."),

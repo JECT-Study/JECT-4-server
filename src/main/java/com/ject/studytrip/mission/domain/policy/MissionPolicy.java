@@ -53,4 +53,16 @@ public class MissionPolicy {
             throw new CustomException(MissionErrorCode.MISSION_ORDER_ALREADY_EXISTS);
         }
     }
+
+    public static void validateCompleted(Mission mission) {
+        if (mission.isCompleted())
+            throw new CustomException(MissionErrorCode.MISSION_ALREADY_COMPLETED);
+    }
+
+    public static void validateExistAll(List<Mission> foundMissions, List<Long> requestedIds) {
+        boolean isEquals = foundMissions.size() == requestedIds.size();
+        if (!isEquals) {
+            throw new CustomException(MissionErrorCode.MISSION_NOT_FOUND);
+        }
+    }
 }

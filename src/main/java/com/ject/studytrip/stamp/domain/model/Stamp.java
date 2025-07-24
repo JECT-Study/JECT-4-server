@@ -54,6 +54,10 @@ public class Stamp extends BaseTimeEntity {
         this.stampOrder = newOrder;
     }
 
+    public void updateCompleted() {
+        this.completed = true;
+    }
+
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
     }

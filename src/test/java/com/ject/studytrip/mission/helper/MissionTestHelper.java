@@ -23,4 +23,11 @@ public class MissionTestHelper {
 
         return missionRepository.save(mission);
     }
+
+    public Mission saveCompletedMission(Stamp stamp, int order) {
+        Mission mission = MissionFixture.createMission(stamp, order);
+        mission.updateCompleted();
+
+        return missionRepository.save(mission);
+    }
 }

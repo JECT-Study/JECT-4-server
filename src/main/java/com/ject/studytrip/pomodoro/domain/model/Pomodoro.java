@@ -3,6 +3,7 @@ package com.ject.studytrip.pomodoro.domain.model;
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -39,5 +40,9 @@ public class Pomodoro extends BaseTimeEntity {
                 .breakDurationInSeconds(0)
                 .totalFocusTimeInSeconds(0)
                 .build();
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

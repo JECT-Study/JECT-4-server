@@ -558,5 +558,36 @@ public class StampServiceTest extends BaseUnitTest {
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StampErrorCode.STAMP_ALREADY_DELETED.getMessage());
         }
+
+        @Test
+        @DisplayName("코스형 여행 ID로 현재 진행중인 스탬프를 조회하고 반한환다")
+        void shouldReturnFirstIncompleteStampForCourseTrip() {
+            // given
+            given(stampQueryRepository.findFirstIncompleteStampByTripId(any()))
+                    .willReturn(Optional.ofNullable(courseStamp1));
+
+            // when
+            Stamp stamp = stampService.getFirstInCompleteStampForCourseTrip(courseTrip.getId());
+
+            // then
+            assertThat(stamp.getId()).isEqualTo(courseStamp1.getId());
+            assertThat(stamp.isCompleted()).isFalse();
+        }
+
+        @Test
+        @DisplayName("코스형 여행의 현재 진행중인 스탬프가 존재하지 않으면 예외가 발생한다")
+        void shouldThrowExceptionWhenNoIncompleteStampExistsForCourseTrip() {
+            // given
+            given(stampQueryRepository.findFirstIncompleteStampByTripId(any()))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    stampService.getFirstInCompleteStampForCourseTrip(
+                                            courseTrip.getId()))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_NOT_FOUND.getMessage());
+        }
     }
 }
