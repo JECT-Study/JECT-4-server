@@ -6,6 +6,7 @@ import com.ject.studytrip.mission.domain.model.Mission;
 public record MissionInfo(
         Long missionId,
         String missionName,
+        String missionMemo,
         int missionOrder,
         boolean completed,
         String createdAt,
@@ -15,6 +16,7 @@ public record MissionInfo(
         return new MissionInfo(
                 mission.getId(),
                 mission.getName(),
+                mission.getMemo(),
                 mission.getMissionOrder(),
                 mission.isCompleted(),
                 DateUtil.formatDateTime(mission.getCreatedAt()),

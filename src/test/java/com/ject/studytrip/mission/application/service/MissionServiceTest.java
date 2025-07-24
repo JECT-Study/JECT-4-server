@@ -11,6 +11,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.mission.domain.error.MissionErrorCode;
 import com.ject.studytrip.mission.domain.model.Mission;
+import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.MissionRepository;
 import com.ject.studytrip.mission.fixture.CreateMissionRequestFixture;
 import com.ject.studytrip.mission.fixture.MissionFixture;
@@ -41,7 +42,10 @@ class MissionServiceTest extends BaseUnitTest {
 
     @InjectMocks private MissionService missionService;
     @Mock private MissionRepository missionRepository;
+    @Mock private MissionQueryRepository missionQueryRepository;
 
+    private Trip courseTrip;
+    private Trip exploreTrip;
     private Stamp courseStamp;
     private Stamp exploreStamp;
     private Mission courseMission;
@@ -51,8 +55,8 @@ class MissionServiceTest extends BaseUnitTest {
     @BeforeEach
     void setUp() {
         Member member = MemberFixture.createMemberFromKakao();
-        Trip courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
-        Trip exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE);
+        courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
+        exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE);
         courseStamp = StampFixture.createStampWithId(1L, courseTrip, 1);
         exploreStamp = StampFixture.createStampWithId(2L, exploreTrip, 0);
         courseMission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
@@ -453,6 +457,63 @@ class MissionServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result).isEqualTo(exploreMission1);
+        }
+
+        @Test
+        @DisplayName("유효한 미션 ID들로 요청 시 검증을 통과하고 미션 리스트를 반환한다")
+        void shouldReturnValidMissions() {
+            // given
+            List<Long> missionIds = List.of(courseMission.getId());
+            given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds))
+                    .willReturn(List.of(courseMission));
+
+            // when
+            List<Mission> result = missionService.getValidMissionsWithStamp(missionIds);
+
+            // then
+            assertThat(result).containsExactly(courseMission);
+        }
+
+        @Test
+        @DisplayName("요청한 ID 개수와 조회된 미션 개수가 다르면 예외가 발생한다")
+        void shouldThrowExceptionWhenSomeMissionsDoNotExist() {
+            // given
+            List<Long> missionIds = List.of(1L, 2L);
+            given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds))
+                    .willReturn(List.of(courseMission));
+
+            // when & then
+            assertThatThrownBy(() -> missionService.getValidMissionsWithStamp(missionIds))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 미션이 포함되어 있을 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenAnyMissionIsDeleted() {
+            // given
+            courseMission.updateDeletedAt(); // deleted
+            given(missionQueryRepository.findAllByIdsInFetchJoinStamp(any()))
+                    .willReturn(List.of(courseMission));
+
+            // when & then
+            assertThatThrownBy(() -> missionService.getValidMissionsWithStamp(List.of(1L)))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 완료된 미션이 포함되어 있을 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenAnyMissionIsCompleted() {
+            // given
+            courseMission.updateCompleted();
+            given(missionQueryRepository.findAllByIdsInFetchJoinStamp(any()))
+                    .willReturn(List.of(courseMission));
+
+            // when & then
+            assertThatThrownBy(() -> missionService.getValidMissionsWithStamp(List.of(1L)))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
         }
     }
 }

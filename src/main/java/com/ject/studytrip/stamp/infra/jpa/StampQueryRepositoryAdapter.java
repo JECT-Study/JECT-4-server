@@ -5,6 +5,7 @@ import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +25,19 @@ public class StampQueryRepositoryAdapter implements StampQueryRepository {
                         stamp.deletedAt.isNull())
                 .orderBy(stamp.stampOrder.asc())
                 .fetch();
+    }
+
+    // 완료되지 않은 스탬프 중 가장 첫번째 스탬프 조회
+    @Override
+    public Optional<Stamp> findFirstIncompleteStampByTripId(Long tripId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .selectFrom(stamp)
+                        .where(
+                                stamp.trip.id.eq(tripId),
+                                stamp.completed.isFalse(),
+                                stamp.deletedAt.isNull())
+                        .orderBy(stamp.stampOrder.asc())
+                        .fetchFirst());
     }
 }

@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.domain.model;
 
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -23,5 +24,9 @@ public class DailyGoal extends BaseTimeEntity {
 
     public static DailyGoal of(Trip trip) {
         return DailyGoal.builder().trip(trip).completed(false).build();
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }
