@@ -1,6 +1,7 @@
 package com.ject.studytrip.studylog.domain.model;
 
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
+import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,6 +18,10 @@ public class StudyLog extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_goal_id", nullable = false)
     private DailyGoal dailyGoal;
 
@@ -26,7 +31,12 @@ public class StudyLog extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    public static StudyLog of(DailyGoal dailyGoal, String title, String content) {
-        return StudyLog.builder().dailyGoal(dailyGoal).title(title).content(content).build();
+    public static StudyLog of(Member member, DailyGoal dailyGoal, String title, String content) {
+        return StudyLog.builder()
+                .member(member)
+                .dailyGoal(dailyGoal)
+                .title(title)
+                .content(content)
+                .build();
     }
 }

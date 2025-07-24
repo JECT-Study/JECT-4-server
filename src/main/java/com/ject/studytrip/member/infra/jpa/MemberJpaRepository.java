@@ -10,4 +10,6 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
             SocialProvider socialProvider, String socialId);
 
     boolean existsBySocialProviderAndSocialId(SocialProvider socialProvider, String socialId);
+
+    Optional<Member> findByIdAndDeletedAtIsNull(Long id);
 }

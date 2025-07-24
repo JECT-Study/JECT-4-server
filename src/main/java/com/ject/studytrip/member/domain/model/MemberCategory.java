@@ -1,7 +1,5 @@
 package com.ject.studytrip.member.domain.model;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
 
@@ -13,10 +11,6 @@ public enum MemberCategory {
     ;
 
     public static MemberCategory from(String category) {
-        if (!hasText(category)) {
-            throw new CustomException(MemberErrorCode.MEMBER_CATEGORY_REQUIRED);
-        }
-
         try {
             return MemberCategory.valueOf(category);
         } catch (IllegalArgumentException e) {

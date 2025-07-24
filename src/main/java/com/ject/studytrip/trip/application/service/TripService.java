@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.service;
 
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.factory.TripFactory;
 import com.ject.studytrip.trip.domain.model.Trip;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -84,5 +86,16 @@ public class TripService {
 
     public Slice<Trip> getTripsSliceByMemberId(Long memberId, int page, int size) {
         return tripQueryRepository.findSliceByMemberId(memberId, PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
+    public TripCount getActiveTripCountsByMemberId(Long memberId) {
+        long courseCount =
+                tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                        memberId, TripCategory.COURSE);
+        long exploreCount =
+                tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                        memberId, TripCategory.EXPLORE);
+        return TripCount.of(courseCount, exploreCount);
     }
 }

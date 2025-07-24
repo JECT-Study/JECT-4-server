@@ -6,7 +6,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.ject.studytrip.BaseIntegrationTest;
-import com.ject.studytrip.auth.fixture.KakaoOauthFixture;
+import com.ject.studytrip.auth.fixture.*;
+import com.ject.studytrip.auth.infra.dto.KakaoTokenResponse;
+import com.ject.studytrip.auth.infra.dto.KakaoUserInfoResponse;
 import com.ject.studytrip.auth.infra.provider.KakaoOauthProvider;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultActions;
@@ -29,28 +32,39 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
     @MockitoBean KakaoOauthProvider kakaoOauthProvider;
 
     @Nested
-    @DisplayName("kakaoLogin 메서드는")
+    @DisplayName("카카오 로그인 API")
     class KakaoLogin {
+        private final KakaoTokenResponseFixture kakaoTokenResponseFixture =
+                new KakaoTokenResponseFixture();
+        private final KakaoLoginRequestFixture kakaoLoginRequestFixture =
+                new KakaoLoginRequestFixture();
+        private final KakaoUserInfoResponseFixture kakaoUserInfoResponseFixture =
+                new KakaoUserInfoResponseFixture();
+
+        private ResultActions getResultActions(KakaoLoginRequest request) throws Exception {
+            return mockMvc.perform(
+                    post("/api/auth/login/kakao")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)));
+        }
 
         @Test
-        @DisplayName("가입되지 않은 사용자 인가 코드로 로그인 시 MEMBER_NEED_SIGNUP 예외가 발생한다")
-        void shouldThrowExceptionWhenMemberNotSignUp() throws Exception {
+        @DisplayName("가입되지 않은 사용자 인가 코드로 로그인 시 409 Conflict를 반환한다.")
+        void shouldReturnConflictWhenMemberNotSignUp() throws Exception {
             // given
-            KakaoLoginRequest request = KakaoOauthFixture.createLoginRequest();
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
+            KakaoLoginRequest request = kakaoLoginRequestFixture.build();
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
+
+            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
             given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
                     .willThrow(new CustomException(MemberErrorCode.MEMBER_NEED_SIGNUP));
 
             // when
-            ResultActions result =
-                    mockMvc.perform(
-                            post("/api/auth/login/kakao")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)));
+            ResultActions resultActions = getResultActions(request);
 
             // then
-            result.andExpect(status().isConflict())
+            resultActions
+                    .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.success").value(false))
                     .andExpect(
                             jsonPath("$.status")
@@ -64,46 +78,60 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("가입된 사용자의 인가 코드로 로그인하면 토큰이 발급된다")
+        @DisplayName("가입된 사용자의 인가 코드로 로그인하면 토큰이 발급된다.")
         void shouldReturnTokenResponseWhenLoginIsSuccessful() throws Exception {
             // given
-            KakaoLoginRequest request = KakaoOauthFixture.createLoginRequest();
+            KakaoLoginRequest request = kakaoLoginRequestFixture.build();
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
+            KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
+
             memberTestHelper.saveMember();
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
+            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
             given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(KakaoOauthFixture.createKakaoUserInfoResponse());
+                    .willReturn(kakaoUserInfoResponse);
 
             // when
-            ResultActions result =
-                    mockMvc.perform(
-                            post("/api/auth/login/kakao")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)));
+            ResultActions resultActions = getResultActions(request);
 
             // then
-            result.andExpect(status().isOk())
+            resultActions
+                    .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
-                    .andExpect(jsonPath("$.status").value(200))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
                     .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                     .andExpect(jsonPath("$.data.refreshToken").isNotEmpty());
         }
     }
 
     @Nested
-    @DisplayName("kakaoSignup 메서드는")
+    @DisplayName("카카오 회원가입 API")
     class KakaoSignup {
+        private final KakaoTokenResponseFixture kakaoTokenResponseFixture =
+                new KakaoTokenResponseFixture();
+        private final KakaoSignupRequestFixture kakaoSignupRequestFixture =
+                new KakaoSignupRequestFixture();
+        private final KakaoUserInfoResponseFixture kakaoUserInfoResponseFixture =
+                new KakaoUserInfoResponseFixture();
+
+        private ResultActions getResultActions(KakaoSignupRequest request) throws Exception {
+            return mockMvc.perform(
+                    post("/api/auth/signup/kakao")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)));
+        }
 
         @Test
-        @DisplayName("이미 가입된 사용자가 회원가입 요청 시 MEMBER_ALREADY_EXISTS 예외가 발생한다")
+        @DisplayName("이미 가입된 사용자가 회원가입 요청 시 409 Conflict를 반환한다.")
         void shouldThrowExceptionWhenSignupForExistingMember() throws Exception {
             // given
-            KakaoSignupRequest request = KakaoOauthFixture.createSignupRequest();
+            KakaoSignupRequest request = kakaoSignupRequestFixture.build();
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
+            KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
+
             memberTestHelper.saveMember();
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
+            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
             given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(KakaoOauthFixture.createKakaoUserInfoResponse());
+                    .willReturn(kakaoUserInfoResponse);
 
             // when
             ResultActions result =
@@ -127,81 +155,25 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("회원가입 요청 시 category가 유효하지 않으면 MEMBER_CATEGORY_REQUIRED 예외가 발생한다")
-        void shouldThrowExceptionWhenCategoryIsInvalid() throws Exception {
-            // given
-            KakaoSignupRequest request = new KakaoSignupRequest("valid-code", "", "민우");
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(KakaoOauthFixture.createKakaoUserInfoResponse());
-
-            // when
-            ResultActions result =
-                    mockMvc.perform(
-                            post("/api/auth/signup/kakao")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)));
-
-            // then
-            result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MemberErrorCode.MEMBER_CATEGORY_REQUIRED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("회원가입 요청 시 닉네임이 비어있으면 MEMBER_NICKNAME_REQUIRED 예외가 발생한다")
-        void shouldThrowExceptionWhenSignupNicknameIsBlank() throws Exception {
-            // given
-            KakaoSignupRequest request = new KakaoSignupRequest("valid-code", "STUDENT", "");
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(KakaoOauthFixture.createKakaoUserInfoResponse());
-
-            // when
-            ResultActions result =
-                    mockMvc.perform(
-                            post("/api/auth/signup/kakao")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)));
-
-            // then
-            result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MemberErrorCode.MEMBER_NICKNAME_REQUIRED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("회원가입 요청 시 유효한 정보라면 토큰이 발급된다")
+        @DisplayName("회원가입 요청 시 유효한 정보라면 토큰이 발급된다.")
         void shouldReturnTokenResponseWhenSignupIsSuccessful() throws Exception {
             // given
-            KakaoSignupRequest request = KakaoOauthFixture.createSignupRequest();
-            given(kakaoOauthProvider.getKakaoTokens(anyString()))
-                    .willReturn(KakaoOauthFixture.createTokenResponse());
+            KakaoSignupRequest request = kakaoSignupRequestFixture.build();
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
+            KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
+
+            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
             given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(KakaoOauthFixture.createKakaoUserInfoResponse());
+                    .willReturn(kakaoUserInfoResponse);
 
             // when
-            ResultActions result =
-                    mockMvc.perform(
-                            post("/api/auth/signup/kakao")
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)));
+            ResultActions resultActions = getResultActions(request);
 
             // then
-            result.andExpect(status().isOk())
+            resultActions
+                    .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
                     .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                     .andExpect(jsonPath("$.data.refreshToken").isNotEmpty());
         }

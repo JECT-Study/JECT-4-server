@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+@DisplayName("MissionController 통합 테스트")
 class MissionControllerIntegrationTest extends BaseIntegrationTest {
     private static final String BASE_MISSION_URL = "/api/trips/{tripId}/stamps/{stampId}/missions";
 
@@ -111,8 +112,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 사용자일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenUnauthenticated() throws Exception {
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
             // given
             CreateMissionRequest request = fixture.build();
 
@@ -395,7 +396,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
             // given
             Long invalidTripId = 10000L;
@@ -415,7 +416,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
             // given
             Long invalidStampId = 10000L;
@@ -475,8 +476,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 사용자일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenUnauthenticated() throws Exception {
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
             // given
             UpdateMissionRequest request = fixture.withName("새로운 미션 이름").build();
 
@@ -739,7 +740,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
             // given
             Long invalidTripId = 10000L;
@@ -764,7 +765,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
             // given
             Long invalidStampId = 10000L;
@@ -789,7 +790,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 미션 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 미션 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenMissionIdIsInvalid() throws Exception {
             // given
             Long invalidMissionId = 10000L;
@@ -903,8 +904,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 사용자일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenUnauthenticated() throws Exception {
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
             // given
             List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
             UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
@@ -1106,7 +1107,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
             // given
             Long invalidTripId = 10000L;
@@ -1127,7 +1128,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
             // given
             Long invalidStampId = 10000L;
@@ -1149,7 +1150,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("중복된 미션 ID가 들어오면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenDuplicatedIds() throws Exception {
+        void shouldReturnBadRequestWhenIdsDuplicated() throws Exception {
             // given
             List<Long> duplicatedIds = List.of(courseMission1.getId(), courseMission1.getId());
             UpdateMissionOrderRequest request = fixture.withOrderedIds(duplicatedIds).build();
@@ -1195,7 +1196,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("요청된 미션 ID 목록에 존재하지 않는 ID가 포함되어 있으면 400 Bad Request를 반환한다.")
+        @DisplayName("요청된 미션 ID 목록에 유효하지 않은 미션 ID가 포함되어 있으면 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenIdsContainInvalidMissionId() throws Exception {
             // given
             Long invalidMissionId = 10000L;
@@ -1251,8 +1252,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 사용자일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenUnauthenticated() throws Exception {
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
             // when
             ResultActions resultActions =
                     getResultActions(
@@ -1478,7 +1479,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
             // given
             Long invalidTripId = 10000L;
@@ -1500,7 +1501,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
             // given
             Long invalidStampId = 10000L;
@@ -1523,7 +1524,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 미션 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 미션 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenMissionIdIsInvalid() throws Exception {
             // given
             Long invalidMissionId = 10000L;
@@ -1577,8 +1578,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("인증되지 않은 사용자일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenUnauthenticated() throws Exception {
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
             // when
             ResultActions resultActions =
                     getResultActions("", exploreTrip.getId(), exploreStamp.getId());
@@ -1707,7 +1708,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
             // given
             Long invalidTripId = 10000L;
@@ -1726,7 +1727,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
         void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
             // given
             Long invalidStampId = 10000L;

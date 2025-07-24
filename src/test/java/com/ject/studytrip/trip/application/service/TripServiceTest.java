@@ -9,6 +9,7 @@ import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
+import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
@@ -296,6 +297,53 @@ public class TripServiceTest extends BaseUnitTest {
             // then
             assertThat(sliceTrips.hasContent()).isTrue();
             assertThat(sliceTrips.hasNext()).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("getActiveTripCountsByMemberId 메서드는")
+    class GetActiveTripCountsByMemberId {
+
+        @Test
+        @DisplayName("해당 멤버의 여행이 존재하지 않으면 0을 반환한다.")
+        void shouldReturnZeroWhenTripDoesNotExistForMember() {
+            // given
+            given(
+                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                                    member.getId(), TripCategory.COURSE))
+                    .willReturn(0L);
+            given(
+                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                                    member.getId(), TripCategory.EXPLORE))
+                    .willReturn(0L);
+
+            // when
+            TripCount result = tripService.getActiveTripCountsByMemberId(member.getId());
+
+            // then
+            assertThat(result.course()).isZero();
+            assertThat(result.explore()).isZero();
+        }
+
+        @Test
+        @DisplayName("코스형과 탐험형 여행 개수를 각각 조회하여 TripCount를 반환한다.")
+        void shouldReturnTripCountByCategory() {
+            // given
+            given(
+                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                                    member.getId(), TripCategory.COURSE))
+                    .willReturn(3L);
+            given(
+                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
+                                    member.getId(), TripCategory.EXPLORE))
+                    .willReturn(2L);
+
+            // when
+            TripCount result = tripService.getActiveTripCountsByMemberId(member.getId());
+
+            // then
+            assertThat(result.course()).isEqualTo(3L);
+            assertThat(result.explore()).isEqualTo(2L);
         }
     }
 }

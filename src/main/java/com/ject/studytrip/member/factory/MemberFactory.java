@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberFactory {
-    public static Member fromKakao(
+    public static Member createFromKakao(
             String kakaoId,
             String email,
             String profileImage,
