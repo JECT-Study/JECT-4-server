@@ -10,8 +10,8 @@ public enum UrlConstants {
     LOCAL_API_SERVER_URL("http://localhost:8080"),
 
     // TODO: 개발, 운영 도메인 URL 추가 작업
-    LOCAL_DOMAIN_URL("http://localhost:3000"),
-    LOCAL_SECURE_DOMAIN_URL("https://localhost:3000"),
+    LOCAL_DOMAIN_URL("http://localhost:5173"),
+    LOCAL_SECURE_DOMAIN_URL("https://localhost:5173"),
     ;
 
     private final String value;
