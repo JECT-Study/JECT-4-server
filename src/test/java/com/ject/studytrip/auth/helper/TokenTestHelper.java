@@ -17,4 +17,8 @@ public class TokenTestHelper {
     public String createAccessToken(String memberId, String role) {
         return tokenProvider.createAccessToken(memberId, role);
     }
+
+    public String createRefreshToken() {
+        return tokenProvider.createRefreshToken();
+    }
 }

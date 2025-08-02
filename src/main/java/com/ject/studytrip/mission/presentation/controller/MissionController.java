@@ -51,8 +51,8 @@ public class MissionController {
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId,
             @PathVariable @NotNull(message = "스탬프 ID는 필수 요청 파라미터입니다.") Long stampId,
             @PathVariable @NotNull(message = "미션 ID는 필수 요청 파라미터입니다.") Long missionId,
-            @RequestBody UpdateMissionRequest request) {
-        missionFacade.updateMissionNameAndMemo(
+            @RequestBody @Valid UpdateMissionRequest request) {
+        missionFacade.updateMissionNameAndMemoIfPresent(
                 Long.valueOf(memberId), tripId, stampId, missionId, request);
 
         return ResponseEntity.status(HttpStatus.OK)

@@ -11,8 +11,6 @@ import com.ject.studytrip.auth.fixture.KakaoUserInfoResponseFixture;
 import com.ject.studytrip.auth.infra.dto.KakaoTokenResponse;
 import com.ject.studytrip.auth.infra.dto.KakaoUserInfoResponse;
 import com.ject.studytrip.auth.infra.provider.KakaoOauthProvider;
-import com.ject.studytrip.auth.infra.provider.TokenProvider;
-import com.ject.studytrip.auth.presentation.dto.response.TokenResponse;
 import com.ject.studytrip.global.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,14 +24,10 @@ class KakaoLoginServiceTest extends BaseUnitTest {
     private static final String EMAIL = "choi@kakao.com";
     private static final String PROFILE_IMAGE = "https://kakao.com/profile.jpg";
     private static final String VALID_CODE = "valid-code";
-    private static final String MEMBER_ID = "123";
-    private static final String ROLE = "ROLE_USER";
 
     @InjectMocks private KakaoLoginService kakaoLoginService;
 
     @Mock private KakaoOauthProvider kakaoOauthProvider;
-
-    @Mock private TokenProvider tokenProvider;
 
     @Nested
     @DisplayName("getKakaoUserInfo 메서드는")
@@ -85,28 +79,6 @@ class KakaoLoginServiceTest extends BaseUnitTest {
             assertThat(result.kakaoId()).isEqualTo(KAKAO_ID);
             assertThat(result.getEmail()).isEqualTo(EMAIL);
             assertThat(result.getProfileImage()).isEqualTo(PROFILE_IMAGE);
-        }
-    }
-
-    @Nested
-    @DisplayName("getTokens 메서드는")
-    class GetTokens {
-
-        @Test
-        @DisplayName("memberId와 memberRole이 주어지면 토큰을 반환한다.")
-        void shouldReturnTokenResponseWhenMemberIdAndRoleProvided() {
-            // given
-            String accessToken = "access.jwt.token";
-            String refreshToken = "refresh.jwt.token";
-            when(tokenProvider.createAccessToken(MEMBER_ID, ROLE)).thenReturn(accessToken);
-            when(tokenProvider.createRefreshToken(MEMBER_ID, ROLE)).thenReturn(refreshToken);
-
-            // when
-            TokenResponse response = kakaoLoginService.getTokens(MEMBER_ID, ROLE);
-
-            // then
-            assertThat(response.accessToken()).isEqualTo(accessToken);
-            assertThat(response.refreshToken()).isEqualTo(refreshToken);
         }
     }
 }

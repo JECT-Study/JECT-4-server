@@ -1,11 +1,11 @@
 package com.ject.studytrip.global.config;
 
-import com.ject.studytrip.auth.infra.filter.JwtFilter;
 import com.ject.studytrip.global.common.constants.SwaggerUrlConstants;
 import com.ject.studytrip.global.common.constants.UrlConstants;
 import com.ject.studytrip.global.config.properties.TokenProperties;
 import com.ject.studytrip.global.security.CustomAccessDeniedHandler;
 import com.ject.studytrip.global.security.CustomAuthenticationEntryPoint;
+import com.ject.studytrip.global.security.JwtAuthenticationFilter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(TokenProperties.class)
 public class WebSecurityConfig {
-    private final JwtFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
@@ -53,7 +53,7 @@ public class WebSecurityConfig {
         defaultFilterChain(http);
 
         // JWT 필터 등록 : 인증 이전에 동작해야 하므로 UsernamePasswordAuthenticationFilter 앞에 삽입
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 경로 인가 설정
         http.authorizeHttpRequests(

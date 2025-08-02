@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,25 +22,31 @@ public class TokenProvider {
         return createToken(memberId, role, tokenProperties.accessExpirationTime());
     }
 
-    public String createRefreshToken(String memberId, String role) {
-        return createToken(memberId, role, tokenProperties.refreshExpirationTime());
+    public String createRefreshToken() {
+        return UUID.randomUUID().toString();
     }
 
     public String extractMemberIdFromToken(String token) {
         return parseClaims(token).getSubject();
     }
 
-    public String extractMemberRoleFromToken(String token) {
+    public String extractRoleFromToken(String token) {
         return (String) parseClaims(token).get("role");
     }
 
-    public boolean validateToken(String token) {
-        try {
-            parseClaims(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException(AuthErrorCode.INVALID_JWT_TOKEN);
-        }
+    public boolean validateAccessToken(String accessToken) {
+        parseClaims(accessToken); // 내부에서 예외 처리
+        return true;
+    }
+
+    public long getRefreshTokenExpirationTime() {
+        return tokenProperties.refreshExpirationTime();
+    }
+
+    public long getAccessTokenRemainingTime(String accessToken) {
+        Claims claims = parseClaims(accessToken); // 내부에서 예외 처리
+        Date expiration = claims.getExpiration();
+        return Math.max(expiration.getTime() - System.currentTimeMillis(), 0); // 음수 방지
     }
 
     private String createToken(String memberId, String role, long expirationSeconds) {

@@ -15,4 +15,6 @@ public interface MemberRepository {
     Member save(Member member);
 
     Optional<Member> findByIdAndDeletedAtIsNull(Long id);
+
+    void deleteById(Long id);
 }

@@ -38,4 +38,9 @@ public class MemberRepositoryAdapter implements MemberRepository {
     public Optional<Member> findByIdAndDeletedAtIsNull(Long id) {
         return memberJpaRepository.findByIdAndDeletedAtIsNull(id);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        memberJpaRepository.deleteById(id);
+    }
 }

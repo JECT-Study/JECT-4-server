@@ -1,4 +1,4 @@
-package com.ject.studytrip.member.factory;
+package com.ject.studytrip.member.domain.factory;
 
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.MemberCategory;

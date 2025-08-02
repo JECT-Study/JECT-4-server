@@ -29,7 +29,7 @@ public class MissionFacade {
         return MissionInfo.from(mission);
     }
 
-    public void updateMissionNameAndMemo(
+    public void updateMissionNameAndMemoIfPresent(
             Long memberId,
             Long tripId,
             Long stampId,
@@ -38,7 +38,7 @@ public class MissionFacade {
         Stamp stamp = getValidStampFromTripOwnedByMember(memberId, tripId, stampId);
         Mission mission = missionService.getValidMission(stamp.getId(), missionId);
 
-        missionService.updateMissionNameAndMemo(stamp.getId(), mission, request);
+        missionService.updateMissionNameAndMemoIfPresent(stamp.getId(), mission, request);
     }
 
     public void updateMissionOrders(

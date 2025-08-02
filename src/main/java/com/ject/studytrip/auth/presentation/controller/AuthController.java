@@ -3,6 +3,8 @@ package com.ject.studytrip.auth.presentation.controller;
 import com.ject.studytrip.auth.application.facade.AuthFacade;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest;
+import com.ject.studytrip.auth.presentation.dto.request.LogoutRequest;
+import com.ject.studytrip.auth.presentation.dto.request.TokenReissueRequest;
 import com.ject.studytrip.auth.presentation.dto.response.TokenResponse;
 import com.ject.studytrip.global.common.response.StandardResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,5 +41,22 @@ public class AuthController {
             @Valid @RequestBody KakaoSignupRequest request) {
         TokenResponse response = authFacade.kakaoSignup(request);
         return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
+    }
+
+    @Operation(summary = "토큰 재발급", description = "리프레시 토큰을 이용하여, 엑세스 토큰과 리프레시 토큰을 재발급합니다.")
+    @PostMapping("/token/reissue")
+    public ResponseEntity<StandardResponse> reissueToken(
+            @Valid @RequestBody TokenReissueRequest request) {
+        TokenResponse response = authFacade.reissueToken(request);
+        return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
+    }
+
+    @Operation(
+            summary = "로그아웃",
+            description = "엑세스 토큰과 리프레시 토큰을 이용하여, 엑세스 토큰을 블랙리스트에 추가하고, 저장된 리프레시 토큰을 제거합니다.")
+    @PostMapping("/logout")
+    public ResponseEntity<StandardResponse> logout(@Valid @RequestBody LogoutRequest request) {
+        authFacade.logout(request);
+        return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), null));
     }
 }

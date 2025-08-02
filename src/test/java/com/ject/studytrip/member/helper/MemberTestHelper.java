@@ -24,4 +24,8 @@ public class MemberTestHelper {
         Member member = MemberFixture.createMemberFromKakao(email, nickname);
         return memberRepository.save(member);
     }
+
+    public void deleteMemberById(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
 }
