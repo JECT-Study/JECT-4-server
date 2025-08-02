@@ -136,8 +136,8 @@ class MissionServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("updateMissionNameAndMemo 메서드는")
-    class UpdateMissionNameAndMemo {
+    @DisplayName("updateMissionNameAndMemoIfPresent 메서드는")
+    class UpdateMissionNameAndMemoIfPresent {
 
         @Test
         @DisplayName("미션이 다른 스탬프에 속하면 예외가 발생한다.")
@@ -150,7 +150,7 @@ class MissionServiceTest extends BaseUnitTest {
             // when & then
             assertThatThrownBy(
                             () ->
-                                    missionService.updateMissionNameAndMemo(
+                                    missionService.updateMissionNameAndMemoIfPresent(
                                             invalidStampId, courseMission, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP.getMessage());
@@ -168,7 +168,7 @@ class MissionServiceTest extends BaseUnitTest {
             // when & then
             assertThatThrownBy(
                             () ->
-                                    missionService.updateMissionNameAndMemo(
+                                    missionService.updateMissionNameAndMemoIfPresent(
                                             stampId, courseMission, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
@@ -183,7 +183,7 @@ class MissionServiceTest extends BaseUnitTest {
                     new UpdateMissionRequestFixture().withName(NEW_MISSION_NAME).build();
 
             // when
-            missionService.updateMissionNameAndMemo(stampId, courseMission, request);
+            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
 
             // then
             assertThat(courseMission.getName()).isEqualTo(NEW_MISSION_NAME);
@@ -198,7 +198,7 @@ class MissionServiceTest extends BaseUnitTest {
                     new UpdateMissionRequestFixture().withMemo(NEW_MISSION_MEMO).build();
 
             // when
-            missionService.updateMissionNameAndMemo(stampId, courseMission, request);
+            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
 
             // then
             assertThat(courseMission.getMemo()).isEqualTo(NEW_MISSION_MEMO);
@@ -216,7 +216,7 @@ class MissionServiceTest extends BaseUnitTest {
                             .build();
 
             // when
-            missionService.updateMissionNameAndMemo(stampId, courseMission, request);
+            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
 
             // then
             assertThat(courseMission.getName()).isEqualTo(NEW_MISSION_NAME);

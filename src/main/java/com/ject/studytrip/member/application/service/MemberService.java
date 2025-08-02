@@ -5,12 +5,14 @@ import static org.springframework.util.StringUtils.hasText;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.application.dto.CreateMemberCommand;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
+import com.ject.studytrip.member.domain.factory.MemberFactory;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.MemberCategory;
+import com.ject.studytrip.member.domain.model.MemberRole;
 import com.ject.studytrip.member.domain.model.SocialProvider;
 import com.ject.studytrip.member.domain.policy.MemberPolicy;
+import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
-import com.ject.studytrip.member.factory.MemberFactory;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
 
     @Transactional
     public Member createMemberFromKakao(CreateMemberCommand command) {
@@ -69,6 +72,17 @@ public class MemberService {
         return memberRepository
                 .findByIdAndDeletedAtIsNull(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public String getRoleByMemberId(String memberId) {
+        MemberRole memberRole = memberQueryRepository.findMemberRoleById(Long.valueOf(memberId));
+
+        if (memberRole == null) {
+            throw new CustomException(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+
+        return memberRole.name();
     }
 
     private void validateMemberIsUnique(SocialProvider socialProvider, String socialId) {

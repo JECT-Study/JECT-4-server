@@ -1,8 +1,8 @@
 package com.ject.studytrip.member.fixture;
 
+import com.ject.studytrip.member.domain.factory.MemberFactory;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.MemberCategory;
-import com.ject.studytrip.member.factory.MemberFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class MemberFixture {

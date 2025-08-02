@@ -10,7 +10,9 @@ import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.application.dto.CreateMemberCommand;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.member.domain.model.MemberRole;
 import com.ject.studytrip.member.domain.model.SocialProvider;
+import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.fixture.CreateMemberCommandFixture;
 import com.ject.studytrip.member.fixture.MemberFixture;
@@ -28,11 +30,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @DisplayName("MemberService 단위 테스트")
 class MemberServiceTest extends BaseUnitTest {
+    private static final String MEMBER_ID = "123";
+    private static final MemberRole MEMBER_ROLE = MemberRole.ROLE_USER;
     private static final String NEW_MEMBER_NICKNAME = "팬텀";
     private static final String NEW_MEMBER_CATEGORY = "WORKER";
 
     @InjectMocks private MemberService memberService;
     @Mock private MemberRepository memberRepository;
+    @Mock private MemberQueryRepository memberQueryRepository;
 
     private Member member;
     private Member memberWithoutProfileImage;
@@ -193,18 +198,6 @@ class MemberServiceTest extends BaseUnitTest {
     @DisplayName("deleteMember 메서드는")
     class DeleteMember {
 
-        //        @Test
-        //        @DisplayName("멤버가 이미 삭제된 경우 예외가 발생한다.")
-        //        void shouldThrowExceptionWhenMemberAlreadyDeleted() {
-        //            // given
-        //            ReflectionTestUtils.setField(member, "deletedAt", LocalDateTime.now());
-        //
-        //            // when & then
-        //            assertThatThrownBy(() -> memberService.deleteMember(member))
-        //                    .isInstanceOf(CustomException.class)
-        //                    .hasMessage(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage());
-        //        }
-
         @Test
         @DisplayName("멤버를 삭제하면 deletedAt 필드에 현재 시각이 설정된다.")
         void shouldDeleteMember() {
@@ -321,7 +314,7 @@ class MemberServiceTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("유효한 ID가 주어지면 Member를 반환한다.")
+        @DisplayName("유효한 멤버 ID가 주어지면 Member를 반환한다.")
         void shouldReturnMemberWhenIdIsValid() {
             // given
             Long memberId = member.getId();
@@ -334,6 +327,38 @@ class MemberServiceTest extends BaseUnitTest {
             // then
             assertThat(result).isEqualTo(member);
             assertThat(result.getDeletedAt()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("getRoleByMemberId 메서드는")
+    class GetRoleByMemberId {
+
+        @Test
+        @DisplayName("존재하지 않는 멤버 ID로 조회하면 예외가 발생한다.")
+        void shouldThrowExceptionWhenMemberIdNotFound() {
+            // given
+            given(memberQueryRepository.findMemberRoleById(Long.valueOf(MEMBER_ID)))
+                    .willReturn(null);
+
+            // when & then
+            assertThatThrownBy(() -> memberService.getRoleByMemberId(MEMBER_ID))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 멤버 ID가 주어지면 Role을 반환한다.")
+        void shouldReturnRoleNameWhenMemberIdIsValid() {
+            // given
+            given(memberQueryRepository.findMemberRoleById(Long.valueOf(MEMBER_ID)))
+                    .willReturn(MEMBER_ROLE);
+
+            // when
+            String result = memberService.getRoleByMemberId(MEMBER_ID);
+
+            // then
+            assertThat(result).isEqualTo(MEMBER_ROLE.name());
         }
     }
 }

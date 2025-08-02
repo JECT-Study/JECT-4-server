@@ -40,7 +40,7 @@ public class MissionService {
     }
 
     @Transactional
-    public void updateMissionNameAndMemo(
+    public void updateMissionNameAndMemoIfPresent(
             Long stampId, Mission mission, UpdateMissionRequest request) {
         validateMissionIsActiveAndBelongsToStamp(stampId, mission);
 
