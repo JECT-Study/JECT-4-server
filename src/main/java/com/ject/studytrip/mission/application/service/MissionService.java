@@ -69,6 +69,13 @@ public class MissionService {
         }
     }
 
+    public void updateCompleted(Mission mission) {
+        MissionPolicy.validateNotDeleted(mission);
+        MissionPolicy.validateCompleted(mission);
+
+        mission.updateCompleted();
+    }
+
     @Transactional
     public void deleteMission(Long stampId, Mission mission) {
         validateMissionIsActiveAndBelongsToStamp(stampId, mission);

@@ -125,4 +125,75 @@ public class PomodoroServiceTest extends BaseUnitTest {
                     .hasMessage(PomodoroErrorCode.POMODORO_ALREADY_DELETED.getMessage());
         }
     }
+
+    @Nested
+    @DisplayName("updateTotalFocusTime 메서드는")
+    class UpdateTotalFocusTime {
+
+        @Test
+        @DisplayName("유효한 데일리 목표 ID와 총 학습시간으로 뽀모도로의 총 학습시간을 업데이트한다")
+        void shouldUpdateTotalFocusTime() {
+            // given
+            int totalFocusTimeInMinutes = 120;
+            given(pomodoroRepository.findByDailyGoalId(dailyGoal.getId()))
+                    .willReturn(Optional.of(pomodoro));
+
+            // when
+            pomodoroService.updateTotalFocusTime(dailyGoal.getId(), totalFocusTimeInMinutes);
+
+            // then
+            assertThat(pomodoro.getTotalFocusTimeInSeconds())
+                    .isEqualTo(totalFocusTimeInMinutes * 60);
+        }
+
+        @Test
+        @DisplayName("뽀모도로 총 집중시간(분)이 음수일 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenTotalFocusTimeIsNegative() {
+            // given
+            int totalFocusTimeInMinutes = -30;
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    pomodoroService.updateTotalFocusTime(
+                                            dailyGoal.getId(), totalFocusTimeInMinutes))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(PomodoroErrorCode.POMODORO_NEGATIVE_FOCUS_TIME.getMessage());
+        }
+
+        @Test
+        @DisplayName("뽀모도로가 존재하지 않으면 예외가 발생한다")
+        void shouldThrowExceptionWhenPomodoroNotFound() {
+            // given
+            int totalFocusTimeInMinutes = 60;
+            given(pomodoroRepository.findByDailyGoalId(dailyGoal.getId()))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    pomodoroService.updateTotalFocusTime(
+                                            dailyGoal.getId(), totalFocusTimeInMinutes))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(PomodoroErrorCode.POMODORO_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("삭제된 뽀모도로일 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenPomodoroIsDeleted() {
+            // given
+            int totalFocusTimeInMinutes = 60;
+            pomodoro.updateDeletedAt();
+            given(pomodoroRepository.findByDailyGoalId(dailyGoal.getId()))
+                    .willReturn(Optional.of(pomodoro));
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    pomodoroService.updateTotalFocusTime(
+                                            dailyGoal.getId(), totalFocusTimeInMinutes))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(PomodoroErrorCode.POMODORO_ALREADY_DELETED.getMessage());
+        }
+    }
 }

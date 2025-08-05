@@ -7,6 +7,7 @@ import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.policy.DailyGoalPolicy;
 import com.ject.studytrip.trip.domain.repository.DailyGoalRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,10 @@ public class DailyGoalService {
 
     public void deleteDailyGoal(DailyGoal dailyGoal) {
         dailyGoal.updateDeletedAt();
+    }
+
+    public List<DailyGoal> getCompleteDailyGoalsByTrip(Long tripId) {
+        return dailyGoalRepository.findAllByTripIdAndCompletedIsTrue(tripId);
     }
 
     public DailyGoal getValidDailyGoal(Long tripId, Long dailyGoalId) {

@@ -70,4 +70,10 @@ public class StampPolicy {
         if (orderedStampIds.size() != savedStamps.size())
             throw new CustomException(StampErrorCode.INVALID_STAMP_ID_IN_REQUEST);
     }
+
+    public static void validateStampListNotEmpty(List<Stamp> stamps) {
+        if (stamps.isEmpty()) {
+            throw new CustomException(StampErrorCode.STAMP_LIST_CANNOT_BE_EMPTY);
+        }
+    }
 }

@@ -17,6 +17,7 @@ public enum StampErrorCode implements ErrorCode {
     STAMP_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 스탬프입니다."),
     CANNOT_UPDATE_ORDER_FOR_EXPLORATION_TRIP(HttpStatus.BAD_REQUEST, "탐험형 여행의 스탬프 순서는 변경할 수 없습니다."),
     INVALID_STAMP_ID_IN_REQUEST(HttpStatus.BAD_REQUEST, "존재하지 않는 스탬프 ID가 포함되어 있습니다. "),
+    STAMP_LIST_CANNOT_BE_EMPTY(HttpStatus.BAD_REQUEST, "스탬프 목록은 비어있을 수 없습니다."),
 
     // 403
     STAMP_NOT_BELONG_TO_TRIP(HttpStatus.FORBIDDEN, "해당 스탬프는 요청한 여행에 속하지 않습니다."),

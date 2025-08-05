@@ -12,4 +12,10 @@ public class PomodoroPolicy {
         if (pomodoro.getDeletedAt() != null)
             throw new CustomException(PomodoroErrorCode.POMODORO_ALREADY_DELETED);
     }
+
+    public static void validateTotalFocusTimeNotNegative(int totalFocusTime) {
+        if (totalFocusTime < 0) {
+            throw new CustomException(PomodoroErrorCode.POMODORO_NEGATIVE_FOCUS_TIME);
+        }
+    }
 }
