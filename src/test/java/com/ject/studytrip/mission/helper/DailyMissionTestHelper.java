@@ -17,4 +17,11 @@ public class DailyMissionTestHelper {
         DailyMission dailyMission = DailyMissionFixture.createDailyMission(mission, dailyGoal);
         return dailyMissionRepository.save(dailyMission);
     }
+
+    public DailyMission saveDeletedDailyMission(Mission mission, DailyGoal dailyGoal) {
+        DailyMission dailyMission = DailyMissionFixture.createDailyMission(mission, dailyGoal);
+        dailyMission.updateDeletedAt();
+
+        return dailyMissionRepository.save(dailyMission);
+    }
 }

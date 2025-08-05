@@ -330,6 +330,50 @@ class MissionServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("updateCompleted 메서드는")
+    class updateCompleted {
+
+        @Test
+        @DisplayName("정상적인 미션이면 completed 필드를 true로 업데이트하고 완료 처리한다")
+        void shouldUpdateCompletedMission() {
+            // given
+            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
+
+            // when
+            missionService.updateCompleted(mission);
+
+            // then
+            assertThat(mission.isCompleted()).isTrue();
+        }
+
+        @Test
+        @DisplayName("삭제된 미션이면 예외가 발생한다")
+        void shouldThrowExceptionWhenMissionIsDeleted() {
+            // given
+            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
+            ReflectionTestUtils.setField(mission, "deletedAt", LocalDateTime.now());
+
+            // then
+            assertThatThrownBy(() -> missionService.updateCompleted(mission))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 완료된 미션이면 예외가 발생한다")
+        void shouldThrowExceptionWhenMissionIsAlreadyCompleted() {
+            // given
+            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
+            ReflectionTestUtils.setField(mission, "completed", true);
+
+            // then
+            assertThatThrownBy(() -> missionService.updateCompleted(mission))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
+        }
+    }
+
+    @Nested
     @DisplayName("deleteMission 메서드는")
     class DeleteMission {
 

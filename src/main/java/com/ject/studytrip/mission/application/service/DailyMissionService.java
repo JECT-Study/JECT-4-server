@@ -7,6 +7,7 @@ import com.ject.studytrip.mission.domain.policy.DailyMissionPolicy;
 import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.DailyMissionRepository;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
+import com.ject.studytrip.trip.domain.model.TripCategory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,27 @@ public class DailyMissionService {
         return dailyMissions;
     }
 
+    public List<DailyMission> getValidDailyMissionByIdsWithMissionAndStamp(
+            Long dailyGoalId, List<Long> dailyMissionIds) {
+        List<DailyMission> dailyMissions =
+                dailyMissionQueryRepository.findAllByIdsFetchJoinMissionAndStamp(dailyMissionIds);
+
+        DailyMissionPolicy.validateExistAll(dailyMissions, dailyMissionIds);
+        dailyMissions.forEach(
+                dailyMission -> {
+                    DailyMissionPolicy.validateBelongsToDailyGoal(dailyMission, dailyGoalId);
+                    DailyMissionPolicy.validateNotDeleted(dailyMission);
+                });
+
+        return dailyMissions;
+    }
+
     public List<DailyMission> getDailyMissionsByDailyGoal(Long dailyGoalId) {
         return dailyMissionQueryRepository.findAllByDailyGoalIdFetchJoinMission(dailyGoalId);
+    }
+
+    public void validateSelectedDailyMissions(
+            TripCategory tripCategory, List<DailyMission> dailyMissions) {
+        DailyMissionPolicy.validateCourseTripStampConsistency(tripCategory, dailyMissions);
     }
 }

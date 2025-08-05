@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
+@DisplayName("StampController 통합 테스트")
 public class StampControllerIntegrationTest extends BaseIntegrationTest {
     private static final int NEXT_STAMP_ORDER = 3;
 

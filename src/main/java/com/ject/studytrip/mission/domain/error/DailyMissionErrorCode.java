@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 public enum DailyMissionErrorCode implements ErrorCode {
     // 400
     DAILY_MISSION_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 데일리 미션입니다."),
+    COURSE_TRIP_STAMP_MISMATCH(HttpStatus.BAD_REQUEST, "코스형 여행의 데일리 미션들은 모두 동일한 스탬프여야 합니다."),
 
     // 403
     DAILY_MISSION_NOT_BELONG_TO_DAILY_GOAL(

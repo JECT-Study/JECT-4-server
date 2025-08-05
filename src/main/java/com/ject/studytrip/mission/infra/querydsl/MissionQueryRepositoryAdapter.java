@@ -1,4 +1,4 @@
-package com.ject.studytrip.mission.infra.jpa;
+package com.ject.studytrip.mission.infra.querydsl;
 
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.domain.model.QMission;

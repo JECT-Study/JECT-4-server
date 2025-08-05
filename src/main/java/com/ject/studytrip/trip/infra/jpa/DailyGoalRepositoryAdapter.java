@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.infra.jpa;
 
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.repository.DailyGoalRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,5 +20,10 @@ public class DailyGoalRepositoryAdapter implements DailyGoalRepository {
     @Override
     public Optional<DailyGoal> findById(Long id) {
         return dailyGoalJpaRepository.findById(id);
+    }
+
+    @Override
+    public List<DailyGoal> findAllByTripIdAndCompletedIsTrue(Long tripId) {
+        return dailyGoalJpaRepository.findAllByTripIdAndCompletedIsTrue(tripId);
     }
 }

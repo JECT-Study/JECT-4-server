@@ -12,9 +12,7 @@ import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadl
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StampService {
-
     private final StampRepository stampRepository;
     private final StampQueryRepository stampQueryRepository;
 
@@ -135,6 +132,44 @@ public class StampService {
         return stampQueryRepository
                 .findFirstIncompleteStampByTripId(tripId)
                 .orElseThrow(() -> new CustomException(StampErrorCode.STAMP_NOT_FOUND));
+    }
+
+    public String getStampNameByTripCategory(TripCategory tripCategory, List<Stamp> stamps) {
+        // 스탬프 목록이 비어있지 않은지 검증
+        StampPolicy.validateStampListNotEmpty(stamps);
+        stamps.forEach(StampPolicy::validateNotDeleted);
+
+        if (tripCategory == TripCategory.COURSE) {
+            return getCourseStampName(stamps);
+        }
+
+        return getExplorationStampName(stamps);
+    }
+
+    private String getCourseStampName(List<Stamp> stamps) {
+        return new HashSet<>(stamps).iterator().next().getName();
+    }
+
+    private String getExplorationStampName(List<Stamp> stamps) {
+        // 스탬프별 개수 집계
+        Map<Stamp, Long> stampCountMap =
+                stamps.stream()
+                        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 최대 개수를 가진 스탬프들 찾기
+        long maxCount = stampCountMap.values().stream().max(Long::compareTo).orElse(0L);
+
+        List<Stamp> maxCountStamps =
+                stampCountMap.entrySet().stream()
+                        .filter(entry -> entry.getValue().equals(maxCount))
+                        .map(Map.Entry::getKey)
+                        .toList();
+
+        // 가장 이른 생성 시간을 가진 스탬프 선택
+        return maxCountStamps.stream()
+                .min(Comparator.comparing(Stamp::getCreatedAt))
+                .map(Stamp::getName)
+                .orElse("");
     }
 
     public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {

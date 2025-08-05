@@ -25,6 +25,7 @@ import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.fixture.TripFixture;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DisplayName("StampService 단위 테스트")
 public class StampServiceTest extends BaseUnitTest {
@@ -588,6 +590,92 @@ public class StampServiceTest extends BaseUnitTest {
                                             courseTrip.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StampErrorCode.STAMP_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("getStampNameByTripCategory 메서드는")
+    class GetStampNameByTripCategory {
+
+        @Test
+        @DisplayName("코스형 여행일 경우 선택한 미션들이 하나의 스탬프에 속하므로 해당 스탬프의 이름을 반환한다")
+        void shouldReturnStampNameForCourseTrip() {
+            // given
+            Stamp stamp = StampFixture.createStamp(courseTrip, 1);
+            List<Stamp> stamps = List.of(stamp);
+
+            // when
+            String result = stampService.getStampNameByTripCategory(TripCategory.COURSE, stamps);
+
+            // then
+            assertThat(result).isEqualTo(stamp.getName());
+        }
+
+        @Test
+        @DisplayName("탐험형 여행일 경우 선택한 미션들의 스탬프 중 가장 많이 포함된 스탬프의 이름을 제목으로 반환한다")
+        void shouldReturnMostFrequentStampNameForExplorationTrip() {
+            // given
+            Stamp stamp1 = StampFixture.createStamp(exploreTrip, 0);
+            Stamp stamp2 = StampFixture.createStamp(exploreTrip, 0);
+            List<Stamp> stamps = List.of(stamp1, stamp1, stamp2);
+
+            // then
+            String result = stampService.getStampNameByTripCategory(TripCategory.EXPLORE, stamps);
+
+            // when
+            assertThat(result).isEqualTo(stamp1.getName());
+        }
+
+        @Test
+        @DisplayName("탐험형 여행이면서 가장 많이 포함된 스탬프가 2개 이상일 경우 createdAt이 가장 빠른 스탬프의 이름을 반환한다")
+        void shouldReturnEarliestStampNameWhenFrequencyIsSame() {
+            // given
+            Stamp stamp1 = StampFixture.createStamp(exploreTrip, 0);
+            ReflectionTestUtils.setField(stamp1, "createdAt", LocalDateTime.now());
+
+            Stamp stamp2 = StampFixture.createStamp(exploreTrip, 0);
+            ReflectionTestUtils.setField(stamp2, "createdAt", LocalDateTime.now().minusDays(1));
+
+            List<Stamp> stamps = List.of(stamp1, stamp1, stamp2, stamp2);
+
+            // when
+            String result = stampService.getStampNameByTripCategory(TripCategory.EXPLORE, stamps);
+
+            // then
+            assertThat(result).isEqualTo(stamp2.getName());
+        }
+
+        @Test
+        @DisplayName("스탬프 목록이 비어있을 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenStampListIsEmpty() {
+            // given
+            List<Stamp> emptyStamps = List.of();
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    stampService.getStampNameByTripCategory(
+                                            TripCategory.COURSE, emptyStamps))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_LIST_CANNOT_BE_EMPTY.getMessage());
+        }
+
+        @Test
+        @DisplayName("스탬프가 삭제된 상태일 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenStampIsDeleted() {
+            // given
+            Stamp stamp = StampFixture.createStamp(courseTrip, 1);
+            ReflectionTestUtils.setField(stamp, "deletedAt", LocalDateTime.now());
+
+            List<Stamp> stamps = List.of(stamp);
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    stampService.getStampNameByTripCategory(
+                                            TripCategory.COURSE, stamps))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_ALREADY_DELETED.getMessage());
         }
     }
 }

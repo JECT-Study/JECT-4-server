@@ -42,6 +42,10 @@ public class Pomodoro extends BaseTimeEntity {
                 .build();
     }
 
+    public void updateTotalFocusTimeInSeconds(int totalFocusTimeInSeconds) {
+        this.totalFocusTimeInSeconds = totalFocusTimeInSeconds;
+    }
+
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
     }
