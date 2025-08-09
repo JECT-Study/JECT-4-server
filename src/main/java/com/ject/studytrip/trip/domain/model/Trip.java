@@ -94,11 +94,15 @@ public class Trip extends BaseTimeEntity {
         this.totalStamps -= 1;
     }
 
-    public void updateIsComplete(boolean completed) {
-        this.completed = completed;
+    public void updateCompleted() {
+        this.completed = true;
     }
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void increaseCompletedStamps() {
+        this.completedStamps += 1;
     }
 }

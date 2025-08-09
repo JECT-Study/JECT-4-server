@@ -1,4 +1,4 @@
-package com.ject.studytrip.stamp.infra.jpa;
+package com.ject.studytrip.stamp.infra.querydsl;
 
 import com.ject.studytrip.stamp.domain.model.QStamp;
 import com.ject.studytrip.stamp.domain.model.Stamp;
@@ -39,5 +39,20 @@ public class StampQueryRepositoryAdapter implements StampQueryRepository {
                                 stamp.deletedAt.isNull())
                         .orderBy(stamp.stampOrder.asc())
                         .fetchFirst());
+    }
+
+    @Override
+    public boolean existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(Long tripId) {
+        Integer hit =
+                queryFactory
+                        .selectOne()
+                        .from(stamp)
+                        .where(
+                                stamp.trip.id.eq(tripId),
+                                stamp.completed.isFalse(),
+                                stamp.deletedAt.isNull())
+                        .fetchOne();
+
+        return hit != null;
     }
 }

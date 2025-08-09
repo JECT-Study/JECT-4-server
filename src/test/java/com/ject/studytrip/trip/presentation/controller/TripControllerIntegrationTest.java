@@ -3,17 +3,21 @@ package com.ject.studytrip.trip.presentation.controller;
 import static com.ject.studytrip.auth.fixture.TokenFixture.TOKEN_PREFIX;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.ject.studytrip.BaseIntegrationTest;
 import com.ject.studytrip.auth.domain.error.AuthErrorCode;
+import com.ject.studytrip.auth.fixture.TokenFixture;
 import com.ject.studytrip.auth.helper.TokenTestHelper;
 import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.global.exception.error.CommonErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.helper.MemberTestHelper;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
+import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
+import com.ject.studytrip.stamp.helper.StampTestHelper;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
@@ -34,6 +38,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -45,10 +50,14 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired private TokenTestHelper tokenTestHelper;
     @Autowired private MemberTestHelper memberTestHelper;
     @Autowired private TripTestHelper tripTestHelper;
+    @Autowired private StampTestHelper stampTestHelper;
 
     private Member member;
     private Trip trip;
     private String token;
+    private String newToken;
+    private Stamp stamp1;
+    private Stamp stamp2;
 
     @BeforeEach
     void setup() {
@@ -57,6 +66,13 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
                 tokenTestHelper.createAccessToken(
                         member.getId().toString(), member.getRole().name());
         trip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
+        stamp1 = stampTestHelper.saveStamp(trip, 1);
+        stamp2 = stampTestHelper.saveStamp(trip, 2);
+
+        Member newMember = memberTestHelper.saveMember("test@kakao.com", "TEST NICKNAME");
+        newToken =
+                tokenTestHelper.createAccessToken(
+                        newMember.getId().toString(), newMember.getRole().name());
     }
 
     @Nested
@@ -636,6 +652,188 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
             // Then
             resultActions.andExpect(
                     status().is(CommonErrorCode.METHOD_ARGUMENT_NOT_VALID.getStatus().value()));
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 완료 API")
+    class CompleteTrip {
+        private ResultActions getResultActions(String token, Object tripId) throws Exception {
+            return mockMvc.perform(
+                    patch("/api/trips/{tripId}/complete", tripId)
+                            .header(
+                                    org.apache.http.HttpHeaders.AUTHORIZATION,
+                                    TokenFixture.TOKEN_PREFIX + token));
+        }
+
+        @Test
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions("", trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("PathVariable 여행 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripIdTypeMismatch() throws Exception {
+            // given
+            String invalidTripId = "abc";
+
+            // when
+            ResultActions resultActions = getResultActions(token, invalidTripId);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
+            // given
+            trip.updateDeletedAt();
+
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.TRIP_ALREADY_DELETED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.TRIP_ALREADY_DELETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
+        void shouldReturnForbiddenWhenNotTripOwner() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions(newToken, trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.NOT_TRIP_OWNER.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.NOT_TRIP_OWNER.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
+            // given
+            Long invalidTripId = 10000L;
+
+            // when
+            ResultActions resultActions = getResultActions(token, invalidTripId);
+
+            // when & then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.TRIP_NOT_FOUND.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.TRIP_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("특정 여행 하위의 스탬프가 하나라도 완료되지 않았다면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenAnyStampIsNotCompleted() throws Exception {
+            // given
+
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            StampErrorCode.ALL_STAMPS_NOT_COMPLETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(StampErrorCode.ALL_STAMPS_NOT_COMPLETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("여행이 이미 완료되었다면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripAlreadyCompleted() throws Exception {
+            // given
+            stamp1.updateCompleted();
+            stamp2.updateCompleted();
+            trip.updateCompleted();
+
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            TripErrorCode.TRIP_ALREADY_COMPLETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.TRIP_ALREADY_COMPLETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("특정 여행 하위의 모든 스탬프가 완료되었다면 여행을 완료합니다.")
+        void shouldCompleteTrip() throws Exception {
+            // given
+            stamp1.updateCompleted();
+            stamp2.updateCompleted();
+
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
         }
     }
 }

@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DisplayName("TripService 단위 테스트")
 public class TripServiceTest extends BaseUnitTest {
@@ -344,6 +345,33 @@ public class TripServiceTest extends BaseUnitTest {
             // then
             assertThat(result.course()).isEqualTo(3L);
             assertThat(result.explore()).isEqualTo(2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("completeTrip 메서드는")
+    class CompleteTrip {
+
+        @Test
+        @DisplayName("이미 완료된 여행이면 예외가 발생한다.")
+        void shouldThrowExceptionWhenTripIsAlreadyCompleted() {
+            // given
+            ReflectionTestUtils.setField(trip, "completed", true);
+
+            // when & then
+            assertThatThrownBy(() -> tripService.completeTrip(trip))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(TripErrorCode.TRIP_ALREADY_COMPLETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 여행이 들어오면, completed 필드를 true로 업데이트한다.")
+        void shouldCompleteStamp() {
+            // when
+            tripService.completeTrip(trip);
+
+            // then
+            assertThat(trip.isCompleted()).isTrue();
         }
     }
 }

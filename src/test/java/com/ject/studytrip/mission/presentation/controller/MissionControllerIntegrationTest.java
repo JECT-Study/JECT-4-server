@@ -58,10 +58,6 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
     private Mission exploreMission1;
     private Mission exploreMission2;
 
-    private Trip deletedTrip;
-    private Stamp deletedStamp;
-    private Mission deletedMission;
-
     private String newAccessToken;
     private Stamp newStamp;
     private Mission newMission;
@@ -80,10 +76,6 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         courseMission2 = missionTestHelper.saveMission(courseStamp, 2);
         exploreMission1 = missionTestHelper.saveMission(exploreStamp, 1);
         exploreMission2 = missionTestHelper.saveMission(exploreStamp, 2);
-
-        deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE);
-        deletedStamp = stampTestHelper.saveDeletedStamp(courseTrip, 3);
-        deletedMission = missionTestHelper.saveDeletedMission(courseStamp, 1);
 
         Member newMember = memberTestHelper.saveMember("test@kakao.com", "TEST NICKNAME");
         newAccessToken =
@@ -290,12 +282,12 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
             // given
+            courseTrip.updateDeletedAt();
             CreateMissionRequest request = fixture.withMissionOrder(0).build();
 
             // when
             ResultActions resultActions =
-                    getResultActions(
-                            accessToken, deletedTrip.getId(), courseStamp.getId(), request);
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
 
             // then
             resultActions
@@ -310,12 +302,12 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
             // given
+            courseStamp.updateDeletedAt();
             CreateMissionRequest request = fixture.withMissionOrder(0).build();
 
             // when
             ResultActions resultActions =
-                    getResultActions(
-                            accessToken, courseTrip.getId(), deletedStamp.getId(), request);
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
 
             // then
             resultActions
@@ -587,13 +579,14 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
             // given
+            courseTrip.updateDeletedAt();
             UpdateMissionRequest request = fixture.withName("새로운 미션 이름").build();
 
             // when
             ResultActions resultActions =
                     getResultActions(
                             accessToken,
-                            deletedTrip.getId(),
+                            courseTrip.getId(),
                             courseStamp.getId(),
                             courseMission1.getId(),
                             request);
@@ -611,6 +604,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
             // given
+            courseStamp.updateDeletedAt();
             UpdateMissionRequest request = fixture.withName("새로운 미션 이름").build();
 
             // when
@@ -618,7 +612,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
                     getResultActions(
                             accessToken,
                             courseTrip.getId(),
-                            deletedStamp.getId(),
+                            courseStamp.getId(),
                             courseMission1.getId(),
                             request);
 
@@ -638,6 +632,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 미션일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenMissionAlreadyDeleted() throws Exception {
             // given
+            courseMission1.updateDeletedAt();
             UpdateMissionRequest request = fixture.withName("새로운 미션 이름").build();
 
             // when
@@ -646,7 +641,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
                             accessToken,
                             courseTrip.getId(),
                             courseStamp.getId(),
-                            deletedMission.getId(),
+                            courseMission1.getId(),
                             request);
 
             // then
@@ -975,13 +970,13 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
             // given
+            courseTrip.updateDeletedAt();
             List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
             UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
 
             // when
             ResultActions resultActions =
-                    getResultActions(
-                            accessToken, deletedTrip.getId(), courseStamp.getId(), request);
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
 
             // then
             resultActions
@@ -996,13 +991,13 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
             // given
+            courseStamp.updateDeletedAt();
             List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
             UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
 
             // when
             ResultActions resultActions =
-                    getResultActions(
-                            accessToken, courseTrip.getId(), deletedStamp.getId(), request);
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
 
             // then
             resultActions
@@ -1020,7 +1015,8 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("삭제된 미션이 포함되어 있다면 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenMissionAlreadyDeleted() throws Exception {
             // given
-            List<Long> ids = List.of(courseMission2.getId(), deletedMission.getId());
+            courseMission1.updateDeletedAt();
+            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
             UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
 
             // when
@@ -1349,11 +1345,14 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
+            // given
+            courseTrip.updateDeletedAt();
+
             // when
             ResultActions resultActions =
                     getResultActions(
                             accessToken,
-                            deletedTrip.getId(),
+                            courseTrip.getId(),
                             courseStamp.getId(),
                             courseMission2.getId());
 
@@ -1369,12 +1368,15 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
+            // given
+            courseStamp.updateDeletedAt();
+
             // when
             ResultActions resultActions =
                     getResultActions(
                             accessToken,
                             courseTrip.getId(),
-                            deletedStamp.getId(),
+                            courseStamp.getId(),
                             courseMission2.getId());
 
             // then
@@ -1392,13 +1394,16 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("삭제된 미션일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenMissionAlreadyDeleted() throws Exception {
+            // given
+            courseMission1.updateDeletedAt();
+
             // when
             ResultActions resultActions =
                     getResultActions(
                             accessToken,
                             courseTrip.getId(),
                             courseStamp.getId(),
-                            deletedMission.getId());
+                            courseMission1.getId());
 
             // then
             resultActions
@@ -1640,9 +1645,12 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
+            // given
+            courseTrip.updateDeletedAt();
+
             // when
             ResultActions resultActions =
-                    getResultActions(accessToken, deletedTrip.getId(), courseStamp.getId());
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId());
 
             // then
             resultActions
@@ -1656,9 +1664,12 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
+            // given
+            courseStamp.updateDeletedAt();
+
             // when
             ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), deletedStamp.getId());
+                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId());
 
             // then
             resultActions

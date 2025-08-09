@@ -98,4 +98,10 @@ public class TripService {
                         memberId, TripCategory.EXPLORE);
         return TripCount.of(courseCount, exploreCount);
     }
+
+    public void completeTrip(Trip trip) {
+        TripPolicy.validateCompleted(trip);
+
+        trip.updateCompleted();
+    }
 }

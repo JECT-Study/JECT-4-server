@@ -73,4 +73,13 @@ public class StampFacade {
 
         return StampDetail.from(StampInfo.from(stamp), missionInfos);
     }
+
+    public void completeStamp(Long memberId, Long tripId, Long stampId) {
+        Trip trip = tripService.getValidTrip(memberId, tripId);
+        Stamp stamp = stampService.getValidStamp(trip.getId(), stampId);
+
+        missionService.validateAllMissionsCompletedByStampId(stamp.getId());
+
+        stampService.completeStamp(stamp);
+    }
 }

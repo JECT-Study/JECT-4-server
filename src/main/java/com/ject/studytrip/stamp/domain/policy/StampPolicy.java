@@ -60,4 +60,16 @@ public class StampPolicy {
             throw new CustomException(StampErrorCode.STAMP_LIST_CANNOT_BE_EMPTY);
         }
     }
+
+    public static void validateCompleted(Stamp stamp) {
+        if (stamp.isCompleted()) {
+            throw new CustomException(StampErrorCode.STAMP_ALREADY_COMPLETED);
+        }
+    }
+
+    public static void validateAllCompleted(boolean exists) {
+        if (exists) {
+            throw new CustomException(StampErrorCode.ALL_STAMPS_NOT_COMPLETED);
+        }
+    }
 }
