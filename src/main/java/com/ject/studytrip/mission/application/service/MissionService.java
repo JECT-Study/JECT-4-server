@@ -69,13 +69,6 @@ public class MissionService {
         }
     }
 
-    public void updateCompleted(Mission mission) {
-        MissionPolicy.validateNotDeleted(mission);
-        MissionPolicy.validateCompleted(mission);
-
-        mission.updateCompleted();
-    }
-
     @Transactional
     public void deleteMission(Long stampId, Mission mission) {
         validateMissionIsActiveAndBelongsToStamp(stampId, mission);
@@ -120,8 +113,24 @@ public class MissionService {
         return missions;
     }
 
+    @Transactional
+    public void completeMission(Mission mission) {
+        MissionPolicy.validateNotDeleted(mission);
+        MissionPolicy.validateCompleted(mission);
+
+        mission.updateCompleted();
+    }
+
     public void validateMissionBelongsToStamp(Long stampId, Mission mission) {
         MissionPolicy.validateMissionBelongsToStamp(stampId, mission);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateAllMissionsCompletedByStampId(Long stampId) {
+        boolean exists =
+                missionQueryRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(
+                        stampId);
+        MissionPolicy.validateAllCompleted(exists);
     }
 
     private void validateMissionIsActiveAndBelongsToStamp(Long stampId, Mission mission) {

@@ -37,4 +37,10 @@ public class TripPolicy {
         if (trip.getDeletedAt() != null)
             throw new CustomException(TripErrorCode.TRIP_ALREADY_DELETED);
     }
+
+    public static void validateCompleted(Trip trip) {
+        if (trip.isCompleted()) {
+            throw new CustomException(TripErrorCode.TRIP_ALREADY_COMPLETED);
+        }
+    }
 }

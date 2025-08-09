@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface MissionQueryRepository {
     List<Mission> findAllByIdsInFetchJoinStamp(List<Long> ids);
+
+    boolean existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(Long stampId);
 }

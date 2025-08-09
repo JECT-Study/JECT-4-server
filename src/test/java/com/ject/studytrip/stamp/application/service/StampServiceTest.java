@@ -2,6 +2,7 @@ package com.ject.studytrip.stamp.application.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -586,6 +588,65 @@ public class StampServiceTest extends BaseUnitTest {
                                             TripCategory.COURSE, stamps))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StampErrorCode.STAMP_ALREADY_DELETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("completeStamp 메서드는")
+    class CompleteStamp {
+
+        @Test
+        @DisplayName("이미 완료된 스탬프이면 예외가 발생한다.")
+        void shouldThrowExceptionWhenStampIsAlreadyCompleted() {
+            // given
+            ReflectionTestUtils.setField(courseStamp1, "completed", true);
+
+            // when & then
+            assertThatThrownBy(() -> stampService.completeStamp(courseStamp1))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_ALREADY_COMPLETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 스탬프가 들어오면, completed 필드를 true로 업데이트한다.")
+        void shouldCompleteStamp() {
+            // when
+            stampService.completeStamp(courseStamp1);
+
+            // then
+            assertThat(courseStamp1.isCompleted()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("validateAllStampsCompletedByTripId 메서드는")
+    class ValidateAllStampsCompletedByTripId {
+
+        @Test
+        @DisplayName("특정 여행 하위의 스탬프가 하나라도 완료되지 않았다면 예외가 발생한다.")
+        void shouldThrowExceptionWhenAnyStampIsNotCompleted() {
+            // given
+            Long tripId = courseTrip.getId();
+            given(stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
+                    .willReturn(true);
+
+            // when & then
+            Assertions.assertThatThrownBy(
+                            () -> stampService.validateAllStampsCompletedByTripId(tripId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.ALL_STAMPS_NOT_COMPLETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("특정 여행 하위의 모든 스탬프가 완료되면 예외가 발생하지 않는다.")
+        void shouldPassWhenAllStampsAreCompleted() {
+            // given
+            Long tripId = courseTrip.getId();
+            given(stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
+                    .willReturn(false);
+
+            // when & then
+            assertDoesNotThrow(() -> stampService.validateAllStampsCompletedByTripId(tripId));
         }
     }
 }
