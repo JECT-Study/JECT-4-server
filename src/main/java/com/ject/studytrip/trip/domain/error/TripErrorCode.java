@@ -12,6 +12,7 @@ public enum TripErrorCode implements ErrorCode {
     TRIP_STAMP_REQUIRED(HttpStatus.BAD_REQUEST, "여행을 생성하려면 최소 1개의 스탬프가 필요합니다."),
     TRIP_END_DATE_BEFORE_START_DATE(HttpStatus.BAD_REQUEST, "여행 종료일은 시작일보다 이후여야 합니다."),
     COURSE_TRIP_END_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "코스형 여행은 종료일이 필수입니다."),
+    TRIP_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 여행입니다."),
     TRIP_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 여행입니다."),
 
     // 403

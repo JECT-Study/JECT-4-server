@@ -102,7 +102,7 @@ public class StudyLogFacade {
 
         // 미션 완료 처리
         selectedDailyMissions.forEach(
-                dailyMission -> missionService.updateCompleted(dailyMission.getMission()));
+                dailyMission -> missionService.completeMission(dailyMission.getMission()));
     }
 
     @Transactional(readOnly = true)

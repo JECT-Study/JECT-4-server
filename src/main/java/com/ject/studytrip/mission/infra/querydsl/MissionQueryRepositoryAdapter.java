@@ -25,4 +25,46 @@ public class MissionQueryRepositoryAdapter implements MissionQueryRepository {
                 .where(mission.id.in(ids))
                 .fetch();
     }
+
+    @Override
+    public boolean existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(Long stampId) {
+        Integer hit =
+                queryFactory
+                        .selectOne()
+                        .from(mission)
+                        .where(
+                                mission.stamp.id.eq(stampId),
+                                mission.completed.isFalse(),
+                                mission.deletedAt.isNull())
+                        .fetchFirst();
+
+        return hit != null;
+    }
+
+    //    @Override
+    //    public long countByStampIdAndDeletedAtIsNull(Long stampId) {
+    //        Long count =
+    //                queryFactory
+    //                        .select(mission.count())
+    //                        .from(mission)
+    //                        .where(mission.stamp.id.eq(stampId), mission.deletedAt.isNull())
+    //                        .fetchOne();
+    //
+    //        return Optional.ofNullable(count).orElse(0L);
+    //    }
+    //
+    //    @Override
+    //    public long countByStampIdAndCompletedIsTrueAndDeletedAtIsNull(Long stampId) {
+    //        Long count =
+    //                queryFactory
+    //                        .select(mission.count())
+    //                        .from(mission)
+    //                        .where(
+    //                                mission.stamp.id.eq(stampId),
+    //                                mission.completed.isTrue(),
+    //                                mission.deletedAt.isNull())
+    //                        .fetchOne();
+    //
+    //        return Optional.ofNullable(count).orElse(0L);
+    //    }
 }

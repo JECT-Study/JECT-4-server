@@ -8,4 +8,6 @@ public interface StampQueryRepository {
     List<Stamp> findStampsToShiftAfterOrder(Long tripId, int deletedOrder);
 
     Optional<Stamp> findFirstIncompleteStampByTripId(Long tripId);
+
+    boolean existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(Long tripId);
 }

@@ -101,6 +101,15 @@ public class TripFacade {
         return TripDetail.from(TripInfo.from(trip, dDay, progress), stampInfos);
     }
 
+    public void completeTrip(Long memberId, Long tripId) {
+        Member member = memberService.getMember(memberId);
+        Trip trip = tripService.getValidTrip(member.getId(), tripId);
+
+        stampService.validateAllStampsCompletedByTripId(trip.getId());
+
+        tripService.completeTrip(trip);
+    }
+
     private Integer calculateDDay(LocalDate endDate) {
         if (endDate == null) return null; // NULL 인 경우 무기한 여행
 

@@ -2,6 +2,7 @@ package com.ject.studytrip.mission.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -330,50 +331,6 @@ class MissionServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("updateCompleted 메서드는")
-    class updateCompleted {
-
-        @Test
-        @DisplayName("정상적인 미션이면 completed 필드를 true로 업데이트하고 완료 처리한다")
-        void shouldUpdateCompletedMission() {
-            // given
-            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
-
-            // when
-            missionService.updateCompleted(mission);
-
-            // then
-            assertThat(mission.isCompleted()).isTrue();
-        }
-
-        @Test
-        @DisplayName("삭제된 미션이면 예외가 발생한다")
-        void shouldThrowExceptionWhenMissionIsDeleted() {
-            // given
-            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
-            ReflectionTestUtils.setField(mission, "deletedAt", LocalDateTime.now());
-
-            // then
-            assertThatThrownBy(() -> missionService.updateCompleted(mission))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
-        }
-
-        @Test
-        @DisplayName("이미 완료된 미션이면 예외가 발생한다")
-        void shouldThrowExceptionWhenMissionIsAlreadyCompleted() {
-            // given
-            Mission mission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
-            ReflectionTestUtils.setField(mission, "completed", true);
-
-            // then
-            assertThatThrownBy(() -> missionService.updateCompleted(mission))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
-        }
-    }
-
-    @Nested
     @DisplayName("deleteMission 메서드는")
     class DeleteMission {
 
@@ -559,6 +516,80 @@ class MissionServiceTest extends BaseUnitTest {
             assertThatThrownBy(() -> missionService.getValidMissionsWithStamp(List.of(1L)))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("completeMission 메서드는")
+    class CompleteMission {
+
+        @Test
+        @DisplayName("정상적인 미션이면 completed 필드를 true로 업데이트한다")
+        void shouldCompletedMission() {
+            // when
+            missionService.completeMission(exploreMission1);
+
+            // then
+            assertThat(exploreMission1.isCompleted()).isTrue();
+        }
+
+        @Test
+        @DisplayName("삭제된 미션이면 예외가 발생한다")
+        void shouldThrowExceptionWhenMissionIsDeleted() {
+            // given
+            ReflectionTestUtils.setField(exploreMission1, "deletedAt", LocalDateTime.now());
+
+            // then
+            assertThatThrownBy(() -> missionService.completeMission(exploreMission1))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 완료된 미션이면 예외가 발생한다")
+        void shouldThrowExceptionWhenMissionIsAlreadyCompleted() {
+            // given
+            ReflectionTestUtils.setField(exploreMission1, "completed", true);
+
+            // then
+            assertThatThrownBy(() -> missionService.completeMission(exploreMission1))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("validateAllMissionsCompletedByStampId 메서드는")
+    class ValidateAllMissionsCompletedByStampId {
+
+        @Test
+        @DisplayName("특정 스탬프 하위의 미션이 하나라도 완료되지 않았다면 예외가 발생한다.")
+        void shouldThrowExceptionWhenAnyMissionIsNotCompleted() {
+            // given
+            Long stampId = courseStamp.getId();
+            given(
+                            missionQueryRepository
+                                    .existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId))
+                    .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> missionService.validateAllMissionsCompletedByStampId(stampId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.ALL_MISSIONS_NOT_COMPLETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("특정 스탬프 하위의 모든 미션이 완료되면 예외가 발생하지 않는다.")
+        void shouldPassWhenAllMissionsAreCompleted() {
+            // given
+            Long stampId = courseStamp.getId();
+            given(
+                            missionQueryRepository
+                                    .existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId))
+                    .willReturn(false);
+
+            // when & then
+            assertDoesNotThrow(() -> missionService.validateAllMissionsCompletedByStampId(stampId));
         }
     }
 }

@@ -11,6 +11,9 @@ import com.ject.studytrip.auth.helper.TokenTestHelper;
 import com.ject.studytrip.global.exception.error.CommonErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.helper.MemberTestHelper;
+import com.ject.studytrip.mission.domain.error.MissionErrorCode;
+import com.ject.studytrip.mission.domain.model.Mission;
+import com.ject.studytrip.mission.helper.MissionTestHelper;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
@@ -30,6 +33,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -40,6 +44,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
     @Autowired private MemberTestHelper memberTestHelper;
     @Autowired private TripTestHelper tripTestHelper;
     @Autowired private StampTestHelper stampTestHelper;
+    @Autowired private MissionTestHelper missionTestHelper;
     @Autowired private TokenTestHelper tokenTestHelper;
 
     private String token;
@@ -48,6 +53,10 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
     private Trip exploreTrip;
     private Stamp courseStamp1;
     private Stamp courseStamp2;
+    private Mission courseMission1;
+    private Mission courseMission2;
+
+    private String newToken;
 
     @BeforeEach
     void setup() {
@@ -59,6 +68,13 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
         exploreTrip = tripTestHelper.saveTrip(member, TripCategory.EXPLORE);
         courseStamp1 = stampTestHelper.saveStamp(courseTrip, 1);
         courseStamp2 = stampTestHelper.saveStamp(courseTrip, 2);
+        courseMission1 = missionTestHelper.saveMission(courseStamp1, 1);
+        courseMission2 = missionTestHelper.saveMission(courseStamp1, 2);
+
+        Member newMember = memberTestHelper.saveMember("test@kakao.com", "TEST NICKNAME");
+        newToken =
+                tokenTestHelper.createAccessToken(
+                        newMember.getId().toString(), newMember.getRole().name());
     }
 
     @Nested
@@ -261,7 +277,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
 
         @Nested
         @DisplayName("스탬프 이름 수정")
-        class UpdateNameAndDeadline {
+        class UpdateName {
             private ResultActions getResultActions(
                     String token, Object tripId, Object stampId, UpdateStampRequest request)
                     throws Exception {
@@ -624,7 +640,6 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             @DisplayName("탐험형 여행이지만 스탬프 순서 변경을 요청한 경우 400 예외가 발생한다")
             void shouldThrowExceptionWhenRequestUpdateStampOrderForExploreTrip() throws Exception {
                 // given
-                Stamp exploreStamp = stampTestHelper.saveStamp(exploreTrip, 0);
                 UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
 
                 // when
@@ -1214,6 +1229,269 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                                             StampErrorCode.STAMP_ALREADY_DELETED
                                                     .getStatus()
                                                     .value()));
+        }
+    }
+
+    @Nested
+    @DisplayName("스탬프 완료 API")
+    class CompleteStamp {
+        private ResultActions getResultActions(String token, Object tripId, Object stampId)
+                throws Exception {
+            return mockMvc.perform(
+                    patch("/api/trips/{tripId}/stamps/{stampId}/complete", tripId, stampId)
+                            .header(HttpHeaders.AUTHORIZATION, TokenFixture.TOKEN_PREFIX + token));
+        }
+
+        @Test
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
+            // when
+            ResultActions resultActions =
+                    getResultActions("", courseTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("PathVariable 여행 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripIdTypeMismatch() throws Exception {
+            // given
+            String invalidTripId = "abc";
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, invalidTripId, courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("PathVariable 스탬프 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenStampIdTypeMismatch() throws Exception {
+            // given
+            String invalidStampId = "def";
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), invalidStampId);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
+            // given
+            courseTrip.updateDeletedAt();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.TRIP_ALREADY_DELETED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.TRIP_ALREADY_DELETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
+        void shouldReturnForbiddenWhenNotTripOwner() throws Exception {
+            // when
+            ResultActions resultActions =
+                    getResultActions(newToken, courseTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.NOT_TRIP_OWNER.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.NOT_TRIP_OWNER.getMessage()));
+        }
+
+        @Test
+        @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
+        void shouldReturnForbiddenWhenStampNotBelongToTrip() throws Exception {
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, exploreTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
+            // given
+            Long invalidTripId = 10000L;
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, invalidTripId, courseStamp1.getId());
+
+            // when & then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(TripErrorCode.TRIP_NOT_FOUND.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripErrorCode.TRIP_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
+            // given
+            Long invalidStampId = 10000L;
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), invalidStampId);
+
+            // when & then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(StampErrorCode.STAMP_NOT_FOUND.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(StampErrorCode.STAMP_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("특정 스탬프 하위의 미션이 하나라도 완료되지 않았다면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenAnyMissionIsNotCompleted() throws Exception {
+            // given
+            courseMission1.updateCompleted();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            MissionErrorCode.ALL_MISSIONS_NOT_COMPLETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            MissionErrorCode.ALL_MISSIONS_NOT_COMPLETED
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("스탬프가 이미 완료되었다면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenStampAlreadyCompleted() throws Exception {
+            // given
+            courseMission1.updateCompleted();
+            courseMission2.updateCompleted();
+            courseStamp1.updateCompleted();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), courseStamp1.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            StampErrorCode.STAMP_ALREADY_COMPLETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(StampErrorCode.STAMP_ALREADY_COMPLETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("특정 스탬프 하위의 모든 미션이 완료되었다면 스탬프를 완료합니다.")
+        void shouldCompleteStamp() throws Exception {
+            // given
+            courseMission1.updateCompleted();
+            courseMission2.updateCompleted();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), courseStamp2.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
         }
     }
 }

@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -133,6 +134,24 @@ public class StampService {
         return getExplorationStampName(stamps);
     }
 
+    @Transactional
+    public void completeStamp(Stamp stamp) {
+        StampPolicy.validateCompleted(stamp);
+
+        stamp.updateCompleted();
+    }
+
+    public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
+        StampPolicy.validateStampBelongsToTrip(tripId, stamp);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateAllStampsCompletedByTripId(Long tripId) {
+        boolean exists =
+                stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId);
+        StampPolicy.validateAllCompleted(exists);
+    }
+
     private String getCourseStampName(List<Stamp> stamps) {
         return new HashSet<>(stamps).iterator().next().getName();
     }
@@ -157,10 +176,6 @@ public class StampService {
                 .min(Comparator.comparing(Stamp::getCreatedAt))
                 .map(Stamp::getName)
                 .orElse("");
-    }
-
-    public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
-        StampPolicy.validateStampBelongsToTrip(tripId, stamp);
     }
 
     private void shiftStampOrdersAfterDeleted(Long tripId, int deletedStampOrder) {

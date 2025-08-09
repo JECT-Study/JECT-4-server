@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 public class TripController {
-
     private final TripFacade tripFacade;
 
     @Operation(summary = "여행 카테고리 목록 조회", description = "여행 카테고리 목록을 조회하는 API 입니다.")
@@ -111,5 +110,16 @@ public class TripController {
                         StandardResponse.success(
                                 HttpStatus.OK.value(),
                                 LoadTripDetailResponse.of(result.tripInfo(), result.stampInfos())));
+    }
+
+    @Operation(summary = "여행 완료", description = "특정 여행 하위의 모든 스탬프가 완료된 경우에만 여행을 완료합니다.")
+    @PatchMapping("/{tripId}/complete")
+    public ResponseEntity<StandardResponse> completeTrip(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId) {
+        tripFacade.completeTrip(Long.valueOf(memberId), tripId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(StandardResponse.success(HttpStatus.OK.value(), null));
     }
 }

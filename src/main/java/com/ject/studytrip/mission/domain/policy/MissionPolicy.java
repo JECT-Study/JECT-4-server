@@ -65,4 +65,10 @@ public class MissionPolicy {
             throw new CustomException(MissionErrorCode.MISSION_NOT_FOUND);
         }
     }
+
+    public static void validateAllCompleted(boolean exists) {
+        if (exists) {
+            throw new CustomException(MissionErrorCode.ALL_MISSIONS_NOT_COMPLETED);
+        }
+    }
 }
