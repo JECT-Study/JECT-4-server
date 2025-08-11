@@ -17,13 +17,12 @@ import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
 import com.ject.studytrip.stamp.fixture.UpdateStampRequestFixture;
 import com.ject.studytrip.stamp.helper.StampTestHelper;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
-import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadlineRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
+import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.helper.TripTestHelper;
-import java.time.LocalDate;
 import java.util.List;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
@@ -154,28 +153,6 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("스탬프 마감일이 과거일 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenDeadlineIsInThePast() throws Exception {
-            // given
-            CreateStampRequest request =
-                    createStampRequestFixture.withDeadline(LocalDate.now().minusDays(1)).build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, courseTrip.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
         @DisplayName("유효하지 않은 여행 ID 라면 404 예외가 발생한다")
         void shouldThrowExceptionWhenInvalidTripId() throws Exception {
             // given
@@ -234,30 +211,6 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("스탬프 마감일이 여행의 종료일보다 이후일 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampDeadlineIsAfterTripEndDate() throws Exception {
-            // given
-            CreateStampRequest request =
-                    createStampRequestFixture
-                            .withDeadline(courseTrip.getEndDate().plusDays(1))
-                            .build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, courseTrip.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
         @DisplayName("탐험형 여행에 순서가 존재하는 스탬프를 추가하면 400 예외가 발생한다")
         void shouldThrowExceptionWhenStampOrderExistsInExplorationTrip() throws Exception {
             // given
@@ -307,13 +260,10 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                 new UpdateStampRequestFixture();
 
         @Nested
-        @DisplayName("스탬프 이름, 마감일 수정")
+        @DisplayName("스탬프 이름 수정")
         class UpdateNameAndDeadline {
             private ResultActions getResultActions(
-                    String token,
-                    Object tripId,
-                    Object stampId,
-                    UpdateStampNameAndDeadlineRequest request)
+                    String token, Object tripId, Object stampId, UpdateStampRequest request)
                     throws Exception {
                 return mockMvc.perform(
                         patch("/api/trips/{tripId}/stamps/{stampId}", tripId, stampId)
@@ -325,11 +275,10 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             }
 
             @Test
-            @DisplayName("유효한 요청으로 스탬프의 이름과 마감일을 수정한다")
-            void shouldUpdateStampNameAndDeadline() throws Exception {
+            @DisplayName("유효한 요청으로 스탬프의 이름을 수정한다")
+            void shouldUpdateStampName() throws Exception {
                 // given
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -345,8 +294,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             @DisplayName("인증되지 않은 사용자일 경우 401 예외가 발생한다")
             void shouldThrowExceptionWhenUnauthenticated() throws Exception {
                 // given
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
                 // when
                 ResultActions resultActions =
                         getResultActions("", courseTrip.getId(), courseStamp1.getId(), request);
@@ -365,8 +313,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenTripIdTypeMismatch() throws Exception {
                 // given
                 String tripId = "abc";
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -389,8 +336,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenStampIdTypeMismatch() throws Exception {
                 // given
                 String stampId = "abc";
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
                 // when
                 ResultActions resultActions =
                         getResultActions(token, courseTrip.getId(), stampId, request);
@@ -408,37 +354,11 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             }
 
             @Test
-            @DisplayName("수정한 스탬프 마감일이 과거일 경우 400 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineCannotBeInPast() throws Exception {
-                // given
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture
-                                .withDeadline(LocalDate.now().minusDays(1))
-                                .buildUpdateNameAndDeadline();
-
-                // when
-                ResultActions resultActions =
-                        getResultActions(token, courseTrip.getId(), courseStamp1.getId(), request);
-
-                // then
-                resultActions
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.success").value(false))
-                        .andExpect(
-                                jsonPath("$.status")
-                                        .value(
-                                                CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
-                                                        .getStatus()
-                                                        .value()));
-            }
-
-            @Test
             @DisplayName("유효하지 않은 여행 ID 라면 404 예외가 발생한다")
             void shouldThrowExceptionWhenInvalidTripId() throws Exception {
                 // given
                 Long tripId = 10000L;
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -460,8 +380,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                 Member newMember = memberTestHelper.saveMember("test@gmail.com", "TEST");
                 Trip newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE);
                 Stamp newStamp = stampTestHelper.saveStamp(newTrip, 1);
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -481,8 +400,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenAlreadyDeletedTrip() throws Exception {
                 // given
                 Trip deleted = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE);
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -505,8 +423,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenInvalidStampId() throws Exception {
                 // given
                 Long stampId = 10000L;
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -526,8 +443,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenStampTripMisMatch() throws Exception {
                 // given
                 Stamp newStamp = stampTestHelper.saveStamp(exploreTrip, 0);
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =
@@ -550,8 +466,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenAlreadyDeletedStamp() throws Exception {
                 // given
                 Stamp newStamp = stampTestHelper.saveDeletedStamp(exploreTrip, 0);
-                UpdateStampNameAndDeadlineRequest request =
-                        updateStampRequestFixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = updateStampRequestFixture.buildUpdateName();
 
                 // when
                 ResultActions resultActions =

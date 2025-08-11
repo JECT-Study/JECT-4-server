@@ -195,56 +195,6 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("스탬프 마감일이 과거일 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampDeadlineCannotBeInPast() throws Exception {
-            // given
-            List<CreateStampRequest> stampRequests =
-                    List.of(
-                            new CreateStampRequestFixture()
-                                    .withDeadline(LocalDate.now().minusDays(1))
-                                    .build());
-            CreateTripRequest request =
-                    new CreateTripRequestFixture().withStamps(stampRequests).build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, request);
-
-            // then
-            resultActions.andExpect(
-                    status().is(
-                                    StampErrorCode.STAMP_DEADLINE_CANNOT_BE_IN_PAST
-                                            .getStatus()
-                                            .value()));
-        }
-
-        @Test
-        @DisplayName("스탬프 마감일이 여행의 종료일보다 이후일 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampDeadlineIsAfterTripEndDate() throws Exception {
-            // given
-            LocalDate tripEndDate = LocalDate.now().plusDays(1);
-            List<CreateStampRequest> stampRequests =
-                    List.of(
-                            new CreateStampRequestFixture()
-                                    .withDeadline(tripEndDate.plusDays(1))
-                                    .build());
-            CreateTripRequest request =
-                    new CreateTripRequestFixture()
-                            .withEndDate(tripEndDate)
-                            .withStamps(stampRequests)
-                            .build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, request);
-
-            // then
-            resultActions.andExpect(
-                    status().is(
-                                    StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE
-                                            .getStatus()
-                                            .value()));
-        }
-
-        @Test
         @DisplayName("탐험형 여행을 선택하고 스탬프 순서가 존재할 경우 400 예외가 발생한다")
         void shouldThrowExceptionWhenStampOrderExistsInExplorationTrip() throws Exception {
             // given
