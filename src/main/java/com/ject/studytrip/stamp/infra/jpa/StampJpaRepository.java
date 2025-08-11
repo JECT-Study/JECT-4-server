@@ -9,5 +9,5 @@ public interface StampJpaRepository extends JpaRepository<Stamp, Long> {
 
     List<Stamp> findAllByTripIdAndDeletedAtIsNull(Long tripId);
 
-    List<Stamp> findAllByTripIdOrderByDeadlineAsc(Long tripId);
+    List<Stamp> findAllByTripIdOrderByCreatedAtAsc(Long tripId);
 }

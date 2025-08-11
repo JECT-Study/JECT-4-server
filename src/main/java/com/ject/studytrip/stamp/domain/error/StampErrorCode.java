@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum StampErrorCode implements ErrorCode {
     // 400
-    STAMP_DEADLINE_CANNOT_BE_IN_PAST(HttpStatus.BAD_REQUEST, "스탬프의 마감일은 과거일 수 없습니다."),
-    STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE(HttpStatus.BAD_REQUEST, "스탬프의 마감일은 여행 종료일을 초과할 수 없습니다."),
     INVALID_STAMP_ORDER_FOR_EXPLORATION_TRIP(
             HttpStatus.BAD_REQUEST, "탐험형 여행에서는 스탬프 순서를 지정할 수 없으며, 항상 0이여야 합니다. "),
     INVALID_STAMP_ORDER_RANGE_FOR_COURSE_TRIP(

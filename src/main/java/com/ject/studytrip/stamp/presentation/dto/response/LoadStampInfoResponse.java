@@ -7,14 +7,9 @@ public record LoadStampInfoResponse(
         @Schema(description = "스탬프 ID") Long stampId,
         @Schema(description = "스탬프 이름") String stampName,
         @Schema(description = "스탬프 순서") int stampOrder,
-        @Schema(description = "스탬프 마감일") String stampDeadline,
         @Schema(description = "스탬프 완료 여부") boolean completed) {
     public static LoadStampInfoResponse of(StampInfo info) {
         return new LoadStampInfoResponse(
-                info.stampId(),
-                info.stampName(),
-                info.stampOrder(),
-                info.deadline(),
-                info.completed());
+                info.stampId(), info.stampName(), info.stampOrder(), info.completed());
     }
 }

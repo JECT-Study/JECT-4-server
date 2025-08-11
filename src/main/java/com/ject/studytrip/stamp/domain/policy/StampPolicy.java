@@ -4,7 +4,6 @@ import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.trip.domain.model.TripCategory;
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,21 +20,6 @@ public class StampPolicy {
     public static void validateNotDeleted(Stamp stamp) {
         if (stamp.getDeletedAt() != null)
             throw new CustomException(StampErrorCode.STAMP_ALREADY_DELETED);
-    }
-
-    public static void validateStampDeadline(LocalDate tripEndDate, List<Stamp> stamps) {
-        if (tripEndDate == null || stamps.isEmpty()) return;
-
-        LocalDate today = LocalDate.now();
-        for (Stamp stamp : stamps) {
-            LocalDate stampDeadline = stamp.getDeadline();
-
-            if (stampDeadline.isBefore(today))
-                throw new CustomException(StampErrorCode.STAMP_DEADLINE_CANNOT_BE_IN_PAST);
-
-            if (stampDeadline.isAfter(tripEndDate))
-                throw new CustomException(StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE);
-        }
     }
 
     public static void validateStampOrders(TripCategory tripCategory, List<Stamp> stamps) {

@@ -19,8 +19,8 @@ import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
 import com.ject.studytrip.stamp.fixture.StampFixture;
 import com.ject.studytrip.stamp.fixture.UpdateStampRequestFixture;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
-import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadlineRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
+import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.fixture.TripFixture;
@@ -74,8 +74,7 @@ public class StampServiceTest extends BaseUnitTest {
                 // given
                 CreateStampRequest request = fixture.build();
 
-                Stamp saved =
-                        Stamp.of(courseTrip, request.name(), request.order(), request.deadline());
+                Stamp saved = Stamp.of(courseTrip, request.name(), request.order());
                 given(stampRepository.save(any())).willReturn(saved);
 
                 // when
@@ -85,33 +84,6 @@ public class StampServiceTest extends BaseUnitTest {
                 verify(stampRepository).save(any());
                 assertThat(stamp.getName()).isEqualTo(saved.getName());
                 assertThat(stamp.getStampOrder()).isEqualTo(saved.getStampOrder());
-                assertThat(stamp.getDeadline()).isEqualTo(saved.getDeadline());
-            }
-
-            @Test
-            @DisplayName("스탬프의 마감일이 과거라면 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineCannotBeInPast() {
-                // given
-                CreateStampRequest request = fixture.withDeadline(PAST_DATE).build();
-
-                // when & given
-                assertThatThrownBy(() -> stampService.createStamp(courseTrip, request))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(StampErrorCode.STAMP_DEADLINE_CANNOT_BE_IN_PAST.getMessage());
-            }
-
-            @Test
-            @DisplayName("스탬프의 마감일이 여행 종료일보다 이후라면 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineExceedsTripEndDate() {
-                // given
-                CreateStampRequest request =
-                        fixture.withDeadline(courseTrip.getEndDate().plusDays(1)).build();
-
-                // when & then
-                assertThatThrownBy(() -> stampService.createStamp(courseTrip, request))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(
-                                StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE.getMessage());
             }
 
             @Test
@@ -188,33 +160,6 @@ public class StampServiceTest extends BaseUnitTest {
             }
 
             @Test
-            @DisplayName("스탬프의 마감일이 과거라면 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineCannotBeInPast() {
-                // given
-                List<CreateStampRequest> requests =
-                        List.of(fixture.withDeadline(PAST_DATE).build());
-
-                // when & then
-                assertThatThrownBy(() -> stampService.createStamps(courseTrip, requests))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(StampErrorCode.STAMP_DEADLINE_CANNOT_BE_IN_PAST.getMessage());
-            }
-
-            @Test
-            @DisplayName("스탬프의 마감일이 여행 종료일보다 이후일 경우 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineExceedsTripEndDate() {
-                // given
-                List<CreateStampRequest> requests =
-                        List.of(fixture.withDeadline(courseTrip.getEndDate().plusDays(1)).build());
-
-                // when & then
-                assertThatThrownBy(() -> stampService.createStamps(courseTrip, requests))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(
-                                StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE.getMessage());
-            }
-
-            @Test
             @DisplayName("탐험형 여행에서 순서가 1 이상이면 예외가 발생한다")
             void shouldThrowExceptionWhenOrderExistsInExploreTrip() {
                 // given
@@ -266,55 +211,20 @@ public class StampServiceTest extends BaseUnitTest {
         private final UpdateStampRequestFixture fixture = new UpdateStampRequestFixture();
 
         @Nested
-        @DisplayName("스탬프 이름 또는 마감일 수정")
-        class UpdateStampNameOrDeadline {
+        @DisplayName("스탬프 이름 수정")
+        class UpdateStampName {
 
             @Test
-            @DisplayName("유효한 정보로 스탬프의 이름 또는 마감일을 수정하면 스탬프가 업데이트된다")
+            @DisplayName("유효한 정보로 스탬프의 이름을 수정하면 스탬프가 업데이트된다")
             void shouldUpdateStampNameOrDeadline() {
                 // given
-                UpdateStampNameAndDeadlineRequest request = fixture.buildUpdateNameAndDeadline();
+                UpdateStampRequest request = fixture.buildUpdateName();
 
                 // when
-                stampService.updateStampNameAndDeadline(courseTrip, courseStamp1, request);
+                stampService.updateStampName(courseStamp1, request);
 
                 // then
                 assertThat(courseStamp1.getName()).isEqualTo(request.name());
-                assertThat(courseStamp1.getDeadline()).isEqualTo(request.deadline());
-            }
-
-            @Test
-            @DisplayName("스탬프의 마감일이 과거라면 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineCannotBeInPast() {
-                // given
-                UpdateStampNameAndDeadlineRequest request =
-                        fixture.withDeadline(PAST_DATE).buildUpdateNameAndDeadline();
-
-                // when & then
-                assertThatThrownBy(
-                                () ->
-                                        stampService.updateStampNameAndDeadline(
-                                                courseTrip, courseStamp1, request))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(StampErrorCode.STAMP_DEADLINE_CANNOT_BE_IN_PAST.getMessage());
-            }
-
-            @Test
-            @DisplayName("스탬프의 마감일이 여행 종료일보다 이후일 경우 예외가 발생한다")
-            void shouldThrowExceptionWhenStampDeadlineExceedsTripEndDate() {
-                // given
-                UpdateStampNameAndDeadlineRequest request =
-                        fixture.withDeadline(courseTrip.getEndDate().plusDays(1))
-                                .buildUpdateNameAndDeadline();
-
-                // when & then
-                assertThatThrownBy(
-                                () ->
-                                        stampService.updateStampNameAndDeadline(
-                                                courseTrip, courseStamp1, request))
-                        .isInstanceOf(CustomException.class)
-                        .hasMessage(
-                                StampErrorCode.STAMP_DEADLINE_EXCEEDS_TRIP_END_DATE.getMessage());
             }
         }
 
@@ -408,7 +318,7 @@ public class StampServiceTest extends BaseUnitTest {
             @DisplayName("여행의 카테고리가 탐험형으로 수정되면 소속된 모든 스탬프의 순서를 0으로 수정한다")
             void shouldSetAllStampOrdersToZeroWhenCategoryChangesToExplore() {
                 // given
-                given(stampRepository.findAllByTripIdOrderByDeadlineAsc(courseTrip.getId()))
+                given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(courseTrip.getId()))
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when
@@ -421,13 +331,13 @@ public class StampServiceTest extends BaseUnitTest {
             }
 
             @Test
-            @DisplayName("여행의 카테고리가 코스형으로 수정되면 소속된 모든 스탬프의 순서를 마감일이 이른 순으로 1부터 순차적으로 순서를 수정한다")
+            @DisplayName("여행의 카테고리가 코스형으로 수정되면 소속된 모든 스탬프의 순서를 생성일이 이른 순으로 1부터 순차적으로 순서를 수정한다")
             void shouldSetSequentialStampOrdersWhenCategoryChangesToCourse() {
                 // given
                 courseStamp1.updateStampOrder(0);
                 courseStamp2.updateStampOrder(0);
 
-                given(stampRepository.findAllByTripIdOrderByDeadlineAsc(exploreTrip.getId()))
+                given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(exploreTrip.getId()))
                         .willReturn(List.of(courseStamp1, courseStamp2));
 
                 // when

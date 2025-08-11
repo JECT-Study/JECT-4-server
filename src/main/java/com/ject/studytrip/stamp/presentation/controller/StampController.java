@@ -5,8 +5,8 @@ import com.ject.studytrip.stamp.application.dto.StampDetail;
 import com.ject.studytrip.stamp.application.dto.StampInfo;
 import com.ject.studytrip.stamp.application.facade.StampFacade;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
-import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadlineRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
+import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.stamp.presentation.dto.response.CreateStampResponse;
 import com.ject.studytrip.stamp.presentation.dto.response.LoadStampDetailResponse;
 import com.ject.studytrip.stamp.presentation.dto.response.LoadStampInfoResponse;
@@ -43,14 +43,14 @@ public class StampController {
                                 HttpStatus.CREATED.value(), CreateStampResponse.of(result)));
     }
 
-    @Operation(summary = "스탬프 이름, 마감일 수정", description = "특정 스탬프의 이름과 마감일을 수정합니다.")
+    @Operation(summary = "스탬프 수정", description = "특정 스탬프의 이름을 수정합니다.")
     @PatchMapping("/api/trips/{tripId}/stamps/{stampId}")
     public ResponseEntity<StandardResponse> updateStamp(
             @AuthenticationPrincipal String memberId,
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId,
             @PathVariable @NotNull(message = "스탬프 ID는 필수 요청 파라미터입니다.") Long stampId,
-            @RequestBody @Valid UpdateStampNameAndDeadlineRequest request) {
-        stampFacade.updateStampNameAndDeadline(Long.valueOf(memberId), tripId, stampId, request);
+            @RequestBody @Valid UpdateStampRequest request) {
+        stampFacade.updateStamp(Long.valueOf(memberId), tripId, stampId, request);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(StandardResponse.success(HttpStatus.OK.value(), null));

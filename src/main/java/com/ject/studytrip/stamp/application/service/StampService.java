@@ -8,8 +8,8 @@ import com.ject.studytrip.stamp.domain.policy.StampPolicy;
 import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
 import com.ject.studytrip.stamp.domain.repository.StampRepository;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
-import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadlineRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
+import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import java.util.*;
@@ -25,10 +25,7 @@ public class StampService {
     private final StampQueryRepository stampQueryRepository;
 
     public Stamp createStamp(Trip trip, CreateStampRequest request) {
-        Stamp newStamp =
-                StampFactory.create(trip, request.name(), request.order(), request.deadline());
-
-        StampPolicy.validateStampDeadline(trip.getEndDate(), List.of(newStamp));
+        Stamp newStamp = StampFactory.create(trip, request.name(), request.order());
 
         List<Stamp> existingStamps =
                 stampRepository.findAllByTripIdAndDeletedAtIsNull(trip.getId());
@@ -43,26 +40,16 @@ public class StampService {
     public void createStamps(Trip trip, List<CreateStampRequest> requests) {
         List<Stamp> stamps =
                 requests.stream()
-                        .map(
-                                stamp ->
-                                        StampFactory.create(
-                                                trip,
-                                                stamp.name(),
-                                                stamp.order(),
-                                                stamp.deadline()))
+                        .map(stamp -> StampFactory.create(trip, stamp.name(), stamp.order()))
                         .toList();
 
-        StampPolicy.validateStampDeadline(trip.getEndDate(), stamps);
         StampPolicy.validateStampOrders(trip.getCategory(), stamps);
 
         stampRepository.saveAll(stamps);
     }
 
-    public void updateStampNameAndDeadline(
-            Trip trip, Stamp stamp, UpdateStampNameAndDeadlineRequest request) {
-        stamp.update(request.name(), request.deadline());
-
-        StampPolicy.validateStampDeadline(trip.getEndDate(), List.of(stamp));
+    public void updateStampName(Stamp stamp, UpdateStampRequest request) {
+        stamp.updateName(request.name());
     }
 
     public void updateStampOrders(Trip trip, UpdateStampOrderRequest request) {
@@ -91,7 +78,7 @@ public class StampService {
     }
 
     public void updateStampOrdersByTripCategoryChange(Long tripId, TripCategory newCategory) {
-        List<Stamp> stamps = stampRepository.findAllByTripIdOrderByDeadlineAsc(tripId);
+        List<Stamp> stamps = stampRepository.findAllByTripIdOrderByCreatedAtAsc(tripId);
 
         if (newCategory == TripCategory.EXPLORE) {
             stamps.forEach(stamp -> stamp.updateStampOrder(0));

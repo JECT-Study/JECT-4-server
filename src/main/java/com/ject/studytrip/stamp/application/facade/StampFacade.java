@@ -7,8 +7,8 @@ import com.ject.studytrip.stamp.application.dto.StampInfo;
 import com.ject.studytrip.stamp.application.service.StampService;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
-import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampNameAndDeadlineRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
+import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.application.service.TripService;
 import com.ject.studytrip.trip.domain.model.Trip;
 import java.util.List;
@@ -34,12 +34,11 @@ public class StampFacade {
     }
 
     @Transactional
-    public void updateStampNameAndDeadline(
-            Long memberId, Long tripId, Long stampId, UpdateStampNameAndDeadlineRequest request) {
+    public void updateStamp(Long memberId, Long tripId, Long stampId, UpdateStampRequest request) {
         Trip trip = tripService.getValidTrip(memberId, tripId);
         Stamp stamp = stampService.getValidStamp(trip.getId(), stampId);
 
-        stampService.updateStampNameAndDeadline(trip, stamp, request);
+        stampService.updateStampName(stamp, request);
     }
 
     @Transactional

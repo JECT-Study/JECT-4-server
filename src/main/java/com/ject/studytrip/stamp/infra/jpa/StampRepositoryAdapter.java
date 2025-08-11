@@ -38,7 +38,7 @@ public class StampRepositoryAdapter implements StampRepository {
     }
 
     @Override
-    public List<Stamp> findAllByTripIdOrderByDeadlineAsc(Long tripId) {
-        return stampJpaRepository.findAllByTripIdOrderByDeadlineAsc(tripId);
+    public List<Stamp> findAllByTripIdOrderByCreatedAtAsc(Long tripId) {
+        return stampJpaRepository.findAllByTripIdOrderByCreatedAtAsc(tripId);
     }
 }
