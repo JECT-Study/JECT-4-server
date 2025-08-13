@@ -107,7 +107,7 @@ public class TripService {
     }
 
     @Transactional
-    public void increaseCompletedStamps (Trip trip) {
+    public void increaseCompletedStamps(Trip trip) {
         trip.increaseCompletedStamps();
     }
 }
