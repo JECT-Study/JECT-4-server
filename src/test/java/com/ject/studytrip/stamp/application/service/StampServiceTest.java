@@ -608,14 +608,13 @@ public class StampServiceTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("유효한 스탬프가 들어오면, completed 필드를 true로 업데이트하고, 여행의 완료된 스탬프 수를 1 증가시킨다.")
+        @DisplayName("유효한 스탬프가 들어오면, completed 필드를 true로 업데이트한다.")
         void shouldCompleteStamp() {
             // when
             stampService.completeStamp(courseStamp1);
 
             // then
             assertThat(courseStamp1.isCompleted()).isTrue();
-            assertThat(courseStamp1.getTrip().getCompletedStamps()).isEqualTo(1);
         }
     }
 

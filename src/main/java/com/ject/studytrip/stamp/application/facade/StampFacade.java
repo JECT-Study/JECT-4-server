@@ -81,5 +81,6 @@ public class StampFacade {
         missionService.validateAllMissionsCompletedByStampId(stamp.getId());
 
         stampService.completeStamp(stamp);
+        tripService.increaseCompletedStamps(trip);
     }
 }

@@ -99,9 +99,15 @@ public class TripService {
         return TripCount.of(courseCount, exploreCount);
     }
 
+    @Transactional
     public void completeTrip(Trip trip) {
         TripPolicy.validateCompleted(trip);
 
         trip.updateCompleted();
+    }
+
+    @Transactional
+    public void increaseCompletedStamps (Trip trip) {
+        trip.increaseCompletedStamps();
     }
 }

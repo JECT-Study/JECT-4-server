@@ -374,4 +374,19 @@ public class TripServiceTest extends BaseUnitTest {
             assertThat(trip.isCompleted()).isTrue();
         }
     }
+
+    @Nested
+    @DisplayName("increaseCompletedStamps 메서드는")
+    class IncreaseCompletedStamps {
+
+        @Test
+        @DisplayName("유효한 여행이 들어오면, Trip의 completedStamps 필드를 1 증가시킨다.")
+        void shouldIncreaseCompletedStamps() {
+            // when
+            tripService.increaseCompletedStamps(trip);
+
+            // then
+            assertThat(trip.getCompletedStamps()).isEqualTo(1);
+        }
+    }
 }

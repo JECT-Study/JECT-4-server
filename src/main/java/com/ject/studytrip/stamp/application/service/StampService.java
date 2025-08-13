@@ -139,7 +139,6 @@ public class StampService {
         StampPolicy.validateCompleted(stamp);
 
         stamp.updateCompleted();
-        stamp.getTrip().increaseCompletedStamps();
     }
 
     public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
