@@ -1,7 +1,5 @@
 package com.ject.studytrip.auth.presentation.controller;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,6 +8,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.auth.domain.repository.RefreshTokenRedisRepository;
 import com.ject.studytrip.auth.fixture.*;
 import com.ject.studytrip.auth.fixture.TokenReissueRequestFixture;
+import com.ject.studytrip.auth.helper.KakaoOauthTestHelper;
 import com.ject.studytrip.auth.helper.TokenTestHelper;
 import com.ject.studytrip.auth.infra.dto.KakaoTokenResponse;
 import com.ject.studytrip.auth.infra.dto.KakaoUserInfoResponse;
@@ -18,7 +17,6 @@ import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest;
 import com.ject.studytrip.auth.presentation.dto.request.LogoutRequest;
 import com.ject.studytrip.auth.presentation.dto.request.TokenReissueRequest;
-import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.global.exception.error.CommonErrorCode;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
@@ -40,6 +38,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired private MemberTestHelper memberTestHelper;
     @Autowired private TokenTestHelper tokenTestHelper;
+    @Autowired private KakaoOauthTestHelper kakaoOauthTestHelper;
     @Autowired private RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     @MockitoBean KakaoOauthProvider kakaoOauthProvider;
@@ -55,6 +54,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
                 tokenTestHelper.createAccessToken(
                         member.getId().toString(), member.getRole().name());
         refreshToken = tokenTestHelper.createRefreshToken();
+
         long refreshTokenExpirationTime = Duration.ofSeconds(30).getSeconds();
         refreshTokenRedisRepository.saveRefreshToken(
                 member.getId().toString(), refreshToken, refreshTokenExpirationTime);
@@ -84,10 +84,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             member.updateDeletedAt();
             KakaoLoginRequest request = kakaoLoginRequestFixture.build();
             KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
-
-            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willThrow(new CustomException(MemberErrorCode.MEMBER_NEED_SIGNUP));
+            kakaoOauthTestHelper.mockThrowException(
+                    kakaoTokenResponse, MemberErrorCode.MEMBER_NEED_SIGNUP);
 
             // when
             ResultActions resultActions = getResultActions(request);
@@ -108,16 +106,41 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("탈퇴한 사용자가 인가 코드로 로그인 시 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenMemberAlreadyDeleted() throws Exception {
+            // given
+            member.updateDeletedAt();
+            KakaoLoginRequest request = kakaoLoginRequestFixture.build();
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
+            kakaoOauthTestHelper.mockThrowException(
+                    kakaoTokenResponse, MemberErrorCode.MEMBER_ALREADY_DELETED);
+
+            // when
+            ResultActions resultActions = getResultActions(request);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            MemberErrorCode.MEMBER_ALREADY_DELETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage()));
+        }
+
+        @Test
         @DisplayName("가입된 사용자의 인가 코드로 로그인하면 토큰이 발급된다.")
         void shouldReturnTokenResponseWhenLoginIsSuccessful() throws Exception {
             // given
             KakaoLoginRequest request = kakaoLoginRequestFixture.build();
             KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
             KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
-
-            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(kakaoUserInfoResponse);
+            kakaoOauthTestHelper.mockSuccess(kakaoTokenResponse, kakaoUserInfoResponse);
 
             // when
             ResultActions resultActions = getResultActions(request);
@@ -156,10 +179,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             KakaoSignupRequest request = kakaoSignupRequestFixture.build();
             KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
             KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
-
-            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(kakaoUserInfoResponse);
+            kakaoOauthTestHelper.mockSuccess(kakaoTokenResponse, kakaoUserInfoResponse);
 
             // when
             ResultActions resultActions = getResultActions(request);
@@ -187,10 +207,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
             KakaoSignupRequest request = kakaoSignupRequestFixture.build();
             KakaoTokenResponse kakaoTokenResponse = kakaoTokenResponseFixture.build();
             KakaoUserInfoResponse kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build();
-
-            given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
-            given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
-                    .willReturn(kakaoUserInfoResponse);
+            kakaoOauthTestHelper.mockSuccess(kakaoTokenResponse, kakaoUserInfoResponse);
 
             // when
             ResultActions resultActions = getResultActions(request);

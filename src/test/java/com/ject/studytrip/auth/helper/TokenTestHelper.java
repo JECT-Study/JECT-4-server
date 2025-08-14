@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenTestHelper {
-
     private final TokenProvider tokenProvider;
 
     @Autowired

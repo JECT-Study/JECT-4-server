@@ -266,6 +266,23 @@ class MemberServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("탈퇴한 Member라면 예외가 발생한다.")
+        void shouldThrowExceptionWhenMemberAlreadyDeleted() {
+            // given
+            member.updateDeletedAt();
+            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId))
+                    .willReturn(Optional.of(member));
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    memberService.getMemberBySocialProviderAndSocialId(
+                                            SocialProvider.KAKAO, socialId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
         @DisplayName("소셜 ID로 조회 시 존재하면 Member를 반환한다.")
         void shouldReturnMemberWhenSocialIdExists() {
             // given
