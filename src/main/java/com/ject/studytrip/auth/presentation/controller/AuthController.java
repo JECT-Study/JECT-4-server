@@ -30,6 +30,7 @@ public class AuthController {
     public ResponseEntity<StandardResponse> kakaoLogin(
             @Valid @RequestBody KakaoLoginRequest request) {
         TokenResponse response = authFacade.kakaoLogin(request);
+
         return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
     }
 
@@ -40,6 +41,7 @@ public class AuthController {
     public ResponseEntity<StandardResponse> kakaoSignup(
             @Valid @RequestBody KakaoSignupRequest request) {
         TokenResponse response = authFacade.kakaoSignup(request);
+
         return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
     }
 
@@ -48,6 +50,7 @@ public class AuthController {
     public ResponseEntity<StandardResponse> reissueToken(
             @Valid @RequestBody TokenReissueRequest request) {
         TokenResponse response = authFacade.reissueToken(request);
+
         return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), response));
     }
 
@@ -57,6 +60,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<StandardResponse> logout(@Valid @RequestBody LogoutRequest request) {
         authFacade.logout(request);
+
         return ResponseEntity.ok(StandardResponse.success(HttpStatus.OK.value(), null));
     }
 }

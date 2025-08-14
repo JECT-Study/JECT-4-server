@@ -62,9 +62,14 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member getMemberBySocialProviderAndSocialId(
             SocialProvider socialProvider, String socialId) {
-        return memberRepository
-                .findBySocialProviderAndSocialId(socialProvider, socialId)
-                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NEED_SIGNUP));
+        Member member =
+                memberRepository
+                        .findBySocialProviderAndSocialId(socialProvider, socialId)
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NEED_SIGNUP));
+
+        MemberPolicy.validateNotDeleted(member);
+
+        return member;
     }
 
     @Transactional(readOnly = true)
