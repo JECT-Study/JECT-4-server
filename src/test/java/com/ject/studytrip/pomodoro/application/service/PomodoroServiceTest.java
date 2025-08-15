@@ -52,7 +52,7 @@ public class PomodoroServiceTest extends BaseUnitTest {
         @DisplayName("뽀모도로를 생성해 저장하고 반환한다")
         void shouldCreateAndReturnPomodoro() {
             // given
-            CreatePomodoroRequest request = new CreatePomodoroRequest(30);
+            CreatePomodoroRequest request = new CreatePomodoroRequest(30, 1);
             given(pomodoroRepository.save(any())).willReturn(pomodoro);
 
             // when
@@ -61,6 +61,7 @@ public class PomodoroServiceTest extends BaseUnitTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getFocusDurationInSeconds()).isEqualTo(30 * 60);
+            assertThat(result.getFocusSessionCount()).isEqualTo(1);
         }
     }
 

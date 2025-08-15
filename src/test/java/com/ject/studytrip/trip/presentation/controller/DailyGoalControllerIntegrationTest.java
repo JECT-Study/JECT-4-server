@@ -21,6 +21,7 @@ import com.ject.studytrip.mission.helper.MissionTestHelper;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.pomodoro.helper.PomodoroTestHelper;
+import com.ject.studytrip.pomodoro.presentation.dto.request.CreatePomodoroRequest;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.helper.StampTestHelper;
@@ -158,6 +159,50 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
             // given
             CreateDailyGoalRequest request =
                     fixture.withPomodoro(null).withMissionIds(List.of()).build();
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId(), request);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
+                                                    .getStatus()
+                                                    .value()));
+        }
+
+        @Test
+        @DisplayName("데일리 목표의 뽀모도로 정보 중 집중 시간이 1분 미만이면 400 Bad Request를 반환한다")
+        void shouldReturnBadRequestWhenDailyGoalPomodoroFocusTimeInMinuteIsLessThanOneMinute()
+                throws Exception {
+            // given
+            CreateDailyGoalRequest request =
+                    fixture.withPomodoro(new CreatePomodoroRequest(0, 1)).build();
+            // when
+            ResultActions resultActions = getResultActions(token, trip.getId(), request);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
+                                                    .getStatus()
+                                                    .value()));
+        }
+
+        @Test
+        @DisplayName("데일리 목표의 뽀모도로 정보 중 집중 세션이 1개 미만이면 400 Bad Request를 반환한다")
+        void shouldReturnBadRequestWhenDailyGoalPomodoroFocusSessionCountIsLessThanOne()
+                throws Exception {
+            // given
+            CreateDailyGoalRequest request =
+                    fixture.withPomodoro(new CreatePomodoroRequest(30, 0)).build();
             // when
             ResultActions resultActions = getResultActions(token, trip.getId(), request);
 
