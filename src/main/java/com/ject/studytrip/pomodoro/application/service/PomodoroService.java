@@ -18,7 +18,9 @@ public class PomodoroService {
 
     public Pomodoro createPomodoro(DailyGoal dailyGoal, CreatePomodoroRequest request) {
         int focusDurationInSeconds = request.focusDurationInMinute() * 60;
-        Pomodoro pomodoro = PomodoroFactory.create(dailyGoal, focusDurationInSeconds, 1, 0);
+        Pomodoro pomodoro =
+                PomodoroFactory.create(
+                        dailyGoal, focusDurationInSeconds, request.focusSessionCount(), 0);
         return pomodoroRepository.save(pomodoro);
     }
 

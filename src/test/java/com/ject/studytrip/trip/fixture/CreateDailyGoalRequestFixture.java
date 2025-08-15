@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CreateDailyGoalRequestFixture {
 
-    private CreatePomodoroRequest pomodoro = new CreatePomodoroRequest(30);
+    private CreatePomodoroRequest pomodoro = new CreatePomodoroRequest(30, 1);
     private List<Long> missionIds = List.of(1L, 2L);
 
     public CreateDailyGoalRequestFixture withPomodoro(CreatePomodoroRequest pomodoro) {

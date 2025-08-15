@@ -22,7 +22,7 @@ public class Pomodoro extends BaseTimeEntity {
     private DailyGoal dailyGoal;
 
     private int focusDurationInSeconds; // 집중 시간(초)
-    private int focusCount; // 집중 세션 횟수
+    private int focusSessionCount; // 집중 세션 횟수
     private int breakDurationInSeconds; // 휴식 시간(초)
     private int totalFocusTimeInSeconds; // 총 집중 시간(초)
 
@@ -31,12 +31,12 @@ public class Pomodoro extends BaseTimeEntity {
     public static Pomodoro of(
             DailyGoal dailyGoal,
             int focusDurationInSeconds,
-            int focusCount,
+            int focusSessionCount,
             int breakDurationInSeconds) {
         return Pomodoro.builder()
                 .dailyGoal(dailyGoal)
                 .focusDurationInSeconds(focusDurationInSeconds)
-                .focusCount(1)
+                .focusSessionCount(focusSessionCount)
                 .breakDurationInSeconds(0)
                 .totalFocusTimeInSeconds(0)
                 .build();

@@ -25,9 +25,11 @@ public record LoadDailyGoalDetailResponse(
 
     public record DailyGoalPomodoroResponse(
             @Schema(name = "뽀모도로 ID") Long pomodoroId,
-            @Schema(name = "뽀모도로 집중 시간(분)") int focusDurationInMinute) {
+            @Schema(name = "뽀모도로 집중 시간(분)") int focusDurationInMinute,
+            @Schema(name = "뽀모도로 집중 세션 개수") int focusSessionCount) {
         public static DailyGoalPomodoroResponse of(PomodoroInfo info) {
-            return new DailyGoalPomodoroResponse(info.pomodoroId(), info.focusDurationInMinute());
+            return new DailyGoalPomodoroResponse(
+                    info.pomodoroId(), info.focusDurationInMinute(), info.focusSessionCount());
         }
     }
 

@@ -2,8 +2,11 @@ package com.ject.studytrip.pomodoro.application.dto;
 
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 
-public record PomodoroInfo(Long pomodoroId, int focusDurationInMinute) {
+public record PomodoroInfo(Long pomodoroId, int focusDurationInMinute, int focusSessionCount) {
     public static PomodoroInfo from(Pomodoro pomodoro) {
-        return new PomodoroInfo(pomodoro.getId(), pomodoro.getFocusDurationInSeconds() / 60);
+        return new PomodoroInfo(
+                pomodoro.getId(),
+                pomodoro.getFocusDurationInSeconds() / 60,
+                pomodoro.getFocusSessionCount());
     }
 }

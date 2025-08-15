@@ -10,8 +10,9 @@ public class PomodoroFactory {
     public static Pomodoro create(
             DailyGoal dailyGoal,
             int focusDurationInSeconds,
-            int focusCount,
+            int focusSessionCount,
             int breakDurationInSeconds) {
-        return Pomodoro.of(dailyGoal, focusDurationInSeconds, focusCount, breakDurationInSeconds);
+        return Pomodoro.of(
+                dailyGoal, focusDurationInSeconds, focusSessionCount, breakDurationInSeconds);
     }
 }
