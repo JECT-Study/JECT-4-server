@@ -48,8 +48,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @DisplayName("DailyGoalController 통합 테스트")
 public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
-    private static final int DEFAULT_ORDER = 1;
-
     @Autowired private MemberTestHelper memberTestHelper;
     @Autowired private TripTestHelper tripTestHelper;
     @Autowired private StampTestHelper stampTestHelper;
@@ -73,8 +71,8 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         member = memberTestHelper.saveMember();
         trip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
         stamp = stampTestHelper.saveStamp(trip, 1);
-        firstMission = missionTestHelper.saveMission(stamp, DEFAULT_ORDER);
-        secondMission = missionTestHelper.saveMission(stamp, DEFAULT_ORDER + 1);
+        firstMission = missionTestHelper.saveMission(stamp);
+        secondMission = missionTestHelper.saveMission(stamp);
         dailyGoal = dailyGoalTestHelper.saveDailyGoal(trip);
         dailyMission = dailyMissionTestHelper.saveDailyMission(firstMission, dailyGoal);
         token =
@@ -343,7 +341,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("조회된 미션들 중 삭제된 미션이 존재하면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenMissionIsDeleted() throws Exception {
             // given
-            Mission deleted = missionTestHelper.saveDeletedMission(stamp, DEFAULT_ORDER);
+            Mission deleted = missionTestHelper.saveDeletedMission(stamp);
             CreateDailyGoalRequest request =
                     fixture.withMissionIds(List.of(deleted.getId())).build();
 
@@ -366,7 +364,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("조회된 미션들 중 완료된 미션이 존재하면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenMissionIsAlreadyCompleted() throws Exception {
             // given
-            Mission completed = missionTestHelper.saveCompletedMission(stamp, DEFAULT_ORDER);
+            Mission completed = missionTestHelper.saveCompletedMission(stamp);
             CreateDailyGoalRequest request =
                     fixture.withMissionIds(List.of(completed.getId())).build();
 
@@ -390,7 +388,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         void shouldReturnBadRequestWhenMissionNotBelongToCurrentStamp() throws Exception {
             // given
             Stamp newStamp = stampTestHelper.saveStamp(trip, 2);
-            Mission newMission = missionTestHelper.saveMission(newStamp, DEFAULT_ORDER);
+            Mission newMission = missionTestHelper.saveMission(newStamp);
             CreateDailyGoalRequest request =
                     fixture.withMissionIds(List.of(newMission.getId())).build();
 
@@ -429,7 +427,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("유효한 요청으로 특정 데일리 목표에 속한 데일리 미션을 수정한다")
         void shouldUpdateDailyGoal() throws Exception {
             // given
-            Mission addMission = missionTestHelper.saveMission(stamp, DEFAULT_ORDER);
+            Mission addMission = missionTestHelper.saveMission(stamp);
             UpdateDailyGoalRequest request =
                     fixture.withDeleteDailyMissionIds(List.of(dailyMission.getId()))
                             .withAddMissionIds(List.of(addMission.getId()))
@@ -762,7 +760,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
             // given
             Trip newTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
             Stamp newStamp = stampTestHelper.saveStamp(newTrip, 1);
-            Mission newMission = missionTestHelper.saveMission(newStamp, DEFAULT_ORDER);
+            Mission newMission = missionTestHelper.saveMission(newStamp);
             UpdateDailyGoalRequest request =
                     fixture.withAddMissionIds(List.of(newMission.getId())).build();
 
@@ -786,7 +784,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("새로 추가할 미션들 중 삭제된 미션이 존재하면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenAnyAddMissionIsDeleted() throws Exception {
             // given
-            Mission deleted = missionTestHelper.saveDeletedMission(stamp, DEFAULT_ORDER);
+            Mission deleted = missionTestHelper.saveDeletedMission(stamp);
             UpdateDailyGoalRequest request =
                     fixture.withAddMissionIds(List.of(deleted.getId())).build();
 
@@ -810,7 +808,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("새로 추가할 미션들 중 완료된 미션이 존재하면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenAnyAddMissionIsAlreadyCompleted() throws Exception {
             // given
-            Mission completed = missionTestHelper.saveCompletedMission(stamp, DEFAULT_ORDER);
+            Mission completed = missionTestHelper.saveCompletedMission(stamp);
             UpdateDailyGoalRequest request =
                     fixture.withAddMissionIds(List.of(completed.getId())).build();
 
@@ -835,7 +833,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
         void shouldReturnBadRequestWhenAddMissionsDoNotBelongToCurrentStamp() throws Exception {
             // given
             Stamp newStamp = stampTestHelper.saveStamp(trip, 2);
-            Mission newMission = missionTestHelper.saveMission(newStamp, DEFAULT_ORDER);
+            Mission newMission = missionTestHelper.saveMission(newStamp);
             UpdateDailyGoalRequest request =
                     fixture.withAddMissionIds(List.of(newMission.getId())).build();
 

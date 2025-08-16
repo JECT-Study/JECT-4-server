@@ -49,7 +49,7 @@ public class DailyMissionServiceTest extends BaseUnitTest {
         Member member = MemberFixture.createMemberFromKakaoWithId(1L);
         courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
         Stamp stamp = StampFixture.createStampWithId(1L, courseTrip, 1);
-        mission = MissionFixture.createMissionWithId(1L, stamp, 1);
+        mission = MissionFixture.createMissionWithId(1L, stamp);
         dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
         dailyMission = DailyMissionFixture.createDailyMissionWithId(1L, mission, dailyGoal);
     }

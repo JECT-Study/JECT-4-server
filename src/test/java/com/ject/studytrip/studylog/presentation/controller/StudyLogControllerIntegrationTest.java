@@ -78,7 +78,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
                         member.getId().toString(), MemberRole.ROLE_USER.name());
         courseTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
         stamp = stampTestHelper.saveStamp(courseTrip, 1);
-        mission = missionTestHelper.saveMission(stamp, 1);
+        mission = missionTestHelper.saveMission(stamp);
         dailyGoal = dailyGoalTestHelper.saveDailyGoal(courseTrip);
         dailyMission = dailyMissionTestHelper.saveDailyMission(mission, dailyGoal);
         pomodoro = pomodoroTestHelper.savePomodoro(dailyGoal);
@@ -470,7 +470,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("선택된 미션들을 완료 처리할 때, 이미 삭제된 미션일 경우 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenSelectedMissionIsAlreadyDeleted() throws Exception {
             // given
-            Mission deletedMission = missionTestHelper.saveDeletedMission(stamp, 2);
+            Mission deletedMission = missionTestHelper.saveDeletedMission(stamp);
             DailyMission newDailyMission =
                     dailyMissionTestHelper.saveDailyMission(deletedMission, dailyGoal);
             CreateStudyLogRequest request =
@@ -496,7 +496,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("선택된 미션들을 완료 처리할 때, 이미 완료된 미션일 경우 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenSelectedMissionIsAlreadyCompleted() throws Exception {
             // given
-            Mission deletedMission = missionTestHelper.saveCompletedMission(stamp, 2);
+            Mission deletedMission = missionTestHelper.saveCompletedMission(stamp);
             DailyMission newDailyMission =
                     dailyMissionTestHelper.saveDailyMission(deletedMission, dailyGoal);
             CreateStudyLogRequest request =

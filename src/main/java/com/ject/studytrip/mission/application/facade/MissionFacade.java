@@ -4,7 +4,6 @@ import com.ject.studytrip.mission.application.dto.MissionInfo;
 import com.ject.studytrip.mission.application.service.MissionService;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
-import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionOrderRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
 import com.ject.studytrip.stamp.application.service.StampService;
 import com.ject.studytrip.stamp.domain.model.Stamp;
@@ -29,7 +28,7 @@ public class MissionFacade {
         return MissionInfo.from(mission);
     }
 
-    public void updateMissionNameAndMemoIfPresent(
+    public void updateMissionNameIfPresent(
             Long memberId,
             Long tripId,
             Long stampId,
@@ -38,14 +37,7 @@ public class MissionFacade {
         Stamp stamp = getValidStampFromTripOwnedByMember(memberId, tripId, stampId);
         Mission mission = missionService.getValidMission(stamp.getId(), missionId);
 
-        missionService.updateMissionNameAndMemoIfPresent(stamp.getId(), mission, request);
-    }
-
-    public void updateMissionOrders(
-            Long memberId, Long tripId, Long stampId, UpdateMissionOrderRequest request) {
-        Stamp stamp = getValidStampFromTripOwnedByMember(memberId, tripId, stampId);
-
-        missionService.updateMissionOrders(stamp.getId(), request);
+        missionService.updateMissionNameIfPresent(stamp.getId(), mission, request);
     }
 
     public void deleteMission(Long memberId, Long tripId, Long stampId, Long missionId) {

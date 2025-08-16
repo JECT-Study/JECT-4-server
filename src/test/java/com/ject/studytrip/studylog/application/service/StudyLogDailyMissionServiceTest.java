@@ -49,8 +49,8 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
         member = MemberFixture.createMemberFromKakaoWithId(1L);
         Trip trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
         Stamp stamp = StampFixture.createStampWithId(1L, trip, 1);
-        mission1 = MissionFixture.createMissionWithId(1L, stamp, 1);
-        mission2 = MissionFixture.createMissionWithId(2L, stamp, 2);
+        mission1 = MissionFixture.createMissionWithId(1L, stamp);
+        mission2 = MissionFixture.createMissionWithId(2L, stamp);
         dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, trip);
     }
 

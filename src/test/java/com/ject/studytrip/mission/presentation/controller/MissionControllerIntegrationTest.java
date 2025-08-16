@@ -14,11 +14,9 @@ import com.ject.studytrip.member.helper.MemberTestHelper;
 import com.ject.studytrip.mission.domain.error.MissionErrorCode;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.fixture.CreateMissionRequestFixture;
-import com.ject.studytrip.mission.fixture.UpdateMissionOrderRequestFixture;
 import com.ject.studytrip.mission.fixture.UpdateMissionRequestFixture;
 import com.ject.studytrip.mission.helper.MissionTestHelper;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
-import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionOrderRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
@@ -27,7 +25,6 @@ import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.helper.TripTestHelper;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -72,10 +69,10 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         exploreTrip = tripTestHelper.saveTrip(member, TripCategory.EXPLORE);
         courseStamp = stampTestHelper.saveStamp(courseTrip, 3);
         exploreStamp = stampTestHelper.saveStamp(exploreTrip, 0);
-        courseMission1 = missionTestHelper.saveMission(courseStamp, 1);
-        courseMission2 = missionTestHelper.saveMission(courseStamp, 2);
-        exploreMission1 = missionTestHelper.saveMission(exploreStamp, 1);
-        exploreMission2 = missionTestHelper.saveMission(exploreStamp, 2);
+        courseMission1 = missionTestHelper.saveMission(courseStamp);
+        courseMission2 = missionTestHelper.saveMission(courseStamp);
+        exploreMission1 = missionTestHelper.saveMission(exploreStamp);
+        exploreMission2 = missionTestHelper.saveMission(exploreStamp);
 
         Member newMember = memberTestHelper.saveMember("test@kakao.com", "TEST NICKNAME");
         newAccessToken =
@@ -83,7 +80,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
                         newMember.getId().toString(), newMember.getRole().name());
         Trip newTrip = tripTestHelper.saveTrip(newMember, TripCategory.EXPLORE);
         newStamp = stampTestHelper.saveStamp(newTrip, 0);
-        newMission = missionTestHelper.saveMission(newStamp, 4);
+        newMission = missionTestHelper.saveMission(newStamp);
     }
 
     @Nested
@@ -191,28 +188,6 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("미션 메모가 null 이면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenMemoIsNull() throws Exception {
-            // given
-            CreateMissionRequest request = fixture.withMemo(null).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
         @DisplayName("미션 이름이 비어있으면 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenNameIsBlank() throws Exception {
             // given
@@ -235,55 +210,11 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("미션 메모가 비어있으면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenMemoIsBlank() throws Exception {
-            // given
-            CreateMissionRequest request = fixture.withMemo(" ").build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("미션 순서가 1 미만이면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenOrderIsLessThanOne() throws Exception {
-            // given
-            CreateMissionRequest request = fixture.withMissionOrder(0).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
         @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
         void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
             // given
             courseTrip.updateDeletedAt();
-            CreateMissionRequest request = fixture.withMissionOrder(0).build();
+            CreateMissionRequest request = fixture.build();
 
             // when
             ResultActions resultActions =
@@ -303,7 +234,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
             // given
             courseStamp.updateDeletedAt();
-            CreateMissionRequest request = fixture.withMissionOrder(0).build();
+            CreateMissionRequest request = fixture.build();
 
             // when
             ResultActions resultActions =
@@ -317,30 +248,6 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
                             jsonPath("$.status")
                                     .value(
                                             StampErrorCode.STAMP_ALREADY_DELETED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("이미 존재하는 미션 순서일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenMissionOrderAlreadyExists() throws Exception {
-            // given
-            CreateMissionRequest request = fixture.withMissionOrder(2).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            System.out.println(resultActions.andReturn().getResponse().getContentAsString());
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_ORDER_ALREADY_EXISTS
                                                     .getStatus()
                                                     .value()));
         }
@@ -431,7 +338,7 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("유효한 요청이 들어오면 미션을 생성한다.")
         void shouldCreateMissionWhenRequestIsValid() throws Exception {
             // given
-            CreateMissionRequest request = fixture.withMissionOrder(3).build();
+            CreateMissionRequest request = fixture.build();
 
             // when
             ResultActions resultActions =
@@ -823,408 +730,6 @@ class MissionControllerIntegrationTest extends BaseIntegrationTest {
                             courseStamp.getId(),
                             courseMission1.getId(),
                             request);
-
-            // then
-            resultActions
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.success").value(true))
-                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
-        }
-
-        @Test
-        @DisplayName("유효한 요청이 들어오면 미션 메모를 수정한다.")
-        void shouldUpdateMissionMemoWhenRequestIsValid() throws Exception {
-            // given
-            UpdateMissionRequest request = fixture.withName("새로운 미션 메모").build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(
-                            accessToken,
-                            courseTrip.getId(),
-                            courseStamp.getId(),
-                            courseMission1.getId(),
-                            request);
-
-            // then
-            resultActions
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.success").value(true))
-                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
-        }
-
-        @Test
-        @DisplayName("유효한 요청이 들어오면 미션 이름과 메모를 모두 수정한다.")
-        void shouldUpdateMissionNameAndMemoWhenRequestIsValid() throws Exception {
-            // given
-            UpdateMissionRequest request =
-                    fixture.withName("새로운 미션 메모").withMemo("새로운 미션 메모").build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(
-                            accessToken,
-                            courseTrip.getId(),
-                            courseStamp.getId(),
-                            courseMission1.getId(),
-                            request);
-
-            // then
-            resultActions
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.success").value(true))
-                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
-        }
-    }
-
-    @Nested
-    @DisplayName("미션 순서 변경 API")
-    class UpdateMissionOrders {
-        private final UpdateMissionOrderRequestFixture fixture =
-                new UpdateMissionOrderRequestFixture();
-
-        private ResultActions getResultActions(
-                String accessToken,
-                Object tripId,
-                Object stampId,
-                UpdateMissionOrderRequest request)
-                throws Exception {
-            return mockMvc.perform(
-                    put(BASE_MISSION_URL + "/orders", tripId, stampId)
-                            .header(
-                                    HttpHeaders.AUTHORIZATION,
-                                    TokenFixture.TOKEN_PREFIX + accessToken)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)));
-        }
-
-        @Test
-        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
-        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
-            // given
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions("", courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(AuthErrorCode.UNAUTHENTICATED.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("PathVariable 여행 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenTripIdTypeMismatch() throws Exception {
-            // given
-            String invalidTripId = "abc";
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, invalidTripId, courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("PathVariable 스탬프 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenStampIdTypeMismatch() throws Exception {
-            // given
-            String invalidStampId = "def";
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), invalidStampId, request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("삭제된 여행일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenTripAlreadyDeleted() throws Exception {
-            // given
-            courseTrip.updateDeletedAt();
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(TripErrorCode.TRIP_ALREADY_DELETED.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("삭제된 스탬프일 경우 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenStampAlreadyDeleted() throws Exception {
-            // given
-            courseStamp.updateDeletedAt();
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.STAMP_ALREADY_DELETED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("삭제된 미션이 포함되어 있다면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenMissionAlreadyDeleted() throws Exception {
-            // given
-            courseMission1.updateDeletedAt();
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_ALREADY_DELETED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
-        void shouldReturnForbiddenWhenNotTripOwner() throws Exception {
-            // given
-            List<Long> ids = List.of(exploreMission2.getId(), exploreMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(newAccessToken, courseTrip.getId(), newStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(TripErrorCode.NOT_TRIP_OWNER.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
-        void shouldReturnForbiddenWhenStampNotBelongToTrip() throws Exception {
-            // given
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(
-                            accessToken, courseTrip.getId(), exploreStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("미션이 요청한 스탬프에 속하지 않으면 403 Forbidden을 반환한다.")
-        void shouldReturnForbiddenWhenMissionNotBelongToStamp() throws Exception {
-            // given
-            List<Long> ids = List.of(exploreMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("유효하지 않은 여행 ID가 들어오면 404 Not Found를 반환한다.")
-        void shouldReturnNotFoundWhenTripIdIsInvalid() throws Exception {
-            // given
-            Long invalidTripId = 10000L;
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, invalidTripId, courseStamp.getId(), request);
-
-            // when & then
-            resultActions
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(TripErrorCode.TRIP_NOT_FOUND.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("유효하지 않은 스탬프 ID가 들어오면 404 Not Found를 반환한다.")
-        void shouldReturnNotFoundWhenStampIdIsInvalid() throws Exception {
-            // given
-            Long invalidStampId = 10000L;
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), invalidStampId, request);
-
-            // when & then
-            resultActions
-                    .andExpect(status().isNotFound())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(StampErrorCode.STAMP_NOT_FOUND.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("중복된 미션 ID가 들어오면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenIdsDuplicated() throws Exception {
-            // given
-            List<Long> duplicatedIds = List.of(courseMission1.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(duplicatedIds).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_ORDER_IDS_DUPLICATED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("요청된 미션 ID 개수가 실제 미션 개수와 다르면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenSizeMismatch() throws Exception {
-            // given
-            Long invalidMissionId = 10000L;
-            List<Long> ids = List.of(courseMission1.getId(), invalidMissionId);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_ORDER_SIZE_MISMATCHED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("요청된 미션 ID 목록에 유효하지 않은 미션 ID가 포함되어 있으면 400 Bad Request를 반환한다.")
-        void shouldReturnBadRequestWhenIdsContainInvalidMissionId() throws Exception {
-            // given
-            Long invalidMissionId = 10000L;
-            List<Long> ids = List.of(courseMission1.getId(), invalidMissionId);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            MissionErrorCode.MISSION_ORDER_IDS_NOT_MATCHED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("유효한 요청이 들어오면 미션 순서를 변경한다.")
-        void shouldUpdateMissionOrdersWhenRequestIsValid() throws Exception {
-            // given
-            List<Long> ids = List.of(courseMission2.getId(), courseMission1.getId());
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(accessToken, courseTrip.getId(), courseStamp.getId(), request);
 
             // then
             resultActions

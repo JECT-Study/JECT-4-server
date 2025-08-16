@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MissionFactory {
-    public static Mission create(Stamp stamp, String name, String memo, int missionOrder) {
-        return Mission.of(stamp, name, memo, missionOrder);
+    public static Mission create(Stamp stamp, String name) {
+        return Mission.of(stamp, name);
     }
 }
