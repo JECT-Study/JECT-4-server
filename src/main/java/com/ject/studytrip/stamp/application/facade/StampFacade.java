@@ -2,6 +2,7 @@ package com.ject.studytrip.stamp.application.facade;
 
 import com.ject.studytrip.mission.application.dto.MissionInfo;
 import com.ject.studytrip.mission.application.service.MissionService;
+import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.stamp.application.dto.StampDetail;
 import com.ject.studytrip.stamp.application.dto.StampInfo;
 import com.ject.studytrip.stamp.application.service.StampService;
@@ -69,9 +70,10 @@ public class StampFacade {
     public StampDetail getStamp(Long memberId, Long tripId, Long stampId) {
         Trip trip = tripService.getValidTrip(memberId, tripId);
         Stamp stamp = stampService.getValidStamp(trip.getId(), stampId);
-        List<MissionInfo> missionInfos = missionService.getMissionsByStamp(stamp.getId());
+        List<Mission> missions = missionService.getMissionsByStampId(stamp.getId());
 
-        return StampDetail.from(StampInfo.from(stamp), missionInfos);
+        return StampDetail.from(
+                StampInfo.from(stamp), missions.stream().map(MissionInfo::from).toList());
     }
 
     public void completeStamp(Long memberId, Long tripId, Long stampId) {

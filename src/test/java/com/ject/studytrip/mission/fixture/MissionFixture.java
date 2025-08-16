@@ -7,14 +7,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class MissionFixture {
     private static final String MISSION_NAME = "TEST MISSION NAME";
-    private static final String MISSION_MEMO = "TEST MISSION MEMO";
 
-    public static Mission createMission(Stamp stamp, int order) {
-        return MissionFactory.create(stamp, MISSION_NAME, MISSION_MEMO, order);
+    public static Mission createMission(Stamp stamp) {
+        return MissionFactory.create(stamp, MISSION_NAME);
     }
 
-    public static Mission createMissionWithId(Long id, Stamp stamp, int order) {
-        Mission mission = MissionFactory.create(stamp, MISSION_NAME, MISSION_MEMO, order);
+    public static Mission createMissionWithId(Long id, Stamp stamp) {
+        Mission mission = MissionFactory.create(stamp, MISSION_NAME);
         ReflectionTestUtils.setField(mission, "id", id);
 
         return mission;

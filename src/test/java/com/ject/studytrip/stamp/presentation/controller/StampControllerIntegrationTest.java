@@ -68,8 +68,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
         exploreTrip = tripTestHelper.saveTrip(member, TripCategory.EXPLORE);
         courseStamp1 = stampTestHelper.saveStamp(courseTrip, 1);
         courseStamp2 = stampTestHelper.saveStamp(courseTrip, 2);
-        courseMission1 = missionTestHelper.saveMission(courseStamp1, 1);
-        courseMission2 = missionTestHelper.saveMission(courseStamp1, 2);
+        courseMission1 = missionTestHelper.saveMission(courseStamp1);
+        courseMission2 = missionTestHelper.saveMission(courseStamp1);
 
         Member newMember = memberTestHelper.saveMember("test@kakao.com", "TEST NICKNAME");
         newToken =

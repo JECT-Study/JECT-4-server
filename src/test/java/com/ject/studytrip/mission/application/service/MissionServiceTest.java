@@ -16,10 +16,8 @@ import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.MissionRepository;
 import com.ject.studytrip.mission.fixture.CreateMissionRequestFixture;
 import com.ject.studytrip.mission.fixture.MissionFixture;
-import com.ject.studytrip.mission.fixture.UpdateMissionOrderRequestFixture;
 import com.ject.studytrip.mission.fixture.UpdateMissionRequestFixture;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
-import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionOrderRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.fixture.StampFixture;
@@ -61,31 +59,15 @@ class MissionServiceTest extends BaseUnitTest {
         exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE);
         courseStamp = StampFixture.createStampWithId(1L, courseTrip, 1);
         exploreStamp = StampFixture.createStampWithId(2L, exploreTrip, 0);
-        courseMission = MissionFixture.createMissionWithId(1L, courseStamp, 1);
-        exploreMission1 = MissionFixture.createMissionWithId(2L, exploreStamp, 1);
-        exploreMission2 = MissionFixture.createMissionWithId(3L, exploreStamp, 2);
+        courseMission = MissionFixture.createMissionWithId(1L, courseStamp);
+        exploreMission1 = MissionFixture.createMissionWithId(2L, exploreStamp);
+        exploreMission2 = MissionFixture.createMissionWithId(3L, exploreStamp);
     }
 
     @Nested
     @DisplayName("createMission 메서드는")
     class CreateMission {
         private final CreateMissionRequestFixture fixture = new CreateMissionRequestFixture();
-
-        @Test
-        @DisplayName("미션 순서가 이미 존재할 경우 예외가 발생한다.")
-        void shouldThrowExceptionWhenMissionOrderAlreadyExists() {
-            // given
-            CreateMissionRequest request = fixture.build();
-            given(
-                            missionRepository.existsByStampIdAndMissionOrderAndDeletedAtIsNull(
-                                    courseStamp.getId(), request.order()))
-                    .willReturn(true);
-
-            // when & then
-            assertThatThrownBy(() -> missionService.createMission(courseStamp, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ORDER_ALREADY_EXISTS.getMessage());
-        }
 
         @Test
         @DisplayName("코스형 여행 스탬프를 위한 미션을 생성하고 반환한다.")
@@ -100,7 +82,6 @@ class MissionServiceTest extends BaseUnitTest {
             // then
             assertThat(result).isEqualTo(courseMission);
             assertThat(result.getStamp()).isEqualTo(courseStamp);
-            assertThat(result.getMissionOrder()).isEqualTo(request.order());
         }
 
         @Test
@@ -116,23 +97,6 @@ class MissionServiceTest extends BaseUnitTest {
             // then
             assertThat(result).isEqualTo(exploreMission1);
             assertThat(result.getStamp()).isEqualTo(exploreStamp);
-            assertThat(result.getMissionOrder()).isEqualTo(request.order());
-        }
-
-        @Test
-        @DisplayName("메모가 없어도 탐험형 여행 스탬프를 위한 미션을 생성하고 반환한다.")
-        void shouldReturnMissionForExploreStampWithoutMemo() {
-            // given
-            CreateMissionRequest request = fixture.withMemo(null).build();
-            given(missionRepository.save(any(Mission.class))).willReturn(exploreMission1);
-
-            // when
-            Mission result = missionService.createMission(exploreStamp, request);
-
-            // then
-            assertThat(result).isEqualTo(exploreMission1);
-            assertThat(result.getStamp()).isEqualTo(exploreStamp);
-            assertThat(result.getMissionOrder()).isEqualTo(request.order());
         }
     }
 
@@ -151,7 +115,7 @@ class MissionServiceTest extends BaseUnitTest {
             // when & then
             assertThatThrownBy(
                             () ->
-                                    missionService.updateMissionNameAndMemoIfPresent(
+                                    missionService.updateMissionNameIfPresent(
                                             invalidStampId, courseMission, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP.getMessage());
@@ -169,14 +133,14 @@ class MissionServiceTest extends BaseUnitTest {
             // when & then
             assertThatThrownBy(
                             () ->
-                                    missionService.updateMissionNameAndMemoIfPresent(
+                                    missionService.updateMissionNameIfPresent(
                                             stampId, courseMission, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
         }
 
         @Test
-        @DisplayName("특정 미션의 이름만 수정하고 DB에 반영한다.")
+        @DisplayName("특정 미션의 이름을 수정하고 DB에 반영한다.")
         void shouldUpdateMissionName() {
             // given
             Long stampId = courseStamp.getId();
@@ -184,149 +148,10 @@ class MissionServiceTest extends BaseUnitTest {
                     new UpdateMissionRequestFixture().withName(NEW_MISSION_NAME).build();
 
             // when
-            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
+            missionService.updateMissionNameIfPresent(stampId, courseMission, request);
 
             // then
             assertThat(courseMission.getName()).isEqualTo(NEW_MISSION_NAME);
-        }
-
-        @Test
-        @DisplayName("특정 미션의 메모만 수정하고 DB에 반영한다.")
-        void shouldUpdateMissionMemo() {
-            // given
-            Long stampId = courseStamp.getId();
-            UpdateMissionRequest request =
-                    new UpdateMissionRequestFixture().withMemo(NEW_MISSION_MEMO).build();
-
-            // when
-            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
-
-            // then
-            assertThat(courseMission.getMemo()).isEqualTo(NEW_MISSION_MEMO);
-        }
-
-        @Test
-        @DisplayName("특정 미션의 이름과 메모를 수정하고 DB에 반영한다.")
-        void shouldUpdateMissionNameAndMemo() {
-            // given
-            Long stampId = courseStamp.getId();
-            UpdateMissionRequest request =
-                    new UpdateMissionRequestFixture()
-                            .withName(NEW_MISSION_NAME)
-                            .withMemo(NEW_MISSION_MEMO)
-                            .build();
-
-            // when
-            missionService.updateMissionNameAndMemoIfPresent(stampId, courseMission, request);
-
-            // then
-            assertThat(courseMission.getName()).isEqualTo(NEW_MISSION_NAME);
-            assertThat(courseMission.getMemo()).isEqualTo(NEW_MISSION_MEMO);
-        }
-    }
-
-    @Nested
-    @DisplayName("updateMissionOrders 메서드는")
-    class UpdateMissionOrders {
-        private final UpdateMissionOrderRequestFixture fixture =
-                new UpdateMissionOrderRequestFixture();
-
-        @Test
-        @DisplayName("미션이 다른 스탬프에 속하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenMissionNotBelongToStamp() {
-            // given
-            Long invalidStampId = courseStamp.getId();
-            List<Long> ids = List.of(2L, 3L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids))
-                    .willReturn(List.of(exploreMission1, exploreMission2));
-
-            // when & then
-            assertThatThrownBy(() -> missionService.updateMissionOrders(invalidStampId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP.getMessage());
-        }
-
-        @Test
-        @DisplayName("미션이 이미 삭제된 경우 예외가 발생한다.")
-        void shouldThrowExceptionWhenMissionIsDeleted() {
-            // given
-            Long stampId = exploreStamp.getId();
-            ReflectionTestUtils.setField(exploreMission1, "deletedAt", LocalDateTime.now());
-            List<Long> ids = List.of(2L, 3L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids))
-                    .willReturn(List.of(exploreMission1, exploreMission2));
-
-            // when & then
-            assertThatThrownBy(() -> missionService.updateMissionOrders(stampId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ALREADY_DELETED.getMessage());
-        }
-
-        @Test
-        @DisplayName("중복된 미션 ID가 존재하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenIdsDuplicated() {
-            // given
-            Long stampId = exploreStamp.getId();
-            List<Long> ids = List.of(1L, 1L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids)).willReturn(List.of(exploreMission1));
-
-            // when & then
-            assertThatThrownBy(() -> missionService.updateMissionOrders(stampId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ORDER_IDS_DUPLICATED.getMessage());
-        }
-
-        @Test
-        @DisplayName("요청된 미션 수가 실제 미션 수와 다르면 예외가 발생한다.")
-        void shouldThrowExceptionWhenSizeMismatch() {
-            // given
-            Long stampId = exploreStamp.getId();
-            List<Long> ids = List.of(1L, 2L, 3L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids))
-                    .willReturn(List.of(exploreMission1, exploreMission2));
-
-            // when & then
-            assertThatThrownBy(() -> missionService.updateMissionOrders(stampId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ORDER_SIZE_MISMATCHED.getMessage());
-        }
-
-        @Test
-        @DisplayName("요청된 ID와 실제 미션 ID가 일치하지 않으면 예외가 발생한다.")
-        void shouldThrowExceptionWhenIdsNotMatched() {
-            // given
-            Long stampId = exploreStamp.getId();
-            List<Long> ids = List.of(1L, 3L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids))
-                    .willReturn(List.of(exploreMission1, exploreMission2));
-
-            // when & then
-            assertThatThrownBy(() -> missionService.updateMissionOrders(stampId, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MissionErrorCode.MISSION_ORDER_IDS_NOT_MATCHED.getMessage());
-        }
-
-        @Test
-        @DisplayName("정상적인 요청이 들어오면 미션들의 순서를 갱신한다.")
-        void shouldUpdateMissionOrders() {
-            // given
-            Long stampId = exploreStamp.getId();
-            List<Long> ids = List.of(2L, 3L);
-            UpdateMissionOrderRequest request = fixture.withOrderedIds(ids).build();
-            given(missionRepository.findAllByIdIn(ids))
-                    .willReturn(List.of(exploreMission1, exploreMission2));
-
-            // when
-            missionService.updateMissionOrders(stampId, request);
-
-            // then
-            assertThat(exploreMission1.getMissionOrder()).isEqualTo(1);
-            assertThat(exploreMission2.getMissionOrder()).isEqualTo(2);
         }
     }
 
@@ -381,11 +206,11 @@ class MissionServiceTest extends BaseUnitTest {
     class GetMissionsByStampId {
 
         @Test
-        @DisplayName("특정 스탬프에 대한 삭제되지 않은 모든 미션을 순서대로 반환한다.")
+        @DisplayName("특정 스탬프에 대한 삭제되지 않은 모든 미션을 생성일 순으로 반환한다.")
         void shouldReturnMissionsInOrderWhenStampIdExists() {
             // given
             Long stampId = exploreStamp.getId();
-            given(missionRepository.findAllByStampIdAndDeletedAtIsNullOrderByMissionOrder(stampId))
+            given(missionRepository.findAllByStampIdAndDeletedAtIsNullOrderByCreatedAt(stampId))
                     .willReturn(List.of(exploreMission1, exploreMission2));
 
             // when
@@ -394,8 +219,6 @@ class MissionServiceTest extends BaseUnitTest {
             // then
             assertThat(result).hasSize(2);
             assertThat(result).containsExactly(exploreMission1, exploreMission2);
-            assertThat(result.get(0).getMissionOrder()).isEqualTo(1);
-            assertThat(result.get(1).getMissionOrder()).isEqualTo(2);
         }
     }
 

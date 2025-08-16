@@ -37,13 +37,10 @@ public record LoadDailyGoalDetailResponse(
 
     public record DailyGoalMissionResponse(
             @Schema(name = "데일리 미션 ID") Long dailyMissionId,
-            @Schema(name = "미션 이름") String missionName,
-            @Schema(name = "미션 메모") String missionMemo) {
+            @Schema(name = "미션 이름") String missionName) {
         public static DailyGoalMissionResponse of(DailyMissionInfo info) {
             return new DailyGoalMissionResponse(
-                    info.dailyMissionId(),
-                    info.missionInfo().missionName(),
-                    info.missionInfo().missionMemo());
+                    info.dailyMissionId(), info.missionInfo().missionName());
         }
     }
 }

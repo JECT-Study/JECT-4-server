@@ -13,30 +13,18 @@ public class MissionRepositoryAdapter implements MissionRepository {
     private final MissionJpaRepository missionJpaRepository;
 
     @Override
-    public List<Mission> findAllByStampIdOrderByMissionOrder(Long stampId) {
-        return missionJpaRepository.findAllByStampIdOrderByMissionOrder(stampId);
-    }
-
-    @Override
     public List<Mission> findAllByIdIn(List<Long> ids) {
         return missionJpaRepository.findAllByIdIn(ids);
     }
 
     @Override
-    public List<Mission> findAllByStampIdAndDeletedAtIsNullOrderByMissionOrder(Long stampId) {
-        return missionJpaRepository.findAllByStampIdAndDeletedAtIsNullOrderByMissionOrder(stampId);
+    public List<Mission> findAllByStampIdAndDeletedAtIsNullOrderByCreatedAt(Long stampId) {
+        return missionJpaRepository.findAllByStampIdAndDeletedAtIsNullOrderByCreatedAt(stampId);
     }
 
     @Override
     public Optional<Mission> findById(Long id) {
         return missionJpaRepository.findById(id);
-    }
-
-    @Override
-    public boolean existsByStampIdAndMissionOrderAndDeletedAtIsNull(
-            Long stampId, int missionOrder) {
-        return missionJpaRepository.existsByStampIdAndMissionOrderAndDeletedAtIsNull(
-                stampId, missionOrder);
     }
 
     @Override
