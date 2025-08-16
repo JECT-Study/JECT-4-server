@@ -48,7 +48,7 @@ public class StudyLogFacade {
                 studyLogService.createStudyLog(trip.getMember(), dailyGoal, request.content());
 
         // 3. 뽀모도로 총 학습시간 업데이트
-        pomodoroService.updateTotalFocusTime(dailyGoalId, request.totalFocusTimeInMinutes());
+        pomodoroService.updateTotalFocusTime(dailyGoalId, request.totalFocusTimeInSeconds());
 
         // 4. 연관 데이터 생성 및 미션 완료 처리
         createStudyLogDailyMissionsAndCompleteMissions(studyLog, selectedDailyMissions);
