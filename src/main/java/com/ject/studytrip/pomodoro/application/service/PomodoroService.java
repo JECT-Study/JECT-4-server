@@ -40,8 +40,8 @@ public class PomodoroService {
         return pomodoro;
     }
 
-    public void updateTotalFocusTime(Long dailyGoalId, int totalFocusTimeInMinutes) {
-        PomodoroPolicy.validateTotalFocusTimeNotNegative(totalFocusTimeInMinutes);
+    public void updateTotalFocusTime(Long dailyGoalId, int totalFocusTimeInSeconds) {
+        PomodoroPolicy.validateTotalFocusTimeNotNegative(totalFocusTimeInSeconds);
 
         Pomodoro pomodoro =
                 pomodoroRepository
@@ -50,7 +50,6 @@ public class PomodoroService {
                                 () -> new CustomException(PomodoroErrorCode.POMODORO_NOT_FOUND));
         PomodoroPolicy.validateNotDeleted(pomodoro);
 
-        int totalFocusTimeInSeconds = totalFocusTimeInMinutes * 60;
         pomodoro.updateTotalFocusTimeInSeconds(totalFocusTimeInSeconds);
     }
 }
