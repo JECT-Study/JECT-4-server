@@ -4,10 +4,16 @@ import com.ject.studytrip.global.util.DateUtil;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 
 public record DailyGoalInfo(
-        Long dailyGoalId, boolean completed, String createdAt, String updatedAt, String deletedAt) {
+        Long dailyGoalId,
+        String title,
+        boolean completed,
+        String createdAt,
+        String updatedAt,
+        String deletedAt) {
     public static DailyGoalInfo from(DailyGoal dailyGoal) {
         return new DailyGoalInfo(
                 dailyGoal.getId(),
+                dailyGoal.getTitle(),
                 dailyGoal.isCompleted(),
                 DateUtil.formatDateTime(dailyGoal.getCreatedAt()),
                 DateUtil.formatDateTime(dailyGoal.getUpdatedAt()),

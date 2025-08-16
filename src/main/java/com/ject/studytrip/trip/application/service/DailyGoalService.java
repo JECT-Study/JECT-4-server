@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class DailyGoalService {
     public final DailyGoalRepository dailyGoalRepository;
 
-    public DailyGoal createDailyGoal(Trip trip) {
-        DailyGoal dailyGoal = DailyGoalFactory.create(trip);
+    public DailyGoal createDailyGoal(Trip trip, String title) {
+        DailyGoal dailyGoal = DailyGoalFactory.create(trip, title);
         return dailyGoalRepository.save(dailyGoal);
     }
 

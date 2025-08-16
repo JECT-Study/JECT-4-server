@@ -87,7 +87,6 @@ class StudyLogServiceTest extends BaseUnitTest {
         void shouldReturnCreateStudyLog() {
             // given
             DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-            String title = "TEST Title";
             String content = "TEST content";
 
             given(studyLogRepository.save(any()))
@@ -99,13 +98,13 @@ class StudyLogServiceTest extends BaseUnitTest {
                             });
 
             // when
-            StudyLog result = studyLogService.createStudyLog(member, dailyGoal, title, content);
+            StudyLog result = studyLogService.createStudyLog(member, dailyGoal, content);
 
             // then
             assertThat(result.getId()).isEqualTo(1L);
             assertThat(result.getMember()).isEqualTo(member);
             assertThat(result.getDailyGoal()).isEqualTo(dailyGoal);
-            assertThat(result.getTitle()).isEqualTo(title);
+            assertThat(result.getTitle()).isEqualTo(dailyGoal.getTitle());
             assertThat(result.getContent()).isEqualTo(content);
         }
     }

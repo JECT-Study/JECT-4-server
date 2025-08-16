@@ -128,7 +128,9 @@ public class StampService {
         stamps.forEach(StampPolicy::validateNotDeleted);
 
         if (tripCategory == TripCategory.COURSE) {
-            return getCourseStampName(stamps);
+            // 코스형 여행은 상위 검증에서 동일한 스탬프인지 검증이 완료된 상태이므로
+            // 스탬프 리스트에서 첫 번째 스탬프의 이름을 추출해도 안전
+            return stamps.get(0).getName();
         }
 
         return getExplorationStampName(stamps);
@@ -150,10 +152,6 @@ public class StampService {
         boolean exists =
                 stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId);
         StampPolicy.validateAllCompleted(exists);
-    }
-
-    private String getCourseStampName(List<Stamp> stamps) {
-        return new HashSet<>(stamps).iterator().next().getName();
     }
 
     private String getExplorationStampName(List<Stamp> stamps) {

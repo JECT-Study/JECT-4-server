@@ -20,10 +20,13 @@ public class DailyGoal extends BaseTimeEntity {
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 
+    @Column(nullable = false)
+    private String title;
+
     private boolean completed;
 
-    public static DailyGoal of(Trip trip) {
-        return DailyGoal.builder().trip(trip).completed(false).build();
+    public static DailyGoal of(Trip trip, String title) {
+        return DailyGoal.builder().trip(trip).title(title).completed(false).build();
     }
 
     public void updateDeletedAt() {

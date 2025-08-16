@@ -31,11 +31,11 @@ public class StudyLog extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    public static StudyLog of(Member member, DailyGoal dailyGoal, String title, String content) {
+    public static StudyLog of(Member member, DailyGoal dailyGoal, String content) {
         return StudyLog.builder()
                 .member(member)
                 .dailyGoal(dailyGoal)
-                .title(title)
+                .title(dailyGoal.getTitle())
                 .content(content)
                 .build();
     }

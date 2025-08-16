@@ -11,6 +11,7 @@ import com.ject.studytrip.pomodoro.application.dto.PomodoroInfo;
 import com.ject.studytrip.pomodoro.application.service.PomodoroService;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.stamp.application.service.StampService;
+import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.trip.application.dto.DailyGoalDetail;
 import com.ject.studytrip.trip.application.dto.DailyGoalInfo;
 import com.ject.studytrip.trip.application.service.DailyGoalService;
@@ -40,12 +41,13 @@ public class DailyGoalFacade {
     public DailyGoalInfo createDailyGoal(
             Long memberId, Long tripId, CreateDailyGoalRequest request) {
         Trip trip = getValidTripOwnedByMember(memberId, tripId);
-
-        DailyGoal dailyGoal = dailyGoalService.createDailyGoal(trip);
-
         List<Mission> missions = getValidMissionsByTripCategory(trip, request.missionIds());
-        dailyMissionService.createDailyMissions(dailyGoal, missions);
 
+        // 스탬프 이름을 추출해 title 설정
+        String title = determineTitleByStamps(trip.getCategory(), missions);
+        DailyGoal dailyGoal = dailyGoalService.createDailyGoal(trip, title);
+
+        dailyMissionService.createDailyMissions(dailyGoal, missions);
         pomodoroService.createPomodoro(dailyGoal, request.pomodoro());
 
         return DailyGoalInfo.from(dailyGoal);
@@ -128,11 +130,15 @@ public class DailyGoalFacade {
             Long currentStampId =
                     stampService.getFirstInCompleteStampForCourseTrip(trip.getId()).getId();
 
-            for (Mission mission : missions) {
-                missionService.validateMissionBelongsToStamp(currentStampId, mission);
-            }
+            missionService.validateMissionsBelongsToStamp(currentStampId, missions);
         }
 
         return missions;
+    }
+
+    private String determineTitleByStamps(TripCategory tripCategory, List<Mission> missions) {
+        List<Stamp> stamps = missions.stream().map(Mission::getStamp).toList();
+
+        return stampService.getStampNameByTripCategory(tripCategory, stamps);
     }
 }

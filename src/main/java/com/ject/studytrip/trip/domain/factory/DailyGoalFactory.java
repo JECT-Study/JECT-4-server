@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DailyGoalFactory {
-    public static DailyGoal create(Trip trip) {
-        return DailyGoal.of(trip);
+    public static DailyGoal create(Trip trip, String title) {
+        return DailyGoal.of(trip, title);
     }
 }

@@ -23,9 +23,8 @@ public class StudyLogService {
         return studyLogQueryRepository.countActiveStudyLogsByMemberId(memberId);
     }
 
-    public StudyLog createStudyLog(
-            Member member, DailyGoal dailyGoal, String title, String content) {
-        StudyLog studyLog = StudyLogFactory.create(member, dailyGoal, title, content);
+    public StudyLog createStudyLog(Member member, DailyGoal dailyGoal, String content) {
+        StudyLog studyLog = StudyLogFactory.create(member, dailyGoal, content);
         return studyLogRepository.save(studyLog);
     }
 
