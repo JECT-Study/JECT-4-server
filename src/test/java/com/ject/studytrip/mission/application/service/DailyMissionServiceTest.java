@@ -2,7 +2,6 @@ package com.ject.studytrip.mission.application.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -13,7 +12,6 @@ import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.mission.domain.error.DailyMissionErrorCode;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.mission.domain.model.Mission;
-import com.ject.studytrip.mission.domain.policy.DailyMissionPolicy;
 import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.DailyMissionRepository;
 import com.ject.studytrip.mission.fixture.DailyMissionFixture;
@@ -178,62 +176,6 @@ public class DailyMissionServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result.isEmpty()).isFalse();
-        }
-    }
-
-    @Nested
-    @DisplayName("validateSelectedMissions 메서드는")
-    class validateSelectedMissions {
-
-        @Test
-        @DisplayName("코스형 여행에서 선택한 DailyMission들이 모두 동일한 스탬프를 가질 경우 예외가 발생하지 않는다")
-        void shouldNotThrowExceptionWhenAllStampsAreSameInCourseTrip() {
-            // given
-            Stamp stamp = StampFixture.createStampWithId(1L, courseTrip, 1);
-            Mission mission1 = MissionFixture.createMissionWithId(1L, stamp, 1);
-            Mission mission2 = MissionFixture.createMissionWithId(2L, stamp, 2);
-
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-
-            DailyMission dailyMission1 =
-                    DailyMissionFixture.createDailyMissionWithId(1L, mission1, dailyGoal);
-            DailyMission dailyMission2 =
-                    DailyMissionFixture.createDailyMissionWithId(2L, mission2, dailyGoal);
-
-            List<DailyMission> dailyMissions = List.of(dailyMission1, dailyMission2);
-
-            // when & then
-            assertDoesNotThrow(
-                    () ->
-                            DailyMissionPolicy.validateCourseTripStampConsistency(
-                                    TripCategory.COURSE, dailyMissions));
-        }
-
-        @Test
-        @DisplayName("코스형 여행에서 선택한 DailyMission 중 하나라도 다른 스탬프를 가지면 예외가 발생한다")
-        void shouldThrowExceptionWhenStampsAreDifferentInCourseTrip() {
-            // given
-            Stamp stamp1 = StampFixture.createStampWithId(1L, courseTrip, 1);
-            Stamp stamp2 = StampFixture.createStampWithId(2L, courseTrip, 2);
-            Mission mission1 = MissionFixture.createMissionWithId(1L, stamp1, 1);
-            Mission mission2 = MissionFixture.createMissionWithId(2L, stamp2, 1);
-
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-
-            DailyMission dailyMission1 =
-                    DailyMissionFixture.createDailyMissionWithId(1L, mission1, dailyGoal);
-            DailyMission dailyMission2 =
-                    DailyMissionFixture.createDailyMissionWithId(2L, mission2, dailyGoal);
-
-            List<DailyMission> dailyMissions = List.of(dailyMission1, dailyMission2);
-
-            // when & then
-            assertThatThrownBy(
-                            () ->
-                                    DailyMissionPolicy.validateCourseTripStampConsistency(
-                                            TripCategory.COURSE, dailyMissions))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(DailyMissionErrorCode.COURSE_TRIP_STAMP_MISMATCH.getMessage());
         }
     }
 }

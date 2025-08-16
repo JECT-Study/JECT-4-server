@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StudyLogFactory {
-    public static StudyLog create(
-            Member member, DailyGoal dailyGoal, String title, String content) {
-        return StudyLog.of(member, dailyGoal, title, content);
+    public static StudyLog create(Member member, DailyGoal dailyGoal, String content) {
+        return StudyLog.of(member, dailyGoal, content);
     }
 }

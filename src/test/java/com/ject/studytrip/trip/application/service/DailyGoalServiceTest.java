@@ -49,10 +49,11 @@ public class DailyGoalServiceTest extends BaseUnitTest {
         @DisplayName("여행에 속한 데일리 목표를 생성하고 저장된 값을 반환한다")
         void shouldCreateAndSaveDailyGoal() {
             // given
+            String title = "TEST TITLE";
             given(dailyGoalRepository.save(any())).willReturn(dailyGoal);
 
             // when
-            DailyGoal result = dailyGoalService.createDailyGoal(trip);
+            DailyGoal result = dailyGoalService.createDailyGoal(trip, title);
 
             // then
             assertThat(result).isNotNull();

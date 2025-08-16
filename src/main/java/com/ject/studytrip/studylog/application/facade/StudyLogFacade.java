@@ -1,12 +1,9 @@
 package com.ject.studytrip.studylog.application.facade;
 
-import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.mission.application.service.DailyMissionService;
 import com.ject.studytrip.mission.application.service.MissionService;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.pomodoro.application.service.PomodoroService;
-import com.ject.studytrip.stamp.application.service.StampService;
-import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
 import com.ject.studytrip.studylog.application.service.StudyLogDailyMissionService;
@@ -18,7 +15,6 @@ import com.ject.studytrip.trip.application.service.DailyGoalService;
 import com.ject.studytrip.trip.application.service.TripService;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
-import com.ject.studytrip.trip.domain.model.TripCategory;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -30,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StudyLogFacade {
     private final TripService tripService;
-    private final StampService stampService;
     private final MissionService missionService;
     private final DailyGoalService dailyGoalService;
     private final DailyMissionService dailyMissionService;
@@ -45,16 +40,12 @@ public class StudyLogFacade {
         Trip trip = tripService.getValidTrip(memberId, tripId);
         DailyGoal dailyGoal = dailyGoalService.getValidDailyGoal(trip.getId(), dailyGoalId);
         List<DailyMission> selectedDailyMissions =
-                getValidatedDailyMissions(dailyGoal.getId(), request);
+                dailyMissionService.getValidDailyMissionsByIds(
+                        dailyGoal.getId(), request.selectedDailyMissionIds());
 
         // 2. 학습 로그 생성
         StudyLog studyLog =
-                createStudyLogWithTitle(
-                        trip.getMember(),
-                        dailyGoal,
-                        trip.getCategory(),
-                        selectedDailyMissions,
-                        request);
+                studyLogService.createStudyLog(trip.getMember(), dailyGoal, request.content());
 
         // 3. 뽀모도로 총 학습시간 업데이트
         pomodoroService.updateTotalFocusTime(dailyGoalId, request.totalFocusTimeInMinutes());
@@ -63,36 +54,6 @@ public class StudyLogFacade {
         createStudyLogDailyMissionsAndCompleteMissions(studyLog, selectedDailyMissions);
 
         return StudyLogInfo.from(studyLog);
-    }
-
-    private List<DailyMission> getValidatedDailyMissions(
-            Long dailyGoalId, CreateStudyLogRequest request) {
-        List<DailyMission> selectedDailyMissions =
-                dailyMissionService.getValidDailyMissionByIdsWithMissionAndStamp(
-                        dailyGoalId, request.selectedDailyMissionIds());
-        dailyMissionService.validateSelectedDailyMissions(
-                TripCategory.COURSE, selectedDailyMissions);
-        return selectedDailyMissions;
-    }
-
-    private StudyLog createStudyLogWithTitle(
-            Member member,
-            DailyGoal dailyGoal,
-            TripCategory tripCategory,
-            List<DailyMission> selectedDailyMissions,
-            CreateStudyLogRequest request) {
-        String title = determineTitleByStamps(tripCategory, selectedDailyMissions);
-        return studyLogService.createStudyLog(member, dailyGoal, title, request.content());
-    }
-
-    private String determineTitleByStamps(
-            TripCategory tripCategory, List<DailyMission> selectedDailyMissions) {
-        List<Stamp> stamps =
-                selectedDailyMissions.stream()
-                        .map(dailyMission -> dailyMission.getMission().getStamp())
-                        .toList();
-
-        return stampService.getStampNameByTripCategory(tripCategory, stamps);
     }
 
     private void createStudyLogDailyMissionsAndCompleteMissions(

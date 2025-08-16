@@ -22,7 +22,6 @@ import com.ject.studytrip.mission.helper.MissionTestHelper;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.pomodoro.helper.PomodoroTestHelper;
-import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.helper.StampTestHelper;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
@@ -412,65 +411,6 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
                             jsonPath("$.status")
                                     .value(
                                             DailyMissionErrorCode.DAILY_MISSION_ALREADY_DELETED
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("코스형 여행에서 선택된 데일리 미션들이 각각 속한 스탬프가 다를 경우 400 Bad Request를 반환한다")
-        void shouldReturnBadRequestWhenSelectedDailyMissionsHaveDifferentStampsInCourseTrip()
-                throws Exception {
-            // given
-            Stamp newStamp = stampTestHelper.saveStamp(courseTrip, 2);
-            Mission newMission = missionTestHelper.saveMission(newStamp, 1);
-            DailyMission newDailyMission =
-                    dailyMissionTestHelper.saveDailyMission(newMission, dailyGoal);
-            CreateStudyLogRequest request =
-                    fixture.withSelectedDailyMissionIds(
-                                    List.of(dailyMission.getId(), newDailyMission.getId()))
-                            .build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(token, courseTrip.getId(), dailyGoal.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            DailyMissionErrorCode.COURSE_TRIP_STAMP_MISMATCH
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("삭제된 스탬프가 포함되어있을 경우 400 Bad Request를 반환한다")
-        void shouldReturnBadRequestWhenStampIsDeleted() throws Exception {
-            // given
-            Trip trip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
-            Stamp deletedStamp = stampTestHelper.saveDeletedStamp(trip, 1);
-            Mission mission = missionTestHelper.saveMission(deletedStamp, 1);
-            DailyGoal dailyGoal = dailyGoalTestHelper.saveDailyGoal(trip);
-            DailyMission dailyMission = dailyMissionTestHelper.saveDailyMission(mission, dailyGoal);
-
-            CreateStudyLogRequest request =
-                    fixture.withSelectedDailyMissionIds(List.of(dailyMission.getId())).build();
-
-            // when
-            ResultActions resultActions =
-                    getResultActions(token, trip.getId(), dailyGoal.getId(), request);
-
-            // then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.STAMP_ALREADY_DELETED
                                                     .getStatus()
                                                     .value()));
         }

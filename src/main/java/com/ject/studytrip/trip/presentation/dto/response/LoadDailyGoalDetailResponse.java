@@ -8,6 +8,7 @@ import java.util.List;
 
 public record LoadDailyGoalDetailResponse(
         @Schema(name = "데일리 목표 ID") Long dailyGoalId,
+        @Schema(name = "데일리 목표 제목(스탬프 이름)") String title,
         @Schema(name = "데일리 목표 완료 여부") boolean completed,
         @Schema(name = "뽀모도로 정보") DailyGoalPomodoroResponse pomodoro,
         @Schema(name = "수행할 데일리 미션 목록") List<DailyGoalMissionResponse> dailyMissions) {
@@ -18,6 +19,7 @@ public record LoadDailyGoalDetailResponse(
             List<DailyMissionInfo> dailyMissionInfos) {
         return new LoadDailyGoalDetailResponse(
                 dailyGoalInfo.dailyGoalId(),
+                dailyGoalInfo.title(),
                 dailyGoalInfo.completed(),
                 DailyGoalPomodoroResponse.of(pomodoroInfo),
                 dailyMissionInfos.stream().map(DailyGoalMissionResponse::of).toList());

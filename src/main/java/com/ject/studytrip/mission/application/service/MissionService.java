@@ -121,8 +121,10 @@ public class MissionService {
         mission.updateCompleted();
     }
 
-    public void validateMissionBelongsToStamp(Long stampId, Mission mission) {
-        MissionPolicy.validateMissionBelongsToStamp(stampId, mission);
+    public void validateMissionsBelongsToStamp(Long stampId, List<Mission> missions) {
+        for (Mission mission : missions) {
+            MissionPolicy.validateMissionBelongsToStamp(stampId, mission);
+        }
     }
 
     @Transactional(readOnly = true)

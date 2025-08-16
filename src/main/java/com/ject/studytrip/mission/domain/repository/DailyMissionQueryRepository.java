@@ -5,6 +5,4 @@ import java.util.List;
 
 public interface DailyMissionQueryRepository {
     List<DailyMission> findAllByDailyGoalIdFetchJoinMission(Long dailyGoalId);
-
-    List<DailyMission> findAllByIdsFetchJoinMissionAndStamp(List<Long> ids);
 }
