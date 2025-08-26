@@ -1,11 +1,10 @@
 package com.ject.studytrip.global.config;
 
-import com.ject.studytrip.global.common.constants.SwaggerUrlConstants;
-import com.ject.studytrip.global.common.constants.UrlConstants;
+import static com.ject.studytrip.global.common.constants.UrlConstants.*;
+
+import com.ject.studytrip.auth.application.service.TokenService;
 import com.ject.studytrip.global.config.properties.TokenProperties;
-import com.ject.studytrip.global.security.CustomAccessDeniedHandler;
-import com.ject.studytrip.global.security.CustomAuthenticationEntryPoint;
-import com.ject.studytrip.global.security.JwtAuthenticationFilter;
+import com.ject.studytrip.global.security.*;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Slf4j
 @EnableWebSecurity
@@ -28,7 +29,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(TokenProperties.class)
 public class WebSecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
@@ -47,23 +47,64 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
     }
 
+    // 퍼블릭 리소스 URL 필터 체인
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(0)
+    public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
+        defaultFilterChain(http);
 
+        http.securityMatcher(STATIC_RESOURCES.getUrls());
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    // 콜백 URL 필터 체인
+    @Bean
+    @Order(1)
+    public SecurityFilterChain callbackFilterChain(HttpSecurity http) throws Exception {
+        defaultFilterChain(http);
+
+        http.securityMatcher(CALLBACK_PATHS.getUrls());
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    // Origin 추출이 필요한 URL 필터체인
+    @Bean
+    @Order(2)
+    public SecurityFilterChain originExtractionFilterChain(
+            HttpSecurity http, SecurityResponseHandler securityResponseHandler) throws Exception {
+        defaultFilterChain(http);
+
+        http.securityMatcher(ORIGIN_EXTRACT_PATHS.getUrls());
+
+        // Origin 추출 필터 등록 : CORS 이후 OriginExtractionFilter 실행
+        http.addFilterAfter(new OriginExtractionFilter(securityResponseHandler), CorsFilter.class);
+
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    // 메인 필터체인
+    @Bean
+    @Order(3)
+    public SecurityFilterChain mainFilterChain(HttpSecurity http, TokenService tokenService)
+            throws Exception {
         defaultFilterChain(http);
 
         // JWT 필터 등록 : 인증 이전에 동작해야 하므로 UsernamePasswordAuthenticationFilter 앞에 삽입
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(
+                new JwtAuthenticationFilter(tokenService),
+                UsernamePasswordAuthenticationFilter.class);
 
         // 경로 인가 설정
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
-                                .requestMatchers(SwaggerUrlConstants.getSwaggerUrls())
-                                .permitAll() // Swagger 경로
-                                .requestMatchers("/api/sample/**", "/api/auth/**")
-                                .permitAll() // 샘플 api 경로
-                                .requestMatchers("/api/trips/categories")
+                                .requestMatchers(PERMIT_ALL_API_PATHS.getUrls())
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()); // 그 외 요청은 모두 인증 수행
@@ -92,8 +133,7 @@ public class WebSecurityConfig {
         //  - prod: PROD_DOMAIN 만 허용
         //  - Spring Active Profile 기반 분기 필요
         //  - 서비스 도메인, 서버 운영 환경 설정 완료 시 작업
-        List<String> allowedOrigins =
-                Arrays.stream(UrlConstants.values()).map(UrlConstants::getValue).toList();
+        List<String> allowedOrigins = Arrays.asList(CORS_DOMAINS.getUrls());
         config.setAllowedOrigins(allowedOrigins);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -22,13 +22,15 @@ public class KakaoOauthTestHelper {
 
     public void mockSuccess(
             KakaoTokenResponse kakaoTokenResponse, KakaoUserInfoResponse kakaoUserInfoResponse) {
-        given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
+        given(kakaoOauthProvider.getKakaoTokens(anyString(), anyString()))
+                .willReturn(kakaoTokenResponse);
         given(kakaoOauthProvider.getKakaoUserInfo(anyString())).willReturn(kakaoUserInfoResponse);
     }
 
     public void mockThrowException(
             KakaoTokenResponse kakaoTokenResponse, MemberErrorCode memberErrorCode) {
-        given(kakaoOauthProvider.getKakaoTokens(anyString())).willReturn(kakaoTokenResponse);
+        given(kakaoOauthProvider.getKakaoTokens(anyString(), anyString()))
+                .willReturn(kakaoTokenResponse);
         given(kakaoOauthProvider.getKakaoUserInfo(anyString()))
                 .willThrow(new CustomException(memberErrorCode));
     }

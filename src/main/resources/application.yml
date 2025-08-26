@@ -5,6 +5,9 @@ spring:
       - redis
       - security
 
+server:
+  forward-headers-strategy: framework
+
 swagger:
   version: ${SWAGGER_VERSION:1}
   server-url: ${API_SERVER_URL:http://localhost:8080}

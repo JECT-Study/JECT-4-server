@@ -20,10 +20,10 @@ public class KakaoOauthProvider {
     private final KakaoOauthClient kakaoOauthClient;
     private final KakaoOauthProperties kakaoOauthProperties;
 
-    public KakaoTokenResponse getKakaoTokens(String code) {
+    public KakaoTokenResponse getKakaoTokens(String code, String origin) {
         validateKakaoAuthorizationCode(code);
         return kakaoOauthClient
-                .fetchKakaoTokens(kakaoOauthProperties.tokenUri(), createFormData(code))
+                .fetchKakaoTokens(kakaoOauthProperties.tokenUri(), createFormData(code, origin))
                 .block();
     }
 
@@ -34,12 +34,12 @@ public class KakaoOauthProvider {
                 .block();
     }
 
-    private BodyInserters.FormInserter<String> createFormData(String code) {
+    private BodyInserters.FormInserter<String> createFormData(String code, String origin) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "authorization_code");
         formData.add("client_id", kakaoOauthProperties.clientId());
         formData.add("client_secret", kakaoOauthProperties.clientSecret());
-        formData.add("redirect_uri", kakaoOauthProperties.redirectUri());
+        formData.add("redirect_uri", origin + kakaoOauthProperties.redirectUri());
         formData.add("code", code);
         return BodyInserters.fromFormData(formData);
     }

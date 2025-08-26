@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @DisplayName("AuthController 통합 테스트")
 class AuthControllerIntegrationTest extends BaseIntegrationTest {
     private static final String BASE_AUTH_URL = "/api/auth";
+    private static final String TEST_ORIGIN = "http://localhost:8080";
 
     @Autowired private MemberTestHelper memberTestHelper;
     @Autowired private TokenTestHelper tokenTestHelper;
@@ -73,6 +74,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         private ResultActions getResultActions(KakaoLoginRequest request) throws Exception {
             return mockMvc.perform(
                     post(BASE_AUTH_URL + "/login/kakao")
+                            .header("Origin", TEST_ORIGIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)));
         }
@@ -168,6 +170,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         private ResultActions getResultActions(KakaoSignupRequest request) throws Exception {
             return mockMvc.perform(
                     post(BASE_AUTH_URL + "/signup/kakao")
+                            .header("Origin", TEST_ORIGIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)));
         }
@@ -309,6 +312,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         private ResultActions getResultActions(LogoutRequest request) throws Exception {
             return mockMvc.perform(
                     post(BASE_AUTH_URL + "/logout")
+                            .header("Origin", TEST_ORIGIN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)));
         }

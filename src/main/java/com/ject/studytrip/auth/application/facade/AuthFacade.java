@@ -22,8 +22,8 @@ public class AuthFacade {
     private final TokenService tokenService;
     private final MemberService memberService;
 
-    public TokenResponse kakaoLogin(KakaoLoginRequest request) {
-        KakaoUserInfoResponse response = kakaoLoginService.getKakaoUserInfo(request.code());
+    public TokenResponse kakaoLogin(KakaoLoginRequest request, String origin) {
+        KakaoUserInfoResponse response = kakaoLoginService.getKakaoUserInfo(request.code(), origin);
 
         Member member =
                 memberService.getMemberBySocialProviderAndSocialId(
@@ -32,8 +32,8 @@ public class AuthFacade {
         return tokenService.getTokens(member.getId().toString(), member.getRole().name());
     }
 
-    public TokenResponse kakaoSignup(KakaoSignupRequest request) {
-        KakaoUserInfoResponse response = kakaoLoginService.getKakaoUserInfo(request.code());
+    public TokenResponse kakaoSignup(KakaoSignupRequest request, String origin) {
+        KakaoUserInfoResponse response = kakaoLoginService.getKakaoUserInfo(request.code(), origin);
         CreateMemberCommand command =
                 CreateMemberCommand.of(
                         response.kakaoId(),
