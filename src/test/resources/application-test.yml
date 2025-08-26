@@ -5,9 +5,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none # 스키마 변경 책임은 전부 Flyway로. Hibernate는 생성/수정 금지
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  flyway:
+    enabled: true # Flyway 켜기
+    locations: classpath:db/migration # 마이그레이션 SQL 파일 위치(V1, V2, V3 등 여기서 읽음)
+    validate-on-migrate: true # 마이그레이션 전체 검증
+    fail-on-missing-locations: true # 경로 누락 시 실패
+    clean-disabled: false

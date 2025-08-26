@@ -5,6 +5,10 @@ spring:
       - redis
       - security
 
+  sql:
+    init:
+      mode: never
+
 server:
   forward-headers-strategy: framework
 
