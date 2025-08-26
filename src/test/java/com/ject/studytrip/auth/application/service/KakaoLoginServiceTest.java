@@ -24,6 +24,7 @@ class KakaoLoginServiceTest extends BaseUnitTest {
     private static final String EMAIL = "choi@kakao.com";
     private static final String PROFILE_IMAGE = "https://kakao.com/profile.jpg";
     private static final String VALID_CODE = "valid-code";
+    private static final String VALID_ORIGIN = "https://test.com";
 
     @InjectMocks private KakaoLoginService kakaoLoginService;
 
@@ -37,11 +38,11 @@ class KakaoLoginServiceTest extends BaseUnitTest {
         @DisplayName("유효하지 않은 인가 코드를 전달하면 예외가 발생한다.")
         void shouldThrowExceptionWhenAuthorizationCodeIsInvalid() {
             // given
-            when(kakaoOauthProvider.getKakaoTokens(" "))
+            when(kakaoOauthProvider.getKakaoTokens(" ", VALID_ORIGIN))
                     .thenThrow(new CustomException(AuthErrorCode.INVALID_KAKAO_AUTHORIZATION_CODE));
 
             // when & then
-            assertThatThrownBy(() -> kakaoLoginService.getKakaoUserInfo(" "))
+            assertThatThrownBy(() -> kakaoLoginService.getKakaoUserInfo(" ", VALID_ORIGIN))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(AuthErrorCode.INVALID_KAKAO_AUTHORIZATION_CODE.getMessage());
         }
@@ -51,29 +52,32 @@ class KakaoLoginServiceTest extends BaseUnitTest {
         void shouldThrowExceptionWhenFetchingKakaoUserInfoFails() {
             // given
             KakaoTokenResponse tokenResponse = new KakaoTokenResponseFixture().build();
-            when(kakaoOauthProvider.getKakaoTokens(VALID_CODE)).thenReturn(tokenResponse);
+            when(kakaoOauthProvider.getKakaoTokens(VALID_CODE, VALID_ORIGIN))
+                    .thenReturn(tokenResponse);
             when(kakaoOauthProvider.getKakaoUserInfo(tokenResponse.accessToken()))
                     .thenThrow(new CustomException(AuthErrorCode.KAKAO_USER_INFO_FETCH_FAILED));
 
             // when & then
-            assertThatThrownBy(() -> kakaoLoginService.getKakaoUserInfo(VALID_CODE))
+            assertThatThrownBy(() -> kakaoLoginService.getKakaoUserInfo(VALID_CODE, VALID_ORIGIN))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(AuthErrorCode.KAKAO_USER_INFO_FETCH_FAILED.getMessage());
         }
 
         @Test
-        @DisplayName("유효한 인가 코드를 전달하면 사용자 정보를 반환한다.")
-        void shouldReturnKakaoUserInfoResponseWhenCodeIsValid() {
+        @DisplayName("유효한 인가 코드와 origin을 전달하면 사용자 정보를 반환한다.")
+        void shouldReturnKakaoUserInfoResponseWhenCodeAndOriginAreValid() {
             // given
             KakaoTokenResponse kakaoTokenResponse = new KakaoTokenResponseFixture().build();
             KakaoUserInfoResponse kakaoUserInfoResponse =
                     new KakaoUserInfoResponseFixture().build();
-            when(kakaoOauthProvider.getKakaoTokens(VALID_CODE)).thenReturn(kakaoTokenResponse);
+            when(kakaoOauthProvider.getKakaoTokens(VALID_CODE, VALID_ORIGIN))
+                    .thenReturn(kakaoTokenResponse);
             when(kakaoOauthProvider.getKakaoUserInfo("access-token"))
                     .thenReturn(kakaoUserInfoResponse);
 
             // when
-            KakaoUserInfoResponse result = kakaoLoginService.getKakaoUserInfo(VALID_CODE);
+            KakaoUserInfoResponse result =
+                    kakaoLoginService.getKakaoUserInfo(VALID_CODE, VALID_ORIGIN);
 
             // then
             assertThat(result.kakaoId()).isEqualTo(KAKAO_ID);

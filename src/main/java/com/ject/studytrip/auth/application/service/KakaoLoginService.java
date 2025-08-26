@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 public class KakaoLoginService {
     private final KakaoOauthProvider kakaoOauthProvider;
 
-    public KakaoUserInfoResponse getKakaoUserInfo(String code) {
-        KakaoTokenResponse response = kakaoOauthProvider.getKakaoTokens(code);
+    public KakaoUserInfoResponse getKakaoUserInfo(String code, String origin) {
+        KakaoTokenResponse response = kakaoOauthProvider.getKakaoTokens(code, origin);
         return kakaoOauthProvider.getKakaoUserInfo(response.accessToken());
     }
 }
