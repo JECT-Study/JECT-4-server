@@ -4,6 +4,8 @@ spring:
       - datasource
       - redis
       - security
+      - flyway
+      - batch
 
   sql:
     init:

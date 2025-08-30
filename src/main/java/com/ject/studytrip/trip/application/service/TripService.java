@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -109,5 +110,15 @@ public class TripService {
     @Transactional
     public void increaseCompletedStamps(Trip trip) {
         trip.increaseCompletedStamps();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteTrips() {
+        return tripQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteTripsOwnedByDeletedMember() {
+        return tripQueryRepository.deleteAllByDeletedMemberOwner();
     }
 }

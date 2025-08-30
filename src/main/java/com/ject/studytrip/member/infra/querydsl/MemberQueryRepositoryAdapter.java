@@ -21,4 +21,9 @@ public class MemberQueryRepositoryAdapter implements MemberQueryRepository {
                 .where(member.id.eq(memberId))
                 .fetchOne();
     }
+
+    @Override
+    public long deleteAllByDeletedAtIsNotNull() {
+        return queryFactory.delete(member).where(member.deletedAt.isNotNull()).execute();
+    }
 }

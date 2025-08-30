@@ -10,6 +10,8 @@ import com.ject.studytrip.trip.domain.model.DailyGoal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,5 +48,20 @@ public class DailyMissionService {
 
     public List<DailyMission> getDailyMissionsByDailyGoal(Long dailyGoalId) {
         return dailyMissionQueryRepository.findAllByDailyGoalIdFetchJoinMission(dailyGoalId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteDailyMissions() {
+        return dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteDailyMissionsOwnedByDeletedMission() {
+        return dailyMissionQueryRepository.deleteAllByDeletedMissionOwner();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteDailyMissionsOwnedByDeletedDailyGoal() {
+        return dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }
 }

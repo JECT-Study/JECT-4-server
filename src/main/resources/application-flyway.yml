@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: "flyway"
+
+  flyway:
+    enabled: true # Flyway 켜기
+    locations:
+    - classpath:db/migration # 도메인 마이그레이션 SQL 파일 위치
+    - classpath:db/migration-batch # 배치 마이그레이션 SQL 파일 위치
+    validate-on-migrate: true # 마이그레이션 전체 검증
+    fail-on-missing-locations: true # 경로 누락 시 실패

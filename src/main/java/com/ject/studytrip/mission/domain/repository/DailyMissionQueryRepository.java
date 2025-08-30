@@ -5,4 +5,10 @@ import java.util.List;
 
 public interface DailyMissionQueryRepository {
     List<DailyMission> findAllByDailyGoalIdFetchJoinMission(Long dailyGoalId);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedMissionOwner();
+
+    long deleteAllByDeletedDailyGoalOwner();
 }

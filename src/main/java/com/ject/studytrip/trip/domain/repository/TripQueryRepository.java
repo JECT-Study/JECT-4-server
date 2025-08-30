@@ -9,4 +9,8 @@ public interface TripQueryRepository {
     Slice<Trip> findSliceByMemberId(Long memberId, Pageable pageable);
 
     long countActiveTripsByMemberIdAndCategory(Long memberId, TripCategory category);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedMemberOwner();
 }

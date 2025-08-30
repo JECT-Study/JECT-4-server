@@ -649,4 +649,66 @@ public class StampServiceTest extends BaseUnitTest {
             assertDoesNotThrow(() -> stampService.validateAllStampsCompletedByTripId(tripId));
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteStamps 메서드는")
+    class HardDeleteStamps {
+
+        @Test
+        @DisplayName("삭제된 스탬프가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedStampsDoNotExist() {
+            // given
+            given(stampQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = stampService.hardDeleteStamps();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 스탬프가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedStampsExist() {
+            // given
+            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+
+            // when
+            long result = stampService.hardDeleteStampsOwnedByDeletedTrip();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteStampsOwnedByDeletedTrip 메서드는")
+    class HardDeleteStampsOwnedByDeletedTrip {
+
+        @Test
+        @DisplayName("삭제된 여행이 소유한 스탬프가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenStampsOwnedByDeletedTripDoNotExist() {
+            // given
+            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
+
+            // when
+            long result = stampService.hardDeleteStampsOwnedByDeletedTrip();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 여행이 소유한 스탬프가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStampsOwnedByDeletedTripExist() {
+            // given
+            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+
+            // when
+            long result = stampService.hardDeleteStampsOwnedByDeletedTrip();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

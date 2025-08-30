@@ -8,4 +8,10 @@ public interface StudyLogQueryRepository {
     long countActiveStudyLogsByMemberId(Long memberId);
 
     Slice<StudyLog> findSliceByTripIdOrderByCreatedAtDesc(Long tripId, Pageable pageable);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedMemberOwner();
+
+    long deleteAllByDeletedDailyGoalOwner();
 }

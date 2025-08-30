@@ -2,9 +2,11 @@ package com.ject.studytrip.studylog.infra.querydsl;
 
 import com.ject.studytrip.mission.domain.model.QDailyMission;
 import com.ject.studytrip.mission.domain.model.QMission;
+import com.ject.studytrip.studylog.domain.model.QStudyLog;
 import com.ject.studytrip.studylog.domain.model.QStudyLogDailyMission;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
 import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionQueryRepository;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ public class StudyLogDailyMissionQueryRepositoryAdapter
             QStudyLogDailyMission.studyLogDailyMission;
     private final QDailyMission dailyMission = QDailyMission.dailyMission;
     private final QMission mission = QMission.mission;
+    private final QStudyLog studyLog = QStudyLog.studyLog;
 
     @Override
     public Map<Long, List<StudyLogDailyMission>> findStudyLogDailyMissionsGroupedByStudyLogId(
@@ -35,5 +38,37 @@ public class StudyLogDailyMissionQueryRepositoryAdapter
                 .fetch()
                 .stream()
                 .collect(Collectors.groupingBy(sldm -> sldm.getStudyLog().getId()));
+    }
+
+    @Override
+    public long deleteAllByDeletedAtIsNotNull() {
+        return queryFactory
+                .delete(studyLogDailyMission)
+                .where(studyLogDailyMission.deletedAt.isNotNull())
+                .execute();
+    }
+
+    @Override
+    public long deleteAllByDeletedDailyMissionOwner() {
+        return queryFactory
+                .delete(studyLogDailyMission)
+                .where(
+                        studyLogDailyMission.dailyMission.id.in(
+                                JPAExpressions.select(dailyMission.id)
+                                        .from(dailyMission)
+                                        .where(dailyMission.deletedAt.isNotNull())))
+                .execute();
+    }
+
+    @Override
+    public long deleteAllByDeletedStudyLogOwner() {
+        return queryFactory
+                .delete(studyLogDailyMission)
+                .where(
+                        studyLogDailyMission.studyLog.id.in(
+                                JPAExpressions.select(studyLog.id)
+                                        .from(studyLog)
+                                        .where(studyLog.deletedAt.isNotNull())))
+                .execute();
     }
 }

@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -152,6 +153,16 @@ public class StampService {
         boolean exists =
                 stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId);
         StampPolicy.validateAllCompleted(exists);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteStamps() {
+        return stampQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteStampsOwnedByDeletedTrip() {
+        return stampQueryRepository.deleteAllByDeletedTripOwner();
     }
 
     private String getExplorationStampName(List<Stamp> stamps) {

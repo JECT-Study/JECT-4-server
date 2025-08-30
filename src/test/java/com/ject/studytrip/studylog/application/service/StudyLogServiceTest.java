@@ -144,4 +144,97 @@ class StudyLogServiceTest extends BaseUnitTest {
             assertThat(result.getContent().get(1)).isEqualTo(studyLog2);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogs 메서드는")
+    class HardDeleteStudyLogs {
+
+        @Test
+        @DisplayName("삭제된 학습 로그가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedStudyLogsDoNotExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogs();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 학습 로그가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedStudyLogsExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogs();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogsOwnedByDeletedMember 메서드는")
+    class HardDeleteStudyLogsOwnedByDeletedMember {
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 학습 로그가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenStudyLogsOwnedByDeletedMemberDoNotExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 학습 로그가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStudyLogsOwnedByDeletedMemberExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogsOwnedByDeletedDailyGoal 메서드는")
+    class HardDeleteStudyLogsOwnedByDeletedDailyGoal {
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenStudyLogsOwnedByDeletedDailyGoalDoNotExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStudyLogsOwnedByDeletedDailyGoalExist() {
+            // given
+            given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+
+            // when
+            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

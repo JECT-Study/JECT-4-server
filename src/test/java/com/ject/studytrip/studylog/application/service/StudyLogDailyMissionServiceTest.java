@@ -120,4 +120,111 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
                     .findStudyLogDailyMissionsGroupedByStudyLogId(studyLogIds);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogDailyMissions 메서드는")
+    class HardDeleteStudyLogDailyMissions {
+
+        @Test
+        @DisplayName("삭제된 StudyLogDailyMission이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedStudyLogDailyMissionsDoNotExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull())
+                    .willReturn(0L);
+
+            // when
+            long result = studyLogDailyMissionService.hardDeleteStudyLogDailyMissions();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedStudyLogDailyMissionsExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull())
+                    .willReturn(5L);
+
+            // when
+            long result = studyLogDailyMissionService.hardDeleteStudyLogDailyMissions();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission 메서드는")
+    class HardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission {
+
+        @Test
+        @DisplayName("삭제된 데일리 미션이 소유한 StudyLogDailyMission이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenStudyLogDailyMissionsOwnedByDeletedDailyMissionDoNotExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner())
+                    .willReturn(0L);
+
+            // when
+            long result =
+                    studyLogDailyMissionService
+                            .hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 미션이 소유한 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStudyLogDailyMissionsOwnedByDeletedDailyMissionExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner())
+                    .willReturn(5L);
+
+            // when
+            long result =
+                    studyLogDailyMissionService
+                            .hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog 메서드는")
+    class HardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog {
+
+        @Test
+        @DisplayName("삭제된 학습 로그가 소유한 StudyLogDailyMission이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDailyMissionsOwnedByDeletedStudyLogDoNotExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner())
+                    .willReturn(0L);
+
+            // when
+            long result =
+                    studyLogDailyMissionService
+                            .hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 학습 로그가 소유한 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStudyLogDailyMissionsOwnedByDeletedStudyLogExist() {
+            // given
+            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner())
+                    .willReturn(5L);
+
+            // when
+            long result =
+                    studyLogDailyMissionService
+                            .hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

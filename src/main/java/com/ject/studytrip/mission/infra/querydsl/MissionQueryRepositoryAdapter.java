@@ -4,6 +4,7 @@ import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.domain.model.QMission;
 import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
 import com.ject.studytrip.stamp.domain.model.QStamp;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,23 @@ public class MissionQueryRepositoryAdapter implements MissionQueryRepository {
                         .fetchFirst();
 
         return hit != null;
+    }
+
+    @Override
+    public long deleteAllByDeletedAtIsNotNull() {
+        return queryFactory.delete(mission).where(mission.deletedAt.isNotNull()).execute();
+    }
+
+    @Override
+    public long deleteAllByDeletedStampOwner() {
+        return queryFactory
+                .delete(mission)
+                .where(
+                        mission.stamp.id.in(
+                                JPAExpressions.select(stamp.id)
+                                        .from(stamp)
+                                        .where(stamp.deletedAt.isNotNull())))
+                .execute();
     }
 
     //    @Override

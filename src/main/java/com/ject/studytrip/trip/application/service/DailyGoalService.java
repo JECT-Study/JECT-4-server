@@ -6,15 +6,19 @@ import com.ject.studytrip.trip.domain.factory.DailyGoalFactory;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.policy.DailyGoalPolicy;
+import com.ject.studytrip.trip.domain.repository.DailyGoalQueryRepository;
 import com.ject.studytrip.trip.domain.repository.DailyGoalRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class DailyGoalService {
     public final DailyGoalRepository dailyGoalRepository;
+    public final DailyGoalQueryRepository dailyGoalQueryRepository;
 
     public DailyGoal createDailyGoal(Trip trip, String title) {
         DailyGoal dailyGoal = DailyGoalFactory.create(trip, title);
@@ -40,5 +44,15 @@ public class DailyGoalService {
         DailyGoalPolicy.validateNotDeleted(dailyGoal);
 
         return dailyGoal;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteDailyGoals() {
+        return dailyGoalQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteDailyGoalsOwnedByDeletedTrip() {
+        return dailyGoalQueryRepository.deleteAllByDeletedTripOwner();
     }
 }

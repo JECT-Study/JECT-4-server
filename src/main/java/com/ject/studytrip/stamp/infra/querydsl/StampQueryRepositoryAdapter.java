@@ -3,6 +3,8 @@ package com.ject.studytrip.stamp.infra.querydsl;
 import com.ject.studytrip.stamp.domain.model.QStamp;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
+import com.ject.studytrip.trip.domain.model.QTrip;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 public class StampQueryRepositoryAdapter implements StampQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final QStamp stamp = QStamp.stamp;
+    private final QTrip trip = QTrip.trip;
 
     @Override
     public List<Stamp> findStampsToShiftAfterOrder(Long tripId, int deletedOrder) {
@@ -54,5 +57,22 @@ public class StampQueryRepositoryAdapter implements StampQueryRepository {
                         .fetchOne();
 
         return hit != null;
+    }
+
+    @Override
+    public long deleteAllByDeletedAtIsNotNull() {
+        return queryFactory.delete(stamp).where(stamp.deletedAt.isNotNull()).execute();
+    }
+
+    @Override
+    public long deleteAllByDeletedTripOwner() {
+        return queryFactory
+                .delete(stamp)
+                .where(
+                        stamp.trip.id.in(
+                                JPAExpressions.select(trip.id)
+                                        .from(trip)
+                                        .where(trip.deletedAt.isNotNull())))
+                .execute();
     }
 }

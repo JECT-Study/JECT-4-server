@@ -415,4 +415,66 @@ class MissionServiceTest extends BaseUnitTest {
             assertDoesNotThrow(() -> missionService.validateAllMissionsCompletedByStampId(stampId));
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteMissions 메서드는")
+    class HardDeleteMissions {
+
+        @Test
+        @DisplayName("삭제된 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedMissionsDoNotExist() {
+            // given
+            given(missionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = missionService.hardDeleteMissions();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedMissionsExist() {
+            // given
+            given(missionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = missionService.hardDeleteMissions();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteMissionsOwnedByDeletedStamp 메서드는")
+    class HardDeleteMissionsOwnedByDeletedStamp {
+
+        @Test
+        @DisplayName("삭제된 스탬프가 소유한 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenMissionsOwnedByDeletedStampDoNotExist() {
+            // given
+            given(missionQueryRepository.deleteAllByDeletedStampOwner()).willReturn(0L);
+
+            // when
+            long result = missionService.hardDeleteMissionsOwnedByDeletedStamp();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 스탬프가 소유한 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenMissionsOwnedByDeletedStampExist() {
+            // given
+            given(missionQueryRepository.deleteAllByDeletedStampOwner()).willReturn(5L);
+
+            // when
+            long result = missionService.hardDeleteMissionsOwnedByDeletedStamp();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

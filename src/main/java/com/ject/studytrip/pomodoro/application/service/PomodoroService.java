@@ -5,16 +5,20 @@ import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.factory.PomodoroFactory;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.pomodoro.domain.policy.PomodoroPolicy;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import com.ject.studytrip.pomodoro.presentation.dto.request.CreatePomodoroRequest;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class PomodoroService {
     private final PomodoroRepository pomodoroRepository;
+    private final PomodoroQueryRepository pomodoroQueryRepository;
 
     public Pomodoro createPomodoro(DailyGoal dailyGoal, CreatePomodoroRequest request) {
         int focusDurationInSeconds = request.focusDurationInMinute() * 60;
@@ -51,5 +55,15 @@ public class PomodoroService {
         PomodoroPolicy.validateNotDeleted(pomodoro);
 
         pomodoro.updateTotalFocusTimeInSeconds(totalFocusTimeInSeconds);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeletePomodoros() {
+        return pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeletePomodorosOwnedByDeletedDailyGoal() {
+        return pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }
 }
