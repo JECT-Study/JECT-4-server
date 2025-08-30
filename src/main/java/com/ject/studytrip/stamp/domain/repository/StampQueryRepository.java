@@ -10,4 +10,8 @@ public interface StampQueryRepository {
     Optional<Stamp> findFirstIncompleteStampByTripId(Long tripId);
 
     boolean existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(Long tripId);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedTripOwner();
 }

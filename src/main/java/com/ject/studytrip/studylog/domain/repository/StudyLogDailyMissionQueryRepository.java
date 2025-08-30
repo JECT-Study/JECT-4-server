@@ -7,4 +7,10 @@ import java.util.Map;
 public interface StudyLogDailyMissionQueryRepository {
     Map<Long, List<StudyLogDailyMission>> findStudyLogDailyMissionsGroupedByStudyLogId(
             List<Long> studyLogIds);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedDailyMissionOwner();
+
+    long deleteAllByDeletedStudyLogOwner();
 }

@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: "batch"
+
+  batch:
+    job:
+      enabled: false # 서버 기동 시 배치 Job 자동 실행 금지 (수동/스케줄로만)
+
+    jdbc:
+      initialize-schema: never # 메타테이블은 Flyway로만 관리
+      table-prefix: BATCH_ # 배치 메타테이블 접두

@@ -363,4 +363,35 @@ class MemberServiceTest extends BaseUnitTest {
             assertThat(result).isEqualTo(MEMBER_ROLE.name());
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteMembers 메서드는")
+    class HardDeleteMembers {
+
+        @Test
+        @DisplayName("삭제된 멤버가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedMembersDoNotExist() {
+            // given
+            given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = memberService.hardDeleteMembers();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 멤버가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedMembersExist() {
+            // given
+            given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = memberService.hardDeleteMembers();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -31,5 +32,20 @@ public class StudyLogService {
     public Slice<StudyLog> getStudyLogsSliceByTripId(Long tripId, int page, int size) {
         return studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(
                 tripId, PageRequest.of(page, size));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteStudyLogs() {
+        return studyLogQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteStudyLogsOwnedByDeletedMember() {
+        return studyLogQueryRepository.deleteAllByDeletedMemberOwner();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteStudyLogsOwnedByDeletedDailyGoal() {
+        return studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }
 }

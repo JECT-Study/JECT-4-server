@@ -178,4 +178,97 @@ public class DailyMissionServiceTest extends BaseUnitTest {
             assertThat(result.isEmpty()).isFalse();
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteDailyMissions 메서드는")
+    class HardDeleteDailyMissions {
+
+        @Test
+        @DisplayName("삭제된 데일리 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedDailyMissionsDoNotExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissions();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedDailyMissionsExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissions();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteDailyMissionsOwnedByDeletedMission 메서드는")
+    class HardDeleteDailyMissionsOwnedByDeletedMission {
+
+        @Test
+        @DisplayName("삭제된 미션이 소유한 데일리 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDailyMissionsOwnedByDeletedMissionDoNotExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedMissionOwner()).willReturn(0L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissionsOwnedByDeletedMission();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 미션이 소유한 데일리 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDailyMissionsOwnedByDeletedMissionExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedMissionOwner()).willReturn(5L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissionsOwnedByDeletedMission();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteDailyMissionsOwnedByDeletedDailyGoal 메서드는")
+    class HardDeleteDailyMissionsOwnedByDeletedDailyGoal {
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 데일리 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDailyMissionsOwnedByDeletedDailyGoalDoNotExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissionsOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 데일리 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDailyMissionsOwnedByDeletedDailyGoalExist() {
+            // given
+            given(dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+
+            // when
+            long result = dailyMissionService.hardDeleteDailyMissionsOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

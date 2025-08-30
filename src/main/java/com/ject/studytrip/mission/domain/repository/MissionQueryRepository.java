@@ -7,4 +7,8 @@ public interface MissionQueryRepository {
     List<Mission> findAllByIdsInFetchJoinStamp(List<Long> ids);
 
     boolean existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(Long stampId);
+
+    long deleteAllByDeletedAtIsNotNull();
+
+    long deleteAllByDeletedStampOwner();
 }

@@ -11,6 +11,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import com.ject.studytrip.pomodoro.fixture.PomodoroFixture;
 import com.ject.studytrip.pomodoro.presentation.dto.request.CreatePomodoroRequest;
@@ -32,6 +33,7 @@ public class PomodoroServiceTest extends BaseUnitTest {
 
     @InjectMocks private PomodoroService pomodoroService;
     @Mock private PomodoroRepository pomodoroRepository;
+    @Mock private PomodoroQueryRepository pomodoroQueryRepository;
 
     private DailyGoal dailyGoal;
     private Pomodoro pomodoro;
@@ -194,6 +196,68 @@ public class PomodoroServiceTest extends BaseUnitTest {
                                             dailyGoal.getId(), totalFocusTimeInSeconds))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PomodoroErrorCode.POMODORO_ALREADY_DELETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeletePomodoros 메서드는")
+    class HardDeletePomodoros {
+
+        @Test
+        @DisplayName("삭제된 뽀모도로가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedPomodorosDoNotExist() {
+            // given
+            given(pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = pomodoroService.hardDeletePomodoros();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 뽀모도로가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedPomodorosExist() {
+            // given
+            given(pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = pomodoroService.hardDeletePomodoros();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeletePomodorosOwnedByDeletedDailyGoal 메서드는")
+    class HardDeletePomodorosOwnedByDeletedDailyGoal {
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenPomodorosOwnedByDeletedDailyGoal() {
+            // given
+            given(pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+
+            // when
+            long result = pomodoroService.hardDeletePomodorosOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenPomodorosOwnedByDeletedDailyGoal() {
+            // given
+            given(pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+
+            // when
+            long result = pomodoroService.hardDeletePomodorosOwnedByDeletedDailyGoal();
+
+            // then
+            assertThat(result).isEqualTo(5L);
         }
     }
 }

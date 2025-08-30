@@ -13,6 +13,7 @@ import com.ject.studytrip.trip.domain.error.DailyGoalErrorCode;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
+import com.ject.studytrip.trip.domain.repository.DailyGoalQueryRepository;
 import com.ject.studytrip.trip.domain.repository.DailyGoalRepository;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
@@ -29,6 +30,7 @@ public class DailyGoalServiceTest extends BaseUnitTest {
 
     @InjectMocks private DailyGoalService dailyGoalService;
     @Mock private DailyGoalRepository dailyGoalRepository;
+    @Mock private DailyGoalQueryRepository dailyGoalQueryRepository;
 
     private Member member;
     private Trip trip;
@@ -136,6 +138,68 @@ public class DailyGoalServiceTest extends BaseUnitTest {
                             () -> dailyGoalService.getValidDailyGoal(trip.getId(), deleted.getId()))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(DailyGoalErrorCode.DAILY_GOAL_ALREADY_DELETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteDailyGoals 메서드는")
+    class HardDeleteDailyGoals {
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedDailyGoalsDoNotExist() {
+            // given
+            given(dailyGoalQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = dailyGoalService.hardDeleteDailyGoals();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 데일리 목표가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedDailyGoalsExist() {
+            // given
+            given(dailyGoalQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = dailyGoalService.hardDeleteDailyGoals();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteDailyGoalsOwnedByDeletedTrip 메서드는")
+    class HardDeleteDailyGoalsOwnedByDeletedTrip {
+
+        @Test
+        @DisplayName("삭제된 여행이 소유한 데일리 목표가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDailyGoalsOwnedByDeletedTripDoNotExist() {
+            // given
+            given(dailyGoalQueryRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
+
+            // when
+            long result = dailyGoalService.hardDeleteDailyGoalsOwnedByDeletedTrip();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 여행이 소유한 데일리 목표가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDailyGoalsOwnedByDeletedTripExist() {
+            // given
+            given(dailyGoalQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+
+            // when
+            long result = dailyGoalService.hardDeleteDailyGoalsOwnedByDeletedTrip();
+
+            // then
+            assertThat(result).isEqualTo(5L);
         }
     }
 }

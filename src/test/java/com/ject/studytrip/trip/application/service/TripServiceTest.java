@@ -389,4 +389,66 @@ public class TripServiceTest extends BaseUnitTest {
             assertThat(trip.getCompletedStamps()).isEqualTo(1);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteTrips 메서드는")
+    class HardDeleteTrips {
+
+        @Test
+        @DisplayName("삭제된 여행이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedTripsDoNotExist() {
+            // given
+            given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = tripService.hardDeleteTrips();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 여행이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedTripsExist() {
+            // given
+            given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = tripService.hardDeleteTrips();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteTripsOwnedByDeletedMember 메서드는")
+    class HardDeleteTripsOwnedByDeletedMember {
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 여행이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenTripsOwnedByDeletedMemberDoNotExist() {
+            // given
+            given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+
+            // when
+            long result = tripService.hardDeleteTripsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 여행이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenTripsOwnedByDeletedMemberExist() {
+            // given
+            given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+
+            // when
+            long result = tripService.hardDeleteTripsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

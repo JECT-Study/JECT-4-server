@@ -17,6 +17,7 @@ import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -88,6 +89,11 @@ public class MemberService {
         }
 
         return memberRole.name();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteMembers() {
+        return memberQueryRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     private void validateMemberIsUnique(SocialProvider socialProvider, String socialId) {

@@ -13,6 +13,7 @@ import com.ject.studytrip.stamp.domain.model.Stamp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -93,6 +94,16 @@ public class MissionService {
                 missionQueryRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(
                         stampId);
         MissionPolicy.validateAllCompleted(exists);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteMissions() {
+        return missionQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long hardDeleteMissionsOwnedByDeletedStamp() {
+        return missionQueryRepository.deleteAllByDeletedStampOwner();
     }
 
     private void validateMissionIsActiveAndBelongsToStamp(Long stampId, Mission mission) {
