@@ -15,9 +15,13 @@ public enum AuthErrorCode implements ErrorCode {
     INVALID_KAKAO_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 카카오 액세스 토큰입니다."),
     INVALID_KAKAO_AUTHORIZATION_CODE(HttpStatus.BAD_REQUEST, "잘못된 카카오 인가 코드입니다."),
     KAKAO_SERVER_ERROR(HttpStatus.BAD_GATEWAY, "카카오 서버에서 오류가 발생했습니다."),
+    MISSING_KAKAO_SIGNUP_KEY(HttpStatus.BAD_REQUEST, "카카오 가입 키(signupKey)가 누락되었습니다."),
+    INVALID_KAKAO_SIGNUP_KEY(
+            HttpStatus.BAD_REQUEST, "요청한 카카오 가입 키(signupKey)의 정보가 존재하지 않거나 만료되었습니다."),
 
     // 인증 관련 예외
     INVALID_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 JWT 토큰입니다."),
+    MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰이 누락되었습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 리프레시 토큰입니다."),
     TOKEN_IS_BLACKLISTED(HttpStatus.UNAUTHORIZED, "블랙리스트된 엑세스 토큰입니다."),
     ;

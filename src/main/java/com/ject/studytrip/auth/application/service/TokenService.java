@@ -1,10 +1,10 @@
 package com.ject.studytrip.auth.application.service;
 
+import com.ject.studytrip.auth.application.dto.TokenInfo;
 import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.auth.domain.repository.LogoutTokenRedisRepository;
 import com.ject.studytrip.auth.domain.repository.RefreshTokenRedisRepository;
 import com.ject.studytrip.auth.infra.provider.TokenProvider;
-import com.ject.studytrip.auth.presentation.dto.response.TokenResponse;
 import com.ject.studytrip.global.exception.CustomException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class TokenService {
     private final LogoutTokenRedisRepository logoutTokenRedisRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
-    public TokenResponse getTokens(String memberId, String role) {
+    public TokenInfo getTokens(String memberId, String role) {
         String accessToken = tokenProvider.createAccessToken(memberId, role);
         String refreshToken = tokenProvider.createRefreshToken();
         long refreshTokenExpirationTime = tokenProvider.getRefreshTokenExpirationTime();
@@ -28,10 +28,10 @@ public class TokenService {
         refreshTokenRedisRepository.saveRefreshToken(
                 memberId, refreshToken, refreshTokenExpirationTime);
 
-        return TokenResponse.of(accessToken, refreshToken);
+        return TokenInfo.of(accessToken, refreshToken, refreshTokenExpirationTime);
     }
 
-    public TokenResponse reissueToken(String refreshToken, String memberId, String role) {
+    public TokenInfo reissueToken(String refreshToken, String memberId, String role) {
         long refreshTokenExpirationTime = tokenProvider.getRefreshTokenExpirationTime();
         String newAccessToken = tokenProvider.createAccessToken(memberId, role);
         String newRefreshToken = tokenProvider.createRefreshToken();
@@ -40,7 +40,7 @@ public class TokenService {
         refreshTokenRedisRepository.saveRefreshToken(
                 memberId, newRefreshToken, refreshTokenExpirationTime);
 
-        return TokenResponse.of(newAccessToken, newRefreshToken);
+        return TokenInfo.of(newAccessToken, newRefreshToken, refreshTokenExpirationTime);
     }
 
     public void logout(String accessToken, String refreshToken) {
@@ -77,6 +77,10 @@ public class TokenService {
     }
 
     private void validateRefreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new CustomException(AuthErrorCode.MISSING_REFRESH_TOKEN);
+        }
+
         if (!refreshTokenRedisRepository.existsRefreshToken(refreshToken)) {
             throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }

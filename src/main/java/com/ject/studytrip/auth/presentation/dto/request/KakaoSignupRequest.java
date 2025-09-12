@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record KakaoSignupRequest(
-        @Schema(description = "카카오 인가 코드") @NotBlank(message = "카카오 인가 코드를 입력해 주세요.") String code,
         @Schema(description = "멤버 카테고리")
                 @NotBlank(message = "멤버 카테고리를 입력해 주세요.")
                 @Pattern(

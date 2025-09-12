@@ -1,13 +1,10 @@
 package com.ject.studytrip.global.common.constants;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public final class CacheKeyConstants {
 
-@Getter
-@RequiredArgsConstructor
-public enum CacheKeyConstants {
-    AUTH_REISSUE_TOKEN_PREFIX("auth::reissue::token:"),
-    AUTH_LOGOUT_TOKEN_PREFIX("auth::logout::token:");
+    private CacheKeyConstants() {}
 
-    private final String value;
+    public static final String AUTH_REISSUE_TOKEN_PREFIX = "auth::reissue::token:";
+    public static final String AUTH_LOGOUT_TOKEN_PREFIX = "auth::logout::token:";
+    public static final String OAUTH_SIGNUP_PROFILE_PREFIX = "%s::signup::profile:";
 }
