@@ -39,7 +39,7 @@ public class OriginExtractionFilter extends OncePerRequestFilter {
         }
 
         // 허용된 origin 검증
-        List<String> allowedOrigins = Arrays.asList(CORS_DOMAINS.getUrls());
+        List<String> allowedOrigins = Arrays.asList(CORS_DOMAINS);
         if (!allowedOrigins.contains(origin)) {
             securityResponseHandler.sendResponse(response, CommonErrorCode.UNSUPPORTED_ORIGIN);
             return;

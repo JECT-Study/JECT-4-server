@@ -53,7 +53,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
-        http.securityMatcher(STATIC_RESOURCES.getUrls());
+        http.securityMatcher(STATIC_RESOURCES);
         http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
 
         return http.build();
@@ -65,7 +65,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain callbackFilterChain(HttpSecurity http) throws Exception {
         defaultFilterChain(http);
 
-        http.securityMatcher(CALLBACK_PATHS.getUrls());
+        http.securityMatcher(CALLBACK_PATHS);
         http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
 
         return http.build();
@@ -78,7 +78,7 @@ public class WebSecurityConfig {
             HttpSecurity http, SecurityResponseHandler securityResponseHandler) throws Exception {
         defaultFilterChain(http);
 
-        http.securityMatcher(ORIGIN_EXTRACT_PATHS.getUrls());
+        http.securityMatcher(ORIGIN_EXTRACT_PATHS);
 
         // Origin 추출 필터 등록 : CORS 이후 OriginExtractionFilter 실행
         http.addFilterAfter(new OriginExtractionFilter(securityResponseHandler), CorsFilter.class);
@@ -104,7 +104,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(
                 authorize ->
                         authorize
-                                .requestMatchers(PERMIT_ALL_API_PATHS.getUrls())
+                                .requestMatchers(PERMIT_ALL_API_PATHS)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()); // 그 외 요청은 모두 인증 수행
@@ -133,7 +133,7 @@ public class WebSecurityConfig {
         //  - prod: PROD_DOMAIN 만 허용
         //  - Spring Active Profile 기반 분기 필요
         //  - 서비스 도메인, 서버 운영 환경 설정 완료 시 작업
-        List<String> allowedOrigins = Arrays.asList(CORS_DOMAINS.getUrls());
+        List<String> allowedOrigins = Arrays.asList(CORS_DOMAINS);
         config.setAllowedOrigins(allowedOrigins);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

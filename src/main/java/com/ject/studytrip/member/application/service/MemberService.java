@@ -14,6 +14,7 @@ import com.ject.studytrip.member.domain.policy.MemberPolicy;
 import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,16 +61,15 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Member getMemberBySocialProviderAndSocialId(
+    public Optional<Member> getMemberBySocialProviderAndSocialId(
             SocialProvider socialProvider, String socialId) {
-        Member member =
-                memberRepository
-                        .findBySocialProviderAndSocialId(socialProvider, socialId)
-                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NEED_SIGNUP));
-
-        MemberPolicy.validateNotDeleted(member);
-
-        return member;
+        return memberRepository
+                .findBySocialProviderAndSocialId(socialProvider, socialId)
+                .map(
+                        member -> {
+                            MemberPolicy.validateNotDeleted(member);
+                            return member;
+                        });
     }
 
     @Transactional(readOnly = true)

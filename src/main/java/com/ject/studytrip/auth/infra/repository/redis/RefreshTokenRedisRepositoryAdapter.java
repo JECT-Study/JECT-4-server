@@ -19,7 +19,7 @@ public class RefreshTokenRedisRepositoryAdapter implements RefreshTokenRedisRepo
         redisTemplate
                 .opsForValue()
                 .set(
-                        AUTH_REISSUE_TOKEN_PREFIX.getValue() + refreshToken,
+                        AUTH_REISSUE_TOKEN_PREFIX + refreshToken,
                         memberId,
                         refreshTokenExpireTime,
                         TimeUnit.MILLISECONDS);
@@ -27,17 +27,16 @@ public class RefreshTokenRedisRepositoryAdapter implements RefreshTokenRedisRepo
 
     @Override
     public boolean existsRefreshToken(String refreshToken) {
-        return Boolean.TRUE.equals(
-                redisTemplate.hasKey(AUTH_REISSUE_TOKEN_PREFIX.getValue() + refreshToken));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(AUTH_REISSUE_TOKEN_PREFIX + refreshToken));
     }
 
     @Override
     public void deleteRefreshToken(String refreshToken) {
-        redisTemplate.delete(AUTH_REISSUE_TOKEN_PREFIX.getValue() + refreshToken);
+        redisTemplate.delete(AUTH_REISSUE_TOKEN_PREFIX + refreshToken);
     }
 
     @Override
     public String findMemberIdByRefreshToken(String refreshToken) {
-        return redisTemplate.opsForValue().get(AUTH_REISSUE_TOKEN_PREFIX.getValue() + refreshToken);
+        return redisTemplate.opsForValue().get(AUTH_REISSUE_TOKEN_PREFIX + refreshToken);
     }
 }

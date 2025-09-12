@@ -16,15 +16,11 @@ public class LogoutTokenRedisRepositoryAdapter implements LogoutTokenRedisReposi
     public void saveAccessToken(String accessToken, long accessTokenExpirationTime) {
         redisTemplate
                 .opsForValue()
-                .set(
-                        AUTH_LOGOUT_TOKEN_PREFIX.getValue() + accessToken,
-                        "LOGOUT",
-                        accessTokenExpirationTime);
+                .set(AUTH_LOGOUT_TOKEN_PREFIX + accessToken, "LOGOUT", accessTokenExpirationTime);
     }
 
     @Override
     public boolean existsAccessToken(String accessToken) {
-        return Boolean.TRUE.equals(
-                redisTemplate.hasKey(AUTH_LOGOUT_TOKEN_PREFIX.getValue() + accessToken));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(AUTH_LOGOUT_TOKEN_PREFIX + accessToken));
     }
 }

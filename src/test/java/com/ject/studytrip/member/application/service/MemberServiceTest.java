@@ -250,22 +250,6 @@ class MemberServiceTest extends BaseUnitTest {
     class GetMemberBySocialProviderAndSocialId {
 
         @Test
-        @DisplayName("소셜 ID로 조회 시 존재하지 않으면 예외가 발생한다.")
-        void shouldThrowExceptionWhenSocialIdNotFound() {
-            // given
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId))
-                    .willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(
-                            () ->
-                                    memberService.getMemberBySocialProviderAndSocialId(
-                                            SocialProvider.KAKAO, socialId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_NEED_SIGNUP.getMessage());
-        }
-
-        @Test
         @DisplayName("탈퇴한 Member라면 예외가 발생한다.")
         void shouldThrowExceptionWhenMemberAlreadyDeleted() {
             // given
@@ -291,8 +275,9 @@ class MemberServiceTest extends BaseUnitTest {
 
             // when
             Member result =
-                    memberService.getMemberBySocialProviderAndSocialId(
-                            SocialProvider.KAKAO, socialId);
+                    memberService
+                            .getMemberBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId)
+                            .get();
 
             // then
             assertThat(result).isEqualTo(member);

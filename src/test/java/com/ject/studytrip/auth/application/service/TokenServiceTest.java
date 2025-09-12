@@ -7,11 +7,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
+import com.ject.studytrip.auth.application.dto.TokenInfo;
 import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.auth.domain.repository.LogoutTokenRedisRepository;
 import com.ject.studytrip.auth.domain.repository.RefreshTokenRedisRepository;
 import com.ject.studytrip.auth.infra.provider.TokenProvider;
-import com.ject.studytrip.auth.presentation.dto.response.TokenResponse;
 import com.ject.studytrip.global.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,7 +53,7 @@ class TokenServiceTest extends BaseUnitTest {
                     .thenReturn(REFRESH_TOKEN_EXPIRATION_TIME);
 
             // when
-            TokenResponse response = tokenService.getTokens(MEMBER_ID, ROLE);
+            TokenInfo response = tokenService.getTokens(MEMBER_ID, ROLE);
 
             // then
             assertThat(response.accessToken()).isEqualTo(ACCESS_TOKEN);
@@ -77,7 +77,7 @@ class TokenServiceTest extends BaseUnitTest {
             given(tokenProvider.createRefreshToken()).willReturn(NEW_REFRESH_TOKEN);
 
             // when
-            TokenResponse response = tokenService.reissueToken(REFRESH_TOKEN, MEMBER_ID, ROLE);
+            TokenInfo response = tokenService.reissueToken(REFRESH_TOKEN, MEMBER_ID, ROLE);
 
             // then
             assertThat(response.accessToken()).isEqualTo(NEW_ACCESS_TOKEN);
