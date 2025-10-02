@@ -6,6 +6,7 @@ spring:
       - security
       - flyway
       - batch
+      - storage
 
   sql:
     init:
@@ -29,3 +30,6 @@ springdoc:
     syntax-highlight:
       theme: none
     urls-primary-name: StudyTrip API DOCS
+
+cdn:
+  domain: ${CDN_DOMAIN:}

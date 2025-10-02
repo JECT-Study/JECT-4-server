@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: "storage"
+
+aws:
+  s3:
+    bucket: ${S3_BUCKET_NAME:}
+    region: ${AWS_REGION:}
+    presign-expires-in-minutes: ${PRESIGN_EXPIRES_IN_MINUTES:10}
