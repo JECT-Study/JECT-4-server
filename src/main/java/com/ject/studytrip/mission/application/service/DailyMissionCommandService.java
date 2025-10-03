@@ -3,19 +3,16 @@ package com.ject.studytrip.mission.application.service;
 import com.ject.studytrip.mission.domain.factory.DailyMissionFactory;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.mission.domain.model.Mission;
-import com.ject.studytrip.mission.domain.policy.DailyMissionPolicy;
 import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
 import com.ject.studytrip.mission.domain.repository.DailyMissionRepository;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class DailyMissionService {
+public class DailyMissionCommandService {
     private final DailyMissionRepository dailyMissionRepository;
     private final DailyMissionQueryRepository dailyMissionQueryRepository;
 
@@ -32,35 +29,14 @@ public class DailyMissionService {
         dailyMission.updateDeletedAt();
     }
 
-    public List<DailyMission> getValidDailyMissionsByIds(
-            Long dailyGoalId, List<Long> dailyMissionIds) {
-        List<DailyMission> dailyMissions = dailyMissionRepository.findAllByIdIn(dailyMissionIds);
-
-        DailyMissionPolicy.validateExistAll(dailyMissions, dailyMissionIds);
-        dailyMissions.forEach(
-                dailyMission -> {
-                    DailyMissionPolicy.validateBelongsToDailyGoal(dailyMission, dailyGoalId);
-                    DailyMissionPolicy.validateNotDeleted(dailyMission);
-                });
-
-        return dailyMissions;
-    }
-
-    public List<DailyMission> getDailyMissionsByDailyGoal(Long dailyGoalId) {
-        return dailyMissionQueryRepository.findAllByDailyGoalIdFetchJoinMission(dailyGoalId);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteDailyMissions() {
         return dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteDailyMissionsOwnedByDeletedMission() {
         return dailyMissionQueryRepository.deleteAllByDeletedMissionOwner();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteDailyMissionsOwnedByDeletedDailyGoal() {
         return dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }

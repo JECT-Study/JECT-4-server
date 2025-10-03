@@ -1,6 +1,7 @@
 package com.ject.studytrip.studylog.application.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -18,24 +19,17 @@ import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@DisplayName("StudyLogService 단위 테스트")
-class StudyLogServiceTest extends BaseUnitTest {
-
-    @InjectMocks private StudyLogService studyLogService;
+@DisplayName("StudyLogCommandService 단위 테스트")
+class StudyLogCommandServiceTest extends BaseUnitTest {
+    @InjectMocks private StudyLogCommandService studyLogCommandService;
     @Mock private StudyLogRepository studyLogRepository;
     @Mock private StudyLogQueryRepository studyLogQueryRepository;
 
@@ -49,39 +43,6 @@ class StudyLogServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("getActiveStudyLogCountByMemberId 메서드는")
-    class GetActiveStudyLogCountByMemberId {
-
-        @Test
-        @DisplayName("해당 멤버의 학습 기록이 존재하지 않으면 0을 반환한다.")
-        void shouldReturnZeroWhenStudyLogDoesNotExistForMember() {
-            // given
-            given(studyLogQueryRepository.countActiveStudyLogsByMemberId(member.getId()))
-                    .willReturn(0L);
-
-            // when
-            long result = studyLogService.getActiveStudyLogCountByMemberId(member.getId());
-
-            // then
-            assertThat(result).isZero();
-        }
-
-        @Test
-        @DisplayName("해당 멤버의 학습 기록이 존재하면 그 개수를 반환한다.")
-        void shouldReturnCountWhenStudyLogExistsForMember() {
-            // given
-            given(studyLogQueryRepository.countActiveStudyLogsByMemberId(member.getId()))
-                    .willReturn(3L);
-
-            // when
-            long result = studyLogService.getActiveStudyLogCountByMemberId(member.getId());
-
-            // then
-            assertThat(result).isEqualTo(3L);
-        }
-    }
-
-    @Nested
     @DisplayName("createStudyLog 메서드는")
     class createStudyLog {
 
@@ -90,7 +51,7 @@ class StudyLogServiceTest extends BaseUnitTest {
         void shouldReturnCreateStudyLog() {
             // given
             DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-            String content = "TEST content";
+            String content = "TEST CONTENT";
 
             given(studyLogRepository.save(any()))
                     .willAnswer(
@@ -101,7 +62,7 @@ class StudyLogServiceTest extends BaseUnitTest {
                             });
 
             // when
-            StudyLog result = studyLogService.createStudyLog(member, dailyGoal, content);
+            StudyLog result = studyLogCommandService.createStudyLog(member, dailyGoal, content);
 
             // then
             assertThat(result.getId()).isEqualTo(1L);
@@ -109,42 +70,6 @@ class StudyLogServiceTest extends BaseUnitTest {
             assertThat(result.getDailyGoal()).isEqualTo(dailyGoal);
             assertThat(result.getTitle()).isEqualTo(dailyGoal.getTitle());
             assertThat(result.getContent()).isEqualTo(content);
-        }
-    }
-
-    @Nested
-    @DisplayName("getStudyLogsSliceByTripId 메서드는")
-    class getStudyLogsSliceByTripId {
-
-        @Test
-        @DisplayName("특정 여행의 학습 로그 목록을 페이징 처리와 최신순으로 정렬하고 반환한다")
-        void shouldReturnStudyLogsByTripIdWithSlice() {
-            // given
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-
-            StudyLog studyLog1 = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
-            StudyLog studyLog2 = StudyLogFixture.createStudyLogWithId(2L, member, dailyGoal);
-            List<StudyLog> studyLogs = List.of(studyLog1, studyLog2);
-
-            int page = 0;
-            int size = 5;
-            Pageable pageable = PageRequest.of(page, size);
-
-            Slice<StudyLog> mockSlice = new SliceImpl<>(studyLogs, pageable, false);
-
-            given(
-                            studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(
-                                    courseTrip.getId(), pageable))
-                    .willReturn(mockSlice);
-
-            // when
-            Slice<StudyLog> result =
-                    studyLogService.getStudyLogsSliceByTripId(courseTrip.getId(), page, size);
-
-            // then
-            assertThat(result.getContent().size()).isEqualTo(studyLogs.size());
-            assertThat(result.getContent().get(0)).isEqualTo(studyLog1);
-            assertThat(result.getContent().get(1)).isEqualTo(studyLog2);
         }
     }
 
@@ -159,7 +84,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogs();
+            long result = studyLogCommandService.hardDeleteStudyLogs();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -172,7 +97,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogs();
+            long result = studyLogCommandService.hardDeleteStudyLogs();
 
             // then
             assertThat(result).isEqualTo(5L);
@@ -190,7 +115,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedMember();
+            long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedMember();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -203,7 +128,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedMember();
+            long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedMember();
 
             // then
             assertThat(result).isEqualTo(5L);
@@ -221,7 +146,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
+            long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -234,61 +159,10 @@ class StudyLogServiceTest extends BaseUnitTest {
             given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
 
             // when
-            long result = studyLogService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
+            long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
 
             // then
             assertThat(result).isEqualTo(5L);
-        }
-    }
-
-    @Nested
-    @DisplayName("getValidStudyLogById 메서드는")
-    class GetValidStudyLogById {
-
-        @Test
-        @DisplayName("존재하지 않는 학습 로그 ID로 조회하면 예외가 발생한다")
-        void shouldThrowExceptionWhenStudyLogNotFound() {
-            // given
-            Long invalidId = -1L;
-            given(studyLogRepository.findById(invalidId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> studyLogService.getValidStudyLogById(invalidId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(StudyLogErrorCode.STUDY_LOG_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        @DisplayName("삭제된 학습 로그를 조회하면 예외가 발생한다")
-        void shouldThrowExceptionWhenStudyLogIsDeleted() {
-            // given
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
-            studyLog.updateDeletedAt();
-
-            given(studyLogRepository.findById(1L)).willReturn(Optional.of(studyLog));
-
-            // when & then
-            assertThatThrownBy(() -> studyLogService.getValidStudyLogById(1L))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED.getMessage());
-        }
-
-        @Test
-        @DisplayName("유효한 학습 로그 ID로 조회하면 학습 로그를 반환한다")
-        void shouldReturnStudyLogWhenIdIsValid() {
-            // given
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
-
-            given(studyLogRepository.findById(1L)).willReturn(Optional.of(studyLog));
-
-            // when
-            StudyLog result = studyLogService.getValidStudyLogById(1L);
-
-            // then
-            assertThat(result).isEqualTo(studyLog);
-            assertThat(result.getDeletedAt()).isNull();
         }
     }
 
@@ -307,7 +181,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             studyLog.updateDeletedAt();
 
             // when & then
-            assertThatThrownBy(() -> studyLogService.updateImageUrl(studyLog, NEW_IMAGE_URL))
+            assertThatThrownBy(() -> studyLogCommandService.updateImageUrl(studyLog, NEW_IMAGE_URL))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED.getMessage());
         }
@@ -321,7 +195,7 @@ class StudyLogServiceTest extends BaseUnitTest {
             String oldImageUrl = studyLog.getImageUrl();
 
             // when
-            studyLogService.updateImageUrl(studyLog, NEW_IMAGE_URL);
+            studyLogCommandService.updateImageUrl(studyLog, NEW_IMAGE_URL);
 
             // then
             assertThat(studyLog.getImageUrl()).isEqualTo(NEW_IMAGE_URL);

@@ -1,15 +1,14 @@
 package com.ject.studytrip.trip.application.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
-import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
@@ -22,26 +21,18 @@ import com.ject.studytrip.trip.presentation.dto.request.CreateTripRequest;
 import com.ject.studytrip.trip.presentation.dto.request.UpdateTripRequest;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.test.util.ReflectionTestUtils;
 
-@DisplayName("TripService 단위 테스트")
-public class TripServiceTest extends BaseUnitTest {
-    private static final String TRIP_NAME = "TRIP NAME UPDATED";
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_SIZE = 5;
+@DisplayName("TripCommandService 단위 테스트")
+class TripCommandServiceTest extends BaseUnitTest {
+    private static final String NEW_TRIP_NAME = "NEW TRIP NAME";
 
-    @InjectMocks private TripService tripService;
+    @InjectMocks private TripCommandService tripCommandService;
     @Mock private TripRepository tripRepository;
     @Mock private TripQueryRepository tripQueryRepository;
 
@@ -55,7 +46,7 @@ public class TripServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("여행을 생성한다")
+    @DisplayName("createTrip 메서드는")
     class CreateTrip {
 
         @Test
@@ -66,7 +57,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripRepository.save(any())).willReturn(trip);
 
             // when
-            Trip saved = tripService.createTrip(member, request);
+            Trip saved = tripCommandService.createTrip(member, request);
 
             // then
             assertThat(saved).isNotNull();
@@ -80,7 +71,7 @@ public class TripServiceTest extends BaseUnitTest {
             CreateTripRequest request = new CreateTripRequestFixture().withCategory(null).build();
 
             // when & then
-            assertThatThrownBy(() -> tripService.createTrip(member, request))
+            assertThatThrownBy(() -> tripCommandService.createTrip(member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(TripErrorCode.TRIP_CATEGORY_REQUIRED.getMessage());
         }
@@ -92,7 +83,7 @@ public class TripServiceTest extends BaseUnitTest {
             CreateTripRequest request = new CreateTripRequestFixture().withCategory("test").build();
 
             // when & then
-            assertThatThrownBy(() -> tripService.createTrip(member, request))
+            assertThatThrownBy(() -> tripCommandService.createTrip(member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(TripErrorCode.INVALID_TRIP_CATEGORY.getMessage());
         }
@@ -108,7 +99,7 @@ public class TripServiceTest extends BaseUnitTest {
                             .build();
 
             // When & Then
-            assertThatThrownBy(() -> tripService.createTrip(member, request))
+            assertThatThrownBy(() -> tripCommandService.createTrip(member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(TripErrorCode.COURSE_TRIP_END_DATE_REQUIRED.getMessage());
         }
@@ -123,7 +114,7 @@ public class TripServiceTest extends BaseUnitTest {
                             .build();
 
             // When & Then
-            assertThatThrownBy(() -> tripService.createTrip(member, request))
+            assertThatThrownBy(() -> tripCommandService.createTrip(member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(
                             TripErrorCode.TRIP_END_DATE_BEFORE_START_DATE.getMessage());
@@ -137,27 +128,28 @@ public class TripServiceTest extends BaseUnitTest {
                     new CreateTripRequestFixture().withStamps(List.of()).build();
 
             // When & Then
-            assertThatThrownBy(() -> tripService.createTrip(member, request))
+            assertThatThrownBy(() -> tripCommandService.createTrip(member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(TripErrorCode.TRIP_STAMP_REQUIRED.getMessage());
         }
     }
 
     @Nested
-    @DisplayName("여행을 수정한다")
+    @DisplayName("updateTrip 메서드는")
     class UpdateTrip {
 
         @Test
         @DisplayName("특정 여행의 정보를 수정하고 DB에 반영한다")
         void shouldUpdateTrip() {
             // given
-            UpdateTripRequest request = new UpdateTripRequestFixture().withName(TRIP_NAME).build();
+            UpdateTripRequest request =
+                    new UpdateTripRequestFixture().withName(NEW_TRIP_NAME).build();
 
             // When
-            tripService.updateTrip(member.getId(), trip, request);
+            tripCommandService.updateTrip(trip, request);
 
             // Then
-            assertThat(trip.getName()).isEqualTo(TRIP_NAME);
+            assertThat(trip.getName()).isEqualTo(NEW_TRIP_NAME);
         }
 
         @Test
@@ -170,11 +162,16 @@ public class TripServiceTest extends BaseUnitTest {
                             .build();
 
             // When & Then
-            assertThatThrownBy(() -> tripService.updateTrip(member.getId(), trip, request))
+            assertThatThrownBy(() -> tripCommandService.updateTrip(trip, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessageContaining(
                             TripErrorCode.TRIP_END_DATE_BEFORE_START_DATE.getMessage());
         }
+    }
+
+    @Nested
+    @DisplayName("increaseTotalStamps 메서드는")
+    class IncreaseTotalStamps {
 
         @Test
         @DisplayName("여행의 총 스탬프 수를 +1 증가시킨다")
@@ -188,6 +185,11 @@ public class TripServiceTest extends BaseUnitTest {
             // then
             assertThat(trip.getTotalStamps()).isEqualTo(tripTotalStamps + 1);
         }
+    }
+
+    @Nested
+    @DisplayName("decreaseTotalStamps 메서드는")
+    class DecreaseTotalStamps {
 
         @Test
         @DisplayName("여행의 총 스탬프 수를 -1 감소시킨다")
@@ -204,147 +206,17 @@ public class TripServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("특정 여행을 삭제한다")
+    @DisplayName("deleteTrip 메서드는")
     class DeleteTrip {
 
         @Test
         @DisplayName("특정 여행을 deletedAt 필드를 현재 시간으로 업데이트한다")
         void shouldDeleteTripForUpdateDeletedAt() {
             // when
-            tripService.deleteTrip(member.getId(), trip);
+            tripCommandService.deleteTrip(trip);
 
             // then
             assertThat(trip.getDeletedAt()).isNotNull();
-        }
-    }
-
-    @Nested
-    @DisplayName("특정 여행의 정보를 조회한다")
-    class GetTrip {
-
-        @Test
-        @DisplayName("특정 여행 ID로 DB에서 조회한 후 반환한다")
-        void shouldGetTripByTripIdReturnTrip() {
-            // given
-            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
-
-            // when
-            Trip result = tripService.getTrip(trip.getId());
-
-            // then
-            assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(trip.getId());
-        }
-
-        @Test
-        @DisplayName("특정 여행 ID로 DB에서 조회한 후 유효한 여행을 반환한다")
-        void shouldGetTripByTripIdReturnValidTrip() {
-            // given
-            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
-
-            // when
-            Trip result = tripService.getValidTrip(member.getId(), trip.getId());
-
-            // then
-            assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(trip.getId());
-        }
-
-        @Test
-        @DisplayName("여행의 소유자가 아닐 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenNotTripOwner() {
-            // given
-            Member newMember = MemberFixture.createMemberFromKakao();
-            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
-
-            // When & Then
-            assertThatThrownBy(() -> tripService.getValidTrip(newMember.getId(), trip.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessageContaining(TripErrorCode.NOT_TRIP_OWNER.getMessage());
-        }
-
-        @Test
-        @DisplayName("이미 삭제된 여행일 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenAlreadyTrip() {
-            // given
-            Trip deleted = TripFixture.createDeletedTrip(member);
-            given(tripRepository.findById(any())).willReturn(Optional.of(deleted));
-
-            // when & then
-            assertThatThrownBy(() -> tripService.getValidTrip(member.getId(), deleted.getId()))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(TripErrorCode.TRIP_ALREADY_DELETED.getMessage());
-        }
-    }
-
-    @Nested
-    @DisplayName("여행 목록을 조회한다")
-    class ListTrips {
-
-        @Test
-        @DisplayName("로그인된 사용자의 여행 목록을 DB에서 조회하고 슬라이스 처리해 반환한다")
-        void shouldGetTripsReturnSlicePaged() {
-            // given
-            List<Trip> trips = List.of(trip);
-            Pageable pageable = PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE);
-            Slice<Trip> results = new SliceImpl<>(trips, pageable, false);
-            given(tripQueryRepository.findSliceByMemberId(member.getId(), pageable))
-                    .willReturn(results);
-
-            // when
-            Slice<Trip> sliceTrips =
-                    tripService.getTripsSliceByMemberId(member.getId(), DEFAULT_PAGE, DEFAULT_SIZE);
-
-            // then
-            assertThat(sliceTrips.hasContent()).isTrue();
-            assertThat(sliceTrips.hasNext()).isFalse();
-        }
-    }
-
-    @Nested
-    @DisplayName("getActiveTripCountsByMemberId 메서드는")
-    class GetActiveTripCountsByMemberId {
-
-        @Test
-        @DisplayName("해당 멤버의 여행이 존재하지 않으면 0을 반환한다.")
-        void shouldReturnZeroWhenTripDoesNotExistForMember() {
-            // given
-            given(
-                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
-                                    member.getId(), TripCategory.COURSE))
-                    .willReturn(0L);
-            given(
-                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
-                                    member.getId(), TripCategory.EXPLORE))
-                    .willReturn(0L);
-
-            // when
-            TripCount result = tripService.getActiveTripCountsByMemberId(member.getId());
-
-            // then
-            assertThat(result.course()).isZero();
-            assertThat(result.explore()).isZero();
-        }
-
-        @Test
-        @DisplayName("코스형과 탐험형 여행 개수를 각각 조회하여 TripCount를 반환한다.")
-        void shouldReturnTripCountByCategory() {
-            // given
-            given(
-                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
-                                    member.getId(), TripCategory.COURSE))
-                    .willReturn(3L);
-            given(
-                            tripQueryRepository.countActiveTripsByMemberIdAndCategory(
-                                    member.getId(), TripCategory.EXPLORE))
-                    .willReturn(2L);
-
-            // when
-            TripCount result = tripService.getActiveTripCountsByMemberId(member.getId());
-
-            // then
-            assertThat(result.course()).isEqualTo(3L);
-            assertThat(result.explore()).isEqualTo(2L);
         }
     }
 
@@ -356,10 +228,10 @@ public class TripServiceTest extends BaseUnitTest {
         @DisplayName("이미 완료된 여행이면 예외가 발생한다.")
         void shouldThrowExceptionWhenTripIsAlreadyCompleted() {
             // given
-            ReflectionTestUtils.setField(trip, "completed", true);
+            trip.updateCompleted();
 
             // when & then
-            assertThatThrownBy(() -> tripService.completeTrip(trip))
+            assertThatThrownBy(() -> tripCommandService.completeTrip(trip))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(TripErrorCode.TRIP_ALREADY_COMPLETED.getMessage());
         }
@@ -368,7 +240,7 @@ public class TripServiceTest extends BaseUnitTest {
         @DisplayName("유효한 여행이 들어오면, completed 필드를 true로 업데이트한다.")
         void shouldCompleteStamp() {
             // when
-            tripService.completeTrip(trip);
+            tripCommandService.completeTrip(trip);
 
             // then
             assertThat(trip.isCompleted()).isTrue();
@@ -383,7 +255,7 @@ public class TripServiceTest extends BaseUnitTest {
         @DisplayName("유효한 여행이 들어오면, Trip의 completedStamps 필드를 1 증가시킨다.")
         void shouldIncreaseCompletedStamps() {
             // when
-            tripService.increaseCompletedStamps(trip);
+            tripCommandService.increaseCompletedStamps(trip);
 
             // then
             assertThat(trip.getCompletedStamps()).isEqualTo(1);
@@ -401,7 +273,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
-            long result = tripService.hardDeleteTrips();
+            long result = tripCommandService.hardDeleteTrips();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -414,7 +286,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
-            long result = tripService.hardDeleteTrips();
+            long result = tripCommandService.hardDeleteTrips();
 
             // then
             assertThat(result).isEqualTo(5L);
@@ -432,7 +304,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
 
             // when
-            long result = tripService.hardDeleteTripsOwnedByDeletedMember();
+            long result = tripCommandService.hardDeleteTripsOwnedByDeletedMember();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -445,7 +317,7 @@ public class TripServiceTest extends BaseUnitTest {
             given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
 
             // when
-            long result = tripService.hardDeleteTripsOwnedByDeletedMember();
+            long result = tripCommandService.hardDeleteTripsOwnedByDeletedMember();
 
             // then
             assertThat(result).isEqualTo(5L);

@@ -32,4 +32,8 @@ public class DailyGoal extends BaseTimeEntity {
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public void updateCompleted() {
+        this.completed = true;
+    }
 }

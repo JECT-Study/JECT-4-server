@@ -10,7 +10,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 public class TripFixture {
     private static final String TRIP_NAME = "TEST TRIP NAME";
     private static final String TRIP_MEMO = "TEST TRIP MEMO";
-    private static final TripCategory TRIP_CATEGORY_COURSE = TripCategory.COURSE;
     private static final LocalDate TRIP_END_DATE = LocalDate.now().plusDays(7);
     private static final int TRIP_TOTAL_STAMPS = 1;
 
@@ -26,19 +25,5 @@ public class TripFixture {
         ReflectionTestUtils.setField(trip, "id", id);
 
         return trip;
-    }
-
-    public static Trip createDeletedTrip(Member member) {
-        Trip deleted =
-                TripFactory.create(
-                        member,
-                        TRIP_NAME,
-                        TRIP_MEMO,
-                        TRIP_CATEGORY_COURSE,
-                        TRIP_END_DATE,
-                        TRIP_TOTAL_STAMPS);
-        deleted.updateDeletedAt();
-
-        return deleted;
     }
 }

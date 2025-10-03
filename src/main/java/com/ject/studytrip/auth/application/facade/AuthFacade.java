@@ -11,7 +11,8 @@ import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest;
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest;
 import com.ject.studytrip.auth.presentation.dto.request.LogoutRequest;
 import com.ject.studytrip.member.application.dto.CreateMemberCommand;
-import com.ject.studytrip.member.application.service.MemberService;
+import com.ject.studytrip.member.application.service.MemberCommandService;
+import com.ject.studytrip.member.application.service.MemberQueryService;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.SocialProvider;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +24,13 @@ public class AuthFacade {
     private final KakaoLoginService kakaoLoginService;
     private final KakaoSignupProfileService kakaoSignupProfileService;
     private final TokenService tokenService;
-    private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
+    private final MemberCommandService memberCommandService;
 
     public OAuthLoginOutcome kakaoLogin(KakaoLoginRequest request, String origin) {
         KakaoUserInfoResponse info = kakaoLoginService.getKakaoUserInfo(request.code(), origin);
 
-        return memberService
+        return memberQueryService
                 .getMemberBySocialProviderAndSocialId(SocialProvider.KAKAO, info.kakaoId())
                 // 가입되어 있는 사용자인 경우 토큰 발급
                 .map(
@@ -49,7 +51,7 @@ public class AuthFacade {
                         request.nickname(),
                         request.category());
 
-        Member member = memberService.createMemberFromKakao(command);
+        Member member = memberCommandService.createMemberFromKakao(command);
 
         kakaoSignupProfileService.deleteBySignupKey(signupKey);
 
@@ -58,7 +60,7 @@ public class AuthFacade {
 
     public TokenInfo reissueToken(String refreshToken) {
         String memberId = tokenService.getMemberIdByRefreshToken(refreshToken);
-        String role = memberService.getRoleByMemberId(memberId);
+        String role = memberQueryService.getRoleByMemberId(memberId);
 
         return tokenService.reissueToken(refreshToken, memberId, role);
     }

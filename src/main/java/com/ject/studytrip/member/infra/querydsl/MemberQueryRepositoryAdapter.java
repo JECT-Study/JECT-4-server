@@ -5,6 +5,7 @@ import static com.ject.studytrip.member.domain.model.QMember.member;
 import com.ject.studytrip.member.domain.model.MemberRole;
 import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,12 +15,15 @@ public class MemberQueryRepositoryAdapter implements MemberQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public MemberRole findMemberRoleById(Long memberId) {
-        return queryFactory
-                .select(member.role)
-                .from(member)
-                .where(member.id.eq(memberId))
-                .fetchOne();
+    public Optional<MemberRole> findMemberRoleById(Long memberId) {
+        MemberRole memberRole =
+                queryFactory
+                        .select(member.role)
+                        .from(member)
+                        .where(member.id.eq(memberId))
+                        .fetchOne();
+
+        return Optional.ofNullable(memberRole);
     }
 
     @Override

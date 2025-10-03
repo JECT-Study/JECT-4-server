@@ -18,11 +18,4 @@ public class DailyGoalFixture {
 
         return dailyGoal;
     }
-
-    public static DailyGoal createDeletedDailyGoal(Trip trip) {
-        DailyGoal dailyGoal = DailyGoalFactory.create(trip, DEFAULT_TITLE);
-        dailyGoal.updateDeletedAt();
-
-        return dailyGoal;
-    }
 }
