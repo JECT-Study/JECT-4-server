@@ -183,7 +183,6 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
                             header().string(
                                             HttpHeaders.SET_COOKIE,
                                             containsString("SameSite=None")));
-            ;
         }
     }
 
@@ -315,7 +314,6 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
                             header().string(
                                             HttpHeaders.SET_COOKIE,
                                             containsString("SameSite=None")));
-            ;
         }
     }
 

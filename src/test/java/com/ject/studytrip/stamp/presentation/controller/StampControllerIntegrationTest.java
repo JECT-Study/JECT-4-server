@@ -17,6 +17,7 @@ import com.ject.studytrip.mission.helper.MissionTestHelper;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
+import com.ject.studytrip.stamp.fixture.UpdateStampOrderRequestFixture;
 import com.ject.studytrip.stamp.fixture.UpdateStampRequestFixture;
 import com.ject.studytrip.stamp.helper.StampTestHelper;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
@@ -274,6 +275,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
     class UpdateStamp {
         private final UpdateStampRequestFixture updateStampRequestFixture =
                 new UpdateStampRequestFixture();
+        private final UpdateStampOrderRequestFixture updateStampOrderRequestFixture =
+                new UpdateStampOrderRequestFixture();
 
         @Nested
         @DisplayName("스탬프 이름 수정")
@@ -521,7 +524,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldUpdateStampOrders() throws Exception {
                 // given
                 UpdateStampOrderRequest request =
-                        new UpdateStampRequestFixture()
+                        updateStampOrderRequestFixture
                                 .withOrderedStampIds(
                                         List.of(courseStamp2.getId(), courseStamp1.getId()))
                                 .buildUpdateOrders();
@@ -539,7 +542,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             @DisplayName("인증되지 않은 사용자일 경우 401 예외가 발생한다")
             void shouldThrowExceptionWhenUnauthenticated() throws Exception {
                 // given
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions("", courseTrip.getId(), request);
@@ -558,7 +562,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenTripIdTypeMismatch() throws Exception {
                 // given
                 String tripId = "abc";
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions(token, tripId, request);
@@ -580,7 +585,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenInvalidTripId() throws Exception {
                 // given
                 Long tripId = 10000L;
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions(token, tripId, request);
@@ -600,7 +606,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                 // given
                 Member newMember = memberTestHelper.saveMember("test@gmail.com", "TEST");
                 Trip newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE);
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions(token, newTrip.getId(), request);
@@ -619,7 +626,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrowExceptionWhenAlreadyDeletedTrip() throws Exception {
                 // given
                 Trip deleted = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE);
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions(token, deleted.getId(), request);
@@ -640,7 +648,8 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             @DisplayName("탐험형 여행이지만 스탬프 순서 변경을 요청한 경우 400 예외가 발생한다")
             void shouldThrowExceptionWhenRequestUpdateStampOrderForExploreTrip() throws Exception {
                 // given
-                UpdateStampOrderRequest request = updateStampRequestFixture.buildUpdateOrders();
+                UpdateStampOrderRequest request =
+                        updateStampOrderRequestFixture.buildUpdateOrders();
 
                 // when
                 ResultActions resultActions = getResultActions(token, exploreTrip.getId(), request);
@@ -663,7 +672,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
             void shouldThrow400WhenStampIdInUpdateOrderRequestIsInvalid() throws Exception {
                 // given
                 UpdateStampOrderRequest request =
-                        updateStampRequestFixture
+                        updateStampOrderRequestFixture
                                 .withOrderedStampIds(List.of(100L, 200L))
                                 .buildUpdateOrders();
 
@@ -688,7 +697,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                 // given
                 Trip newTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE);
                 UpdateStampOrderRequest request =
-                        updateStampRequestFixture
+                        updateStampOrderRequestFixture
                                 .withOrderedStampIds(
                                         List.of(courseStamp1.getId(), courseStamp2.getId()))
                                 .buildUpdateOrders();
@@ -714,7 +723,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                 // given
                 Stamp newStamp = stampTestHelper.saveDeletedStamp(courseTrip, NEXT_STAMP_ORDER);
                 UpdateStampOrderRequest request =
-                        updateStampRequestFixture
+                        updateStampOrderRequestFixture
                                 .withOrderedStampIds(
                                         List.of(
                                                 newStamp.getId(),

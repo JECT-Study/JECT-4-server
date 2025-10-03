@@ -1,8 +1,8 @@
 package com.ject.studytrip.studylog.application.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.member.domain.model.Member;
@@ -23,9 +23,7 @@ import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,9 +31,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-@DisplayName("StudyLogDailyMissionService 단위 테스트")
-public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
-    @InjectMocks private StudyLogDailyMissionService studyLogDailyMissionService;
+@DisplayName("StudyLogDailyMissionCommandService 단위 테스트")
+class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
+    @InjectMocks private StudyLogDailyMissionCommandService studyLogDailyMissionCommandService;
     @Mock private StudyLogDailyMissionRepository studyLogDailyMissionRepository;
     @Mock private StudyLogDailyMissionQueryRepository studyLogDailyMissionQueryRepository;
 
@@ -63,7 +61,6 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
         void shouldReturnCreateStudyLogDailyMissions() {
             // given
             StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
-
             DailyMission dailyMission1 =
                     DailyMissionFixture.createDailyMissionWithId(1L, mission1, dailyGoal);
             DailyMission dailyMission2 =
@@ -75,49 +72,11 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
 
             // when
             List<StudyLogDailyMission> result =
-                    studyLogDailyMissionService.createStudyLogDailyMissions(
+                    studyLogDailyMissionCommandService.createStudyLogDailyMissions(
                             studyLog, dailyMissions);
 
             // then
             assertThat(result.size()).isEqualTo(dailyMissions.size());
-        }
-    }
-
-    @Nested
-    @DisplayName("getGroupedStudyLogDailyMissionsByStudyLogIds 메서드는")
-    class getGroupedStudyLogDailyMissionsByStudyLogIds {
-
-        @Test
-        @DisplayName("학습 로그 ID 리스트로 그룹화된 StudyLogDailyMission Map을 반환한다")
-        void shouldReturnGroupedStudyLogDailyMissionMap() {
-            // given
-            Long studyLogId1 = 1L;
-            Long studyLogId2 = 2L;
-
-            StudyLogDailyMission studyLogDailyMission1 = mock(StudyLogDailyMission.class);
-            StudyLogDailyMission studyLogDailyMission2 = mock(StudyLogDailyMission.class);
-            StudyLogDailyMission studyLogDailyMission3 = mock(StudyLogDailyMission.class);
-
-            Map<Long, List<StudyLogDailyMission>> mockResult = new HashMap<>();
-            mockResult.put(studyLogId1, List.of(studyLogDailyMission1, studyLogDailyMission2));
-            mockResult.put(studyLogId2, List.of(studyLogDailyMission3));
-
-            List<Long> studyLogIds = List.of(studyLogId1, studyLogId2);
-
-            given(
-                            studyLogDailyMissionQueryRepository
-                                    .findStudyLogDailyMissionsGroupedByStudyLogId(studyLogIds))
-                    .willReturn(mockResult);
-
-            // when
-            Map<Long, List<StudyLogDailyMission>> result =
-                    studyLogDailyMissionService.getGroupedStudyLogDailyMissionsByStudyLogIds(
-                            studyLogIds);
-
-            // then
-            assertThat(result).isEqualTo(mockResult);
-            verify(studyLogDailyMissionQueryRepository, times(1))
-                    .findStudyLogDailyMissionsGroupedByStudyLogId(studyLogIds);
         }
     }
 
@@ -133,7 +92,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
                     .willReturn(0L);
 
             // when
-            long result = studyLogDailyMissionService.hardDeleteStudyLogDailyMissions();
+            long result = studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissions();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -147,7 +106,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
                     .willReturn(5L);
 
             // when
-            long result = studyLogDailyMissionService.hardDeleteStudyLogDailyMissions();
+            long result = studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissions();
 
             // then
             assertThat(result).isEqualTo(5L);
@@ -167,7 +126,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
 
             // when
             long result =
-                    studyLogDailyMissionService
+                    studyLogDailyMissionCommandService
                             .hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission();
 
             // then
@@ -183,7 +142,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
 
             // when
             long result =
-                    studyLogDailyMissionService
+                    studyLogDailyMissionCommandService
                             .hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission();
 
             // then
@@ -204,7 +163,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
 
             // when
             long result =
-                    studyLogDailyMissionService
+                    studyLogDailyMissionCommandService
                             .hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog();
 
             // then
@@ -220,7 +179,7 @@ public class StudyLogDailyMissionServiceTest extends BaseUnitTest {
 
             // when
             long result =
-                    studyLogDailyMissionService
+                    studyLogDailyMissionCommandService
                             .hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog();
 
             // then

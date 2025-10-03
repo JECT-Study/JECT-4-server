@@ -10,7 +10,6 @@ import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.application.dto.CreateMemberCommand;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
-import com.ject.studytrip.member.domain.model.MemberRole;
 import com.ject.studytrip.member.domain.model.SocialProvider;
 import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
@@ -19,23 +18,19 @@ import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.member.fixture.UpdateMemberRequestFixture;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 
-@DisplayName("MemberService 단위 테스트")
-class MemberServiceTest extends BaseUnitTest {
-    private static final String MEMBER_ID = "123";
-    private static final MemberRole MEMBER_ROLE = MemberRole.ROLE_USER;
+@DisplayName("MemberCommandService 단위 테스트")
+class MemberCommandServiceTest extends BaseUnitTest {
     private static final String NEW_MEMBER_NICKNAME = "팬텀";
     private static final String NEW_MEMBER_CATEGORY = "WORKER";
 
-    @InjectMocks private MemberService memberService;
+    @InjectMocks private MemberCommandService memberCommandService;
     @Mock private MemberRepository memberRepository;
     @Mock private MemberQueryRepository memberQueryRepository;
 
@@ -48,7 +43,7 @@ class MemberServiceTest extends BaseUnitTest {
 
     @BeforeEach
     void setUp() {
-        member = MemberFixture.createMemberFromKakao();
+        member = MemberFixture.createMemberFromKakaoWithId(1L);
         memberWithoutProfileImage = MemberFixture.createMemberWithoutProfileImageFromKakao();
 
         socialId = member.getSocialId();
@@ -72,7 +67,7 @@ class MemberServiceTest extends BaseUnitTest {
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> memberService.createMemberFromKakao(command))
+            assertThatThrownBy(() -> memberCommandService.createMemberFromKakao(command))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MemberErrorCode.MEMBER_ALREADY_EXISTS.getMessage());
         }
@@ -88,7 +83,7 @@ class MemberServiceTest extends BaseUnitTest {
                     .willReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> memberService.createMemberFromKakao(command))
+            assertThatThrownBy(() -> memberCommandService.createMemberFromKakao(command))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MemberErrorCode.INVALID_MEMBER_CATEGORY.getMessage());
         }
@@ -105,7 +100,7 @@ class MemberServiceTest extends BaseUnitTest {
             given(memberRepository.save(any(Member.class))).willReturn(member);
 
             // when
-            Member result = memberService.createMemberFromKakao(command);
+            Member result = memberCommandService.createMemberFromKakao(command);
 
             // then
             assertThat(result).isEqualTo(member);
@@ -123,7 +118,7 @@ class MemberServiceTest extends BaseUnitTest {
             given(memberRepository.save(any(Member.class))).willReturn(memberWithoutProfileImage);
 
             // when
-            Member result = memberService.createMemberFromKakao(command);
+            Member result = memberCommandService.createMemberFromKakao(command);
 
             // then
             assertThat(result).isEqualTo(memberWithoutProfileImage);
@@ -143,7 +138,9 @@ class MemberServiceTest extends BaseUnitTest {
 
             // when & then
             assertThatThrownBy(
-                            () -> memberService.updateNicknameAndCategoryIfPresent(member, request))
+                            () ->
+                                    memberCommandService.updateNicknameAndCategoryIfPresent(
+                                            member, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MemberErrorCode.INVALID_MEMBER_CATEGORY.getMessage());
         }
@@ -155,7 +152,7 @@ class MemberServiceTest extends BaseUnitTest {
             UpdateMemberRequest request = fixture.withNickname(NEW_MEMBER_NICKNAME).build();
 
             // when
-            memberService.updateNicknameAndCategoryIfPresent(member, request);
+            memberCommandService.updateNicknameAndCategoryIfPresent(member, request);
 
             // then
             assertThat(member.getNickname()).isEqualTo(NEW_MEMBER_NICKNAME);
@@ -169,7 +166,7 @@ class MemberServiceTest extends BaseUnitTest {
             UpdateMemberRequest request = fixture.withCategory(NEW_MEMBER_CATEGORY).build();
 
             // when
-            memberService.updateNicknameAndCategoryIfPresent(member, request);
+            memberCommandService.updateNicknameAndCategoryIfPresent(member, request);
 
             // then
             assertThat(member.getNickname()).isEqualTo(nickname);
@@ -177,7 +174,7 @@ class MemberServiceTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("특정 멤버의 카테고리만 수정하고 DB에 반영한다.")
+        @DisplayName("특정 멤버의 닉네임과 카테고리를 수정하고 DB에 반영한다.")
         void shouldUpdateMemberNicknameAndCategory() {
             // given
             UpdateMemberRequest request =
@@ -186,181 +183,11 @@ class MemberServiceTest extends BaseUnitTest {
                             .build();
 
             // when
-            memberService.updateNicknameAndCategoryIfPresent(member, request);
+            memberCommandService.updateNicknameAndCategoryIfPresent(member, request);
 
             // then
             assertThat(member.getNickname()).isEqualTo(NEW_MEMBER_NICKNAME);
             assertThat(member.getCategory().name()).isEqualTo(NEW_MEMBER_CATEGORY);
-        }
-    }
-
-    @Nested
-    @DisplayName("deleteMember 메서드는")
-    class DeleteMember {
-
-        @Test
-        @DisplayName("멤버를 삭제하면 deletedAt 필드에 현재 시각이 설정된다.")
-        void shouldDeleteMember() {
-            // given
-            assertThat(member.getDeletedAt()).isNull();
-            LocalDateTime beforeDeletionTime = LocalDateTime.now();
-
-            // when
-            memberService.deleteMember(member);
-
-            // then
-            assertThat(member.getDeletedAt()).isNotNull();
-            assertThat(member.getDeletedAt()).isAfterOrEqualTo(beforeDeletionTime);
-        }
-    }
-
-    @Nested
-    @DisplayName("getMember 메서드는")
-    class GetMember {
-
-        @Test
-        @DisplayName("존재하지 않는 멤버 ID로 조회하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenMemberIdNotFound() {
-            // given
-            Long invalidId = -1L;
-            given(memberRepository.findById(invalidId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> memberService.getMember(invalidId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        @DisplayName("멤버 ID가 존재하면 Member를 반환한다.")
-        void shouldReturnMemberWhenMemberIdExists() {
-            // given
-            given(memberRepository.findById(1L)).willReturn(Optional.of(member));
-
-            // when
-            Member result = memberService.getMember(1L);
-
-            // then
-            assertThat(result).isEqualTo(member);
-        }
-    }
-
-    @Nested
-    @DisplayName("getMemberBySocialProviderAndSocialId 메서드는")
-    class GetMemberBySocialProviderAndSocialId {
-
-        @Test
-        @DisplayName("탈퇴한 Member라면 예외가 발생한다.")
-        void shouldThrowExceptionWhenMemberAlreadyDeleted() {
-            // given
-            member.updateDeletedAt();
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId))
-                    .willReturn(Optional.of(member));
-
-            // when & then
-            assertThatThrownBy(
-                            () ->
-                                    memberService.getMemberBySocialProviderAndSocialId(
-                                            SocialProvider.KAKAO, socialId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage());
-        }
-
-        @Test
-        @DisplayName("소셜 ID로 조회 시 존재하면 Member를 반환한다.")
-        void shouldReturnMemberWhenSocialIdExists() {
-            // given
-            given(memberRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId))
-                    .willReturn(Optional.of(member));
-
-            // when
-            Member result =
-                    memberService
-                            .getMemberBySocialProviderAndSocialId(SocialProvider.KAKAO, socialId)
-                            .get();
-
-            // then
-            assertThat(result).isEqualTo(member);
-        }
-    }
-
-    @Nested
-    @DisplayName("getActiveMemberById 메서드는")
-    class GetActiveMemberById {
-
-        @Test
-        @DisplayName("존재하지 않는 멤버 ID로 조회하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenMemberIdNotFound() {
-            // given
-            Long invalidId = -1L;
-            given(memberRepository.findByIdAndDeletedAtIsNull(invalidId))
-                    .willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> memberService.getActiveMemberById(invalidId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        @DisplayName("멤버가 이미 삭제된 경우 예외가 발생한다.")
-        void shouldThrowExceptionWhenMemberAlreadyDeleted() {
-            // given
-            Long memberId = member.getId();
-            ReflectionTestUtils.setField(member, "deletedAt", LocalDateTime.now());
-
-            // when & then
-            assertThatThrownBy(() -> memberService.getActiveMemberById(memberId))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        @DisplayName("유효한 멤버 ID가 주어지면 Member를 반환한다.")
-        void shouldReturnMemberWhenIdIsValid() {
-            // given
-            Long memberId = member.getId();
-            given(memberRepository.findByIdAndDeletedAtIsNull(memberId))
-                    .willReturn(Optional.of(member));
-
-            // when
-            Member result = memberService.getActiveMemberById(memberId);
-
-            // then
-            assertThat(result).isEqualTo(member);
-            assertThat(result.getDeletedAt()).isNull();
-        }
-    }
-
-    @Nested
-    @DisplayName("getRoleByMemberId 메서드는")
-    class GetRoleByMemberId {
-
-        @Test
-        @DisplayName("존재하지 않는 멤버 ID로 조회하면 예외가 발생한다.")
-        void shouldThrowExceptionWhenMemberIdNotFound() {
-            // given
-            given(memberQueryRepository.findMemberRoleById(Long.valueOf(MEMBER_ID)))
-                    .willReturn(null);
-
-            // when & then
-            assertThatThrownBy(() -> memberService.getRoleByMemberId(MEMBER_ID))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
-        }
-
-        @Test
-        @DisplayName("유효한 멤버 ID가 주어지면 Role을 반환한다.")
-        void shouldReturnRoleNameWhenMemberIdIsValid() {
-            // given
-            given(memberQueryRepository.findMemberRoleById(Long.valueOf(MEMBER_ID)))
-                    .willReturn(MEMBER_ROLE);
-
-            // when
-            String result = memberService.getRoleByMemberId(MEMBER_ID);
-
-            // then
-            assertThat(result).isEqualTo(MEMBER_ROLE.name());
         }
     }
 
@@ -377,7 +204,10 @@ class MemberServiceTest extends BaseUnitTest {
             member.updateDeletedAt();
 
             // when & then
-            assertThatThrownBy(() -> memberService.updateProfileImage(member, NEW_PROFILE_IMAGE))
+            assertThatThrownBy(
+                            () ->
+                                    memberCommandService.updateProfileImage(
+                                            member, NEW_PROFILE_IMAGE))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage());
         }
@@ -389,11 +219,31 @@ class MemberServiceTest extends BaseUnitTest {
             String oldProfileImage = member.getProfileImage();
 
             // when
-            memberService.updateProfileImage(member, NEW_PROFILE_IMAGE);
+            memberCommandService.updateProfileImage(member, NEW_PROFILE_IMAGE);
 
             // then
             assertThat(member.getProfileImage()).isEqualTo(NEW_PROFILE_IMAGE);
             assertThat(member.getProfileImage()).isNotEqualTo(oldProfileImage);
+        }
+    }
+
+    @Nested
+    @DisplayName("deleteMember 메서드는")
+    class DeleteMember {
+
+        @Test
+        @DisplayName("멤버를 삭제하면 deletedAt 필드에 현재 시각이 설정된다.")
+        void shouldDeleteMember() {
+            // given
+            assertThat(member.getDeletedAt()).isNull();
+            LocalDateTime beforeDeletionTime = LocalDateTime.now();
+
+            // when
+            memberCommandService.deleteMember(member);
+
+            // then
+            assertThat(member.getDeletedAt()).isNotNull();
+            assertThat(member.getDeletedAt()).isAfterOrEqualTo(beforeDeletionTime);
         }
     }
 
@@ -408,7 +258,7 @@ class MemberServiceTest extends BaseUnitTest {
             given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
-            long result = memberService.hardDeleteMembers();
+            long result = memberCommandService.hardDeleteMembers();
 
             // then
             assertThat(result).isEqualTo(0L);
@@ -421,7 +271,7 @@ class MemberServiceTest extends BaseUnitTest {
             given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
-            long result = memberService.hardDeleteMembers();
+            long result = memberCommandService.hardDeleteMembers();
 
             // then
             assertThat(result).isEqualTo(5L);

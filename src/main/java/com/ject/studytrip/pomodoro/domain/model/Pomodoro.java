@@ -37,7 +37,7 @@ public class Pomodoro extends BaseTimeEntity {
                 .dailyGoal(dailyGoal)
                 .focusDurationInSeconds(focusDurationInSeconds)
                 .focusSessionCount(focusSessionCount)
-                .breakDurationInSeconds(0)
+                .breakDurationInSeconds(breakDurationInSeconds)
                 .totalFocusTimeInSeconds(0)
                 .build();
     }

@@ -7,15 +7,12 @@ import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
 import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionQueryRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionRepository;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class StudyLogDailyMissionService {
+public class StudyLogDailyMissionCommandService {
     private final StudyLogDailyMissionRepository studyLogDailyMissionRepository;
     private final StudyLogDailyMissionQueryRepository studyLogDailyMissionQueryRepository;
 
@@ -31,23 +28,14 @@ public class StudyLogDailyMissionService {
         return studyLogDailyMissionRepository.saveAll(studyLogDailyMissions);
     }
 
-    public Map<Long, List<StudyLogDailyMission>> getGroupedStudyLogDailyMissionsByStudyLogIds(
-            List<Long> studyLogIds) {
-        return studyLogDailyMissionQueryRepository.findStudyLogDailyMissionsGroupedByStudyLogId(
-                studyLogIds);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteStudyLogDailyMissions() {
         return studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission() {
         return studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog() {
         return studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner();
     }
