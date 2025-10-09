@@ -5,8 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import com.ject.studytrip.BaseUnitTest;
+import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
+import com.ject.studytrip.studylog.domain.error.StudyLogErrorCode;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogRepository;
@@ -17,6 +19,7 @@ import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -235,6 +238,94 @@ class StudyLogServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("getValidStudyLogById 메서드는")
+    class GetValidStudyLogById {
+
+        @Test
+        @DisplayName("존재하지 않는 학습 로그 ID로 조회하면 예외가 발생한다")
+        void shouldThrowExceptionWhenStudyLogNotFound() {
+            // given
+            Long invalidId = -1L;
+            given(studyLogRepository.findById(invalidId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> studyLogService.getValidStudyLogById(invalidId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StudyLogErrorCode.STUDY_LOG_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("삭제된 학습 로그를 조회하면 예외가 발생한다")
+        void shouldThrowExceptionWhenStudyLogIsDeleted() {
+            // given
+            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
+            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+            studyLog.updateDeletedAt();
+
+            given(studyLogRepository.findById(1L)).willReturn(Optional.of(studyLog));
+
+            // when & then
+            assertThatThrownBy(() -> studyLogService.getValidStudyLogById(1L))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 학습 로그 ID로 조회하면 학습 로그를 반환한다")
+        void shouldReturnStudyLogWhenIdIsValid() {
+            // given
+            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
+            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+
+            given(studyLogRepository.findById(1L)).willReturn(Optional.of(studyLog));
+
+            // when
+            StudyLog result = studyLogService.getValidStudyLogById(1L);
+
+            // then
+            assertThat(result).isEqualTo(studyLog);
+            assertThat(result.getDeletedAt()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("updateImageUrl 메서드는")
+    class UpdateImageUrl {
+        private static final String NEW_IMAGE_URL =
+                "https://cdn.example.com/study-logs/1/image.jpg";
+
+        @Test
+        @DisplayName("삭제된 학습 로그의 이미지 URL을 수정하면 예외가 발생한다")
+        void shouldThrowExceptionWhenStudyLogIsDeleted() {
+            // given
+            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
+            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+            studyLog.updateDeletedAt();
+
+            // when & then
+            assertThatThrownBy(() -> studyLogService.updateImageUrl(studyLog, NEW_IMAGE_URL))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 학습 로그의 이미지 URL을 수정한다")
+        void shouldUpdateImageUrlWhenStudyLogIsValid() {
+            // given
+            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
+            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+            String oldImageUrl = studyLog.getImageUrl();
+
+            // when
+            studyLogService.updateImageUrl(studyLog, NEW_IMAGE_URL);
+
+            // then
+            assertThat(studyLog.getImageUrl()).isEqualTo(NEW_IMAGE_URL);
+            assertThat(studyLog.getImageUrl()).isNotEqualTo(oldImageUrl);
         }
     }
 }

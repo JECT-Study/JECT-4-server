@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.ject.studytrip.BaseUnitTest;
+import com.ject.studytrip.global.config.properties.CdnProperties;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.image.application.dto.PresignedImageInfo;
 import com.ject.studytrip.image.domain.error.ImageErrorCode;
@@ -31,6 +32,7 @@ class ImageServiceTest extends BaseUnitTest {
     @InjectMocks private ImageService imageService;
     @Mock private S3ImageStorageProvider s3Provider;
     @Mock private TikaImageProbeProvider tikaProvider;
+    @Mock private CdnProperties cdnProperties;
 
     @Nested
     @DisplayName("presign 메서드는")
@@ -90,20 +92,23 @@ class ImageServiceTest extends BaseUnitTest {
     class Confirm {
 
         @Test
-        @DisplayName("유효한 이미지를 검증하고 최종 키를 반환한다")
-        void shouldConfirmValidImageAndReturnFinalKey() {
+        @DisplayName("유효한 이미지를 검증하고 CDN URL을 반환한다")
+        void shouldConfirmValidImageAndReturnCdnUrl() {
             // given
             ImageHeadInfo headInfo = ImageHeadInfoFixture.createImageHeadInfo();
             given(s3Provider.getHeadByKey(TMP_KEY)).willReturn(headInfo);
             given(s3Provider.readPrefix(TMP_KEY, (int) VALID_CONTENT_LENGTH))
                     .willReturn(JPEG_HEADER_BYTES);
             given(tikaProvider.detectMime(JPEG_HEADER_BYTES)).willReturn(VALID_MIME);
+            given(cdnProperties.domain()).willReturn("test-cdn.cloudfront.net");
 
             // when
             String result = imageService.confirm(TMP_KEY);
 
             // then
-            assertThat(result).isEqualTo(FINAL_KEY);
+            assertThat(result).isNotNull();
+            assertThat(result).startsWith("test-cdn.cloudfront.net/");
+            assertThat(result).contains(FINAL_KEY);
             verify(s3Provider).getHeadByKey(TMP_KEY);
             verify(s3Provider).readPrefix(TMP_KEY, (int) VALID_CONTENT_LENGTH);
             verify(tikaProvider).detectMime(JPEG_HEADER_BYTES);
@@ -224,12 +229,15 @@ class ImageServiceTest extends BaseUnitTest {
             given(s3Provider.getHeadByKey(TMP_KEY)).willReturn(headInfo);
             given(s3Provider.readPrefix(TMP_KEY, (int) smallSize)).willReturn(smallImageBytes);
             given(tikaProvider.detectMime(smallImageBytes)).willReturn(VALID_MIME);
+            given(cdnProperties.domain()).willReturn("test-cdn.cloudfront.net");
 
             // when
             String result = imageService.confirm(TMP_KEY);
 
             // then
-            assertThat(result).isEqualTo(FINAL_KEY);
+            assertThat(result).isNotNull();
+            assertThat(result).startsWith("test-cdn.cloudfront.net/");
+            assertThat(result).contains(FINAL_KEY);
             verify(s3Provider).readPrefix(TMP_KEY, (int) smallSize);
         }
     }
@@ -262,6 +270,78 @@ class ImageServiceTest extends BaseUnitTest {
 
             // then
             verify(s3Provider).deleteByKeys(emptyKeys);
+        }
+    }
+
+    @Nested
+    @DisplayName("cleanup 메서드는")
+    class Cleanup {
+        private static final String IMAGE_BASE_URL = "https://test-cdn.cloudfront.net";
+        private static final String EXTRACTED_KEY = "members/1/test.jpg";
+
+        @Test
+        @DisplayName("유효한 CDN URL에서 키를 추출하고 이미지를 삭제한다")
+        void shouldExtractKeyAndDeleteImage() {
+            // given
+            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL);
+
+            // when
+            imageService.cleanup(IMAGE_BASE_URL + "/" + EXTRACTED_KEY);
+
+            // then
+            verify(s3Provider).deleteByKey(EXTRACTED_KEY);
+        }
+
+        @Test
+        @DisplayName("null URL이면 삭제하지 않는다")
+        void shouldNotDeleteWhenUrlIsNull() {
+            // given
+            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL);
+
+            // when
+            imageService.cleanup(null);
+
+            // then
+            verify(s3Provider, never()).deleteByKey(anyString());
+        }
+
+        @Test
+        @DisplayName("빈 URL이면 삭제하지 않는다")
+        void shouldNotDeleteWhenUrlIsEmpty() {
+            // given
+            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL);
+
+            // when
+            imageService.cleanup("");
+
+            // then
+            verify(s3Provider, never()).deleteByKey(anyString());
+        }
+
+        @Test
+        @DisplayName("잘못된 CDN 도메인이면 삭제하지 않는다")
+        void shouldNotDeleteWhenCdnDomainMismatch() {
+            // given
+            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL);
+
+            // when
+            imageService.cleanup("https://wrong-cdn.com/members/1/test.jpg");
+
+            // then
+            verify(s3Provider, never()).deleteByKey(anyString());
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 URL 형식이면 삭제하지 않는다")
+        void shouldNotDeleteWhenUrlFormatIsInvalid() {
+            // given
+            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL);
+
+            // when
+            imageService.cleanup("invalid-url");
+
+            // then
+            verify(s3Provider, never()).deleteByKey(anyString());
         }
     }
 }

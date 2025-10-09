@@ -7,6 +7,7 @@ public record StudyLogInfo(
         Long studyLogId,
         String title,
         String content,
+        String imageUrl,
         String createdAt,
         String updatedAt,
         String deletedAt) {
@@ -15,6 +16,7 @@ public record StudyLogInfo(
                 studyLog.getId(),
                 studyLog.getTitle(),
                 studyLog.getContent(),
+                studyLog.getImageUrl(),
                 DateUtil.formatDateTime(studyLog.getCreatedAt()),
                 DateUtil.formatDateTime(studyLog.getUpdatedAt()),
                 DateUtil.formatDateTime(studyLog.getDeletedAt()));

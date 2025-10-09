@@ -58,7 +58,6 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
-    // 프로필 이미지 수정 로직 추가 예정
     public void update(String nickname, MemberCategory category) {
         if (hasText(nickname) && !nickname.equals(this.nickname)) { // 다른 경우에만 닉네임 수정
             this.nickname = nickname;
@@ -66,6 +65,10 @@ public class Member extends BaseTimeEntity {
         if (category != null && category != this.category) { // 다른 경우에만 카테고리 수정
             this.category = category;
         }
+    }
+
+    public void updateProfileImage(String profileImage) {
+        if (hasText(profileImage)) this.profileImage = profileImage;
     }
 
     public void updateDeletedAt() {

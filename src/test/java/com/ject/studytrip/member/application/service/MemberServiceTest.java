@@ -365,6 +365,39 @@ class MemberServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("updateProfileImage 메서드는")
+    class UpdateProfileImage {
+        private static final String NEW_PROFILE_IMAGE =
+                "https://cdn.example.com/members/1/profile.jpg";
+
+        @Test
+        @DisplayName("삭제된 멤버의 프로필 이미지를 수정하면 예외가 발생한다")
+        void shouldThrowExceptionWhenMemberIsDeleted() {
+            // given
+            member.updateDeletedAt();
+
+            // when & then
+            assertThatThrownBy(() -> memberService.updateProfileImage(member, NEW_PROFILE_IMAGE))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MemberErrorCode.MEMBER_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("유효한 멤버의 프로필 이미지를 수정한다")
+        void shouldUpdateProfileImageWhenMemberIsValid() {
+            // given
+            String oldProfileImage = member.getProfileImage();
+
+            // when
+            memberService.updateProfileImage(member, NEW_PROFILE_IMAGE);
+
+            // then
+            assertThat(member.getProfileImage()).isEqualTo(NEW_PROFILE_IMAGE);
+            assertThat(member.getProfileImage()).isNotEqualTo(oldProfileImage);
+        }
+    }
+
+    @Nested
     @DisplayName("hardDeleteMembers 메서드는")
     class HardDeleteMembers {
 

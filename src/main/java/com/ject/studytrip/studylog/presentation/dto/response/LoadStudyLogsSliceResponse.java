@@ -29,6 +29,7 @@ public record LoadStudyLogsSliceResponse(
                     List<StudyLogDailyMissionResponse> dailyMissions,
             @Schema(description = "학습 로그 제목") String title,
             @Schema(description = "학습 로그 내용") String content,
+            @Schema(description = "학습 로그 이미지 URL") String imageUrl,
             @Schema(description = "학습 로그 생성날짜") String createdAt) {
         private static StudyLogResponse of(
                 StudyLogInfo studyLogInfo,
@@ -46,6 +47,7 @@ public record LoadStudyLogsSliceResponse(
                             .toList(),
                     studyLogInfo.title(),
                     studyLogInfo.content(),
+                    studyLogInfo.imageUrl(),
                     studyLogInfo.createdAt());
         }
 

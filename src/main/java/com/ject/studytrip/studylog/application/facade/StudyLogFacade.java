@@ -1,16 +1,21 @@
 package com.ject.studytrip.studylog.application.facade;
 
+import com.ject.studytrip.image.application.dto.PresignedImageInfo;
+import com.ject.studytrip.image.application.service.ImageService;
 import com.ject.studytrip.mission.application.service.DailyMissionService;
 import com.ject.studytrip.mission.application.service.MissionService;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.pomodoro.application.service.PomodoroService;
+import com.ject.studytrip.studylog.application.dto.PresignedStudyLogImageInfo;
 import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
 import com.ject.studytrip.studylog.application.service.StudyLogDailyMissionService;
 import com.ject.studytrip.studylog.application.service.StudyLogService;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
+import com.ject.studytrip.studylog.presentation.dto.request.ConfirmStudyLogImageRequest;
 import com.ject.studytrip.studylog.presentation.dto.request.CreateStudyLogRequest;
+import com.ject.studytrip.studylog.presentation.dto.request.PresignStudyLogImageRequest;
 import com.ject.studytrip.trip.application.service.DailyGoalService;
 import com.ject.studytrip.trip.application.service.TripService;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -25,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class StudyLogFacade {
+    private static final String STUDY_LOG_IMAGE_KEY_PREFIX = "study-logs";
+
     private final TripService tripService;
     private final MissionService missionService;
     private final DailyGoalService dailyGoalService;
@@ -32,6 +39,7 @@ public class StudyLogFacade {
     private final PomodoroService pomodoroService;
     private final StudyLogService studyLogService;
     private final StudyLogDailyMissionService studyLogDailyMissionService;
+    private final ImageService imageService;
 
     @Transactional
     public StudyLogInfo createStudyLog(
@@ -78,6 +86,27 @@ public class StudyLogFacade {
 
         // 3. 학습 로그 상세 정보 구성
         return buildStudyLogDetailsSlice(studyLogSlice);
+    }
+
+    @Transactional(readOnly = true)
+    public PresignedStudyLogImageInfo issuePresignedUrl(
+            Long studyLogId, PresignStudyLogImageRequest request) {
+        StudyLog studyLog = studyLogService.getValidStudyLogById(studyLogId);
+        PresignedImageInfo info =
+                imageService.presign(
+                        STUDY_LOG_IMAGE_KEY_PREFIX,
+                        studyLog.getId().toString(),
+                        request.originFilename());
+
+        return PresignedStudyLogImageInfo.of(studyLog.getId(), info.tmpKey(), info.presignedUrl());
+    }
+
+    @Transactional
+    public void confirmImage(Long studyLogId, ConfirmStudyLogImageRequest request) {
+        StudyLog studyLog = studyLogService.getValidStudyLogById(studyLogId);
+        String imageUrl = imageService.confirm(request.tmpKey());
+
+        studyLogService.updateImageUrl(studyLog, imageUrl);
     }
 
     private Slice<StudyLogDetail> buildStudyLogDetailsSlice(Slice<StudyLog> studyLogSlice) {
