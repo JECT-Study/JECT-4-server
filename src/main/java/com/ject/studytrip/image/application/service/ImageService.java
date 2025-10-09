@@ -1,11 +1,13 @@
 package com.ject.studytrip.image.application.service;
 
+import com.ject.studytrip.global.config.properties.CdnProperties;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.global.util.FilenameUtil;
 import com.ject.studytrip.image.application.dto.PresignedImageInfo;
 import com.ject.studytrip.image.domain.constants.ImageConstants;
 import com.ject.studytrip.image.domain.factory.ImageKeyFactory;
 import com.ject.studytrip.image.domain.policy.ImagePolicy;
+import com.ject.studytrip.image.domain.util.ImageUrlUtil;
 import com.ject.studytrip.image.infra.s3.dto.ImageHeadInfo;
 import com.ject.studytrip.image.infra.s3.provider.S3ImageStorageProvider;
 import com.ject.studytrip.image.infra.tika.provider.TikaImageProbeProvider;
@@ -19,6 +21,8 @@ public class ImageService {
 
     private final S3ImageStorageProvider s3Provider;
     private final TikaImageProbeProvider tikaProvider;
+
+    private final CdnProperties cdnProps;
 
     // Presigned URL 발급
     public PresignedImageInfo presign(String keyPrefix, String id, String originFilename) {
@@ -57,13 +61,18 @@ public class ImageService {
         // MIME 추출 및 판별, 검증 실패 시 이미지 삭제
         validateMimeWithCleanup(tmpKey, head.contentLength());
 
-        // 임시 -> 최종 이미지 복사 및 키 반환
+        // 임시 -> 최종 이미지 복사 및 경로 반환
         return moveToFinalLocation(tmpKey);
     }
 
-    // 업로드 취소, 업로드된 이미지 삭제
+    // 업로드 취소
     public void cancel(List<String> uploadedKeys) {
         s3Provider.deleteByKeys(uploadedKeys);
+    }
+
+    // 이미지 삭제
+    public void cleanup(String imageUrl) {
+        ImageUrlUtil.extractKey(cdnProps.domain(), imageUrl).ifPresent(s3Provider::deleteByKey);
     }
 
     // 이미지 사이즈 검증, 실패 시 삭제
@@ -88,12 +97,13 @@ public class ImageService {
         }
     }
 
-    // 최종 경로에 이미지 복사
+    // 최종 경로에 이미지 복사 및 반환
     private String moveToFinalLocation(String tmpKey) {
         String finalKey = ImageKeyFactory.toFinalKey(tmpKey);
         ImagePolicy.validateKey(finalKey);
         s3Provider.copyByKey(tmpKey, finalKey);
-        return finalKey;
+
+        return ImageUrlUtil.build(cdnProps.domain(), finalKey);
     }
 
     // 삭제 및 예외 처리

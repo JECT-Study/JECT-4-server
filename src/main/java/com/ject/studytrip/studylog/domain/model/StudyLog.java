@@ -1,9 +1,12 @@
 package com.ject.studytrip.studylog.domain.model;
 
+import static org.flywaydb.core.internal.util.StringUtils.hasText;
+
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -31,12 +34,23 @@ public class StudyLog extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    private String imageUrl;
+
     public static StudyLog of(Member member, DailyGoal dailyGoal, String content) {
         return StudyLog.builder()
                 .member(member)
                 .dailyGoal(dailyGoal)
                 .title(dailyGoal.getTitle())
                 .content(content)
+                .imageUrl(null)
                 .build();
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        if (hasText(imageUrl)) this.imageUrl = imageUrl;
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

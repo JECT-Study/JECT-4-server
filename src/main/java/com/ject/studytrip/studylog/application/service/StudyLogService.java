@@ -1,8 +1,11 @@
 package com.ject.studytrip.studylog.application.service;
 
+import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
+import com.ject.studytrip.studylog.domain.error.StudyLogErrorCode;
 import com.ject.studytrip.studylog.domain.factory.StudyLogFactory;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
+import com.ject.studytrip.studylog.domain.policy.StudyLogPolicy;
 import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogRepository;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -47,5 +50,21 @@ public class StudyLogService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public long hardDeleteStudyLogsOwnedByDeletedDailyGoal() {
         return studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner();
+    }
+
+    public StudyLog getValidStudyLogById(Long studyLogId) {
+        StudyLog studyLog =
+                studyLogRepository
+                        .findById(studyLogId)
+                        .orElseThrow(
+                                () -> new CustomException(StudyLogErrorCode.STUDY_LOG_NOT_FOUND));
+
+        StudyLogPolicy.validateNotDeleted(studyLog);
+        return studyLog;
+    }
+
+    public void updateImageUrl(StudyLog studyLog, String imageUrl) {
+        StudyLogPolicy.validateNotDeleted(studyLog);
+        studyLog.updateImageUrl(imageUrl);
     }
 }

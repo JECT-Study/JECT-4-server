@@ -49,6 +49,11 @@ public class MemberService {
         member.update(request.nickname(), memberCategory);
     }
 
+    public void updateProfileImage(Member member, String profileImage) {
+        MemberPolicy.validateNotDeleted(member);
+        member.updateProfileImage(profileImage);
+    }
+
     @Transactional
     public void deleteMember(Member member) {
         member.updateDeletedAt();
