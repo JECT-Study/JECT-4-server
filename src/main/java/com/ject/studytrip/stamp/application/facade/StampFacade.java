@@ -76,6 +76,7 @@ public class StampFacade {
                 StampInfo.from(stamp), missions.stream().map(MissionInfo::from).toList());
     }
 
+    @Transactional
     public void completeStamp(Long memberId, Long tripId, Long stampId) {
         Trip trip = tripService.getValidTrip(memberId, tripId);
         Stamp stamp = stampService.getValidStamp(trip.getId(), stampId);

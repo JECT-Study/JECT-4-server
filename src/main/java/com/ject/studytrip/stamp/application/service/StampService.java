@@ -137,7 +137,6 @@ public class StampService {
         return getExplorationStampName(stamps);
     }
 
-    @Transactional
     public void completeStamp(Stamp stamp) {
         StampPolicy.validateCompleted(stamp);
 
