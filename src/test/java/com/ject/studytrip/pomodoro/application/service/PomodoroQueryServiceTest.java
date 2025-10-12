@@ -10,6 +10,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import com.ject.studytrip.pomodoro.fixture.PomodoroFixture;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -29,14 +30,16 @@ import org.mockito.Mock;
 class PomodoroQueryServiceTest extends BaseUnitTest {
     @InjectMocks private PomodoroQueryService pomodoroQueryService;
     @Mock private PomodoroRepository pomodoroRepository;
+    @Mock private PomodoroQueryRepository pomodoroQueryRepository;
 
+    private Trip trip;
     private DailyGoal dailyGoal;
     private Pomodoro pomodoro;
 
     @BeforeEach
     void setUp() {
         Member member = MemberFixture.createMemberFromKakaoWithId(1L);
-        Trip trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
+        trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
         dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, trip);
         pomodoro = PomodoroFixture.createPomodoroWithId(1L, dailyGoal);
     }
@@ -87,6 +90,41 @@ class PomodoroQueryServiceTest extends BaseUnitTest {
             assertThatThrownBy(() -> pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoalId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(PomodoroErrorCode.POMODORO_ALREADY_DELETED.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("getTotalFocusHoursByTripId 메서드는")
+    class GetTotalFocusHoursByTripId {
+
+        @Test
+        @DisplayName("유효하지 않은 여행 ID가 들어오면 0을 반환한다.")
+        void shouldReturnZeroWhenTripIdIsInvalid() {
+            // given
+            Long tripId = trip.getId();
+            given(pomodoroQueryRepository.sumFocusHoursByTripId(tripId)).willReturn(0L);
+
+            // when
+            long result = pomodoroQueryService.getTotalFocusHoursByTripId(tripId);
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("유효한 여행 ID가 들어오면 총 집중 시간(시간 단위)을 반환한다.")
+        void shouldReturnTotalFocusHoursWhenTripIdIsValid() {
+            // given
+            Long tripId = trip.getId();
+            long totalFocusHours = 120L;
+            given(pomodoroQueryRepository.sumFocusHoursByTripId(tripId))
+                    .willReturn(totalFocusHours);
+
+            // when
+            long result = pomodoroQueryService.getTotalFocusHoursByTripId(tripId);
+
+            // then
+            assertThat(result).isEqualTo(totalFocusHours);
         }
     }
 }

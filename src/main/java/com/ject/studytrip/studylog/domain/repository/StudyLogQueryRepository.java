@@ -14,4 +14,7 @@ public interface StudyLogQueryRepository {
     long deleteAllByDeletedMemberOwner();
 
     long deleteAllByDeletedDailyGoalOwner();
+
+    Slice<StudyLog> findSliceByTripReportIdOrderByCreatedAtDesc(
+            Long tripReportId, Pageable pageable);
 }

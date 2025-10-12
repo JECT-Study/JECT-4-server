@@ -5,6 +5,7 @@ import com.ject.studytrip.studylog.domain.model.QStudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
 import com.ject.studytrip.trip.domain.model.QDailyGoal;
+import com.ject.studytrip.trip.domain.model.QTripReportStudyLog;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -22,6 +23,7 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
     private final QStudyLog studyLog = QStudyLog.studyLog;
     private final QDailyGoal dailyGoal = QDailyGoal.dailyGoal;
     private final QMember member = QMember.member;
+    private final QTripReportStudyLog tripReportStudyLog = QTripReportStudyLog.tripReportStudyLog;
 
     @Override
     public long countActiveStudyLogsByMemberId(Long memberId) {
@@ -83,5 +85,27 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
                                         .from(dailyGoal)
                                         .where(dailyGoal.deletedAt.isNotNull())))
                 .execute();
+    }
+
+    @Override
+    public Slice<StudyLog> findSliceByTripReportIdOrderByCreatedAtDesc(
+            Long tripReportId, Pageable pageable) {
+        List<StudyLog> content =
+                queryFactory
+                        .select(studyLog)
+                        .from(tripReportStudyLog)
+                        .join(tripReportStudyLog.studyLog, studyLog)
+                        .where(
+                                tripReportStudyLog.tripReport.id.eq(tripReportId),
+                                studyLog.deletedAt.isNull())
+                        .orderBy(studyLog.createdAt.desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1)
+                        .fetch();
+
+        boolean hasNext = content.size() > pageable.getPageSize();
+        List<StudyLog> result = hasNext ? content.subList(0, pageable.getPageSize()) : content;
+
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 }

@@ -8,7 +8,7 @@ import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
-import com.ject.studytrip.trip.application.dto.TripCountInfo;
+import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
@@ -171,7 +171,7 @@ class TripQueryServiceTest extends BaseUnitTest {
                     .willReturn(0L);
 
             // when
-            TripCountInfo result = tripQueryService.getActiveTripCountsByMemberId(memberId);
+            TripCount result = tripQueryService.getActiveTripCountsByMemberId(memberId);
 
             // then
             assertThat(result.course()).isZero();
@@ -193,11 +193,72 @@ class TripQueryServiceTest extends BaseUnitTest {
                     .willReturn(2L);
 
             // when
-            TripCountInfo result = tripQueryService.getActiveTripCountsByMemberId(memberId);
+            TripCount result = tripQueryService.getActiveTripCountsByMemberId(memberId);
 
             // then
             assertThat(result.course()).isEqualTo(3L);
             assertThat(result.explore()).isEqualTo(2L);
+        }
+    }
+
+    @Nested
+    @DisplayName("getValidCompletedTrip 메서드는")
+    class GetValidCompletedTrip {
+
+        @Test
+        @DisplayName("여행의 소유자가 아닐 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenNotTripOwner() {
+            // given
+            Member newMember = MemberFixture.createMemberFromKakao();
+            Long tripId = trip.getId();
+            given(tripRepository.findById(tripId)).willReturn(Optional.of(trip));
+
+            // When & Then
+            assertThatThrownBy(() -> tripQueryService.getValidTrip(newMember.getId(), tripId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessageContaining(TripErrorCode.NOT_TRIP_OWNER.getMessage());
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 여행일 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenTripIsDeleted() {
+            // given
+            trip.updateDeletedAt();
+            Long deletedId = trip.getId();
+            given(tripRepository.findById(deletedId)).willReturn(Optional.of(trip));
+
+            // when & then
+            assertThatThrownBy(() -> tripQueryService.getValidTrip(member.getId(), deletedId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(TripErrorCode.TRIP_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("여행이 아직 완료되지 않은 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenTripDoesNotCompletedYet() {
+            // given
+            Long tripId = trip.getId();
+            given(tripRepository.findById(tripId)).willReturn(Optional.of(trip));
+
+            // when & then
+            assertThatThrownBy(() -> tripQueryService.getValidCompletedTrip(member.getId(), tripId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(TripErrorCode.TRIP_NOT_COMPLETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("여행이 이미 완료되었다면 여행을 반환한다.")
+        void shouldReturnTripWhenTripAlreadyCompleted() {
+            // given
+            trip.updateCompleted();
+            given(tripRepository.findById(trip.getId())).willReturn(Optional.of(trip));
+
+            // when
+            Trip result = tripQueryService.getValidCompletedTrip(member.getId(), trip.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(trip.getId());
         }
     }
 }

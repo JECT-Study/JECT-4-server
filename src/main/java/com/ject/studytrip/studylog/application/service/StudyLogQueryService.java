@@ -6,6 +6,7 @@ import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.policy.StudyLogPolicy;
 import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -36,5 +37,19 @@ public class StudyLogQueryService {
         StudyLogPolicy.validateNotDeleted(studyLog);
 
         return studyLog;
+    }
+
+    public List<StudyLog> getValidStudyLogs(List<Long> studyLogIds) {
+        List<StudyLog> studyLogs = studyLogRepository.findAllByIdIn(studyLogIds);
+
+        StudyLogPolicy.validateExistAll(studyLogs, studyLogIds);
+        studyLogs.forEach(StudyLogPolicy::validateNotDeleted);
+
+        return studyLogs;
+    }
+
+    public Slice<StudyLog> getStudyLogsSliceByTripReportId(Long tripReportId, int page, int size) {
+        return studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(
+                tripReportId, PageRequest.of(page, size));
     }
 }

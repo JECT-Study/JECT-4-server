@@ -1,7 +1,7 @@
 package com.ject.studytrip.trip.application.service;
 
 import com.ject.studytrip.global.exception.CustomException;
-import com.ject.studytrip.trip.application.dto.TripCountInfo;
+import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
@@ -41,7 +41,7 @@ public class TripQueryService {
         return tripQueryRepository.findSliceByMemberId(memberId, PageRequest.of(page, size));
     }
 
-    public TripCountInfo getActiveTripCountsByMemberId(Long memberId) {
+    public TripCount getActiveTripCountsByMemberId(Long memberId) {
         long courseCount =
                 tripQueryRepository.countActiveTripsByMemberIdAndCategory(
                         memberId, TripCategory.COURSE);
@@ -49,6 +49,19 @@ public class TripQueryService {
                 tripQueryRepository.countActiveTripsByMemberIdAndCategory(
                         memberId, TripCategory.EXPLORE);
 
-        return TripCountInfo.of(courseCount, exploreCount);
+        return TripCount.of(courseCount, exploreCount);
+    }
+
+    public Trip getValidCompletedTrip(Long memberId, Long tripId) {
+        Trip trip =
+                tripRepository
+                        .findById(tripId)
+                        .orElseThrow(() -> new CustomException(TripErrorCode.TRIP_NOT_FOUND));
+
+        TripPolicy.validateOwner(memberId, trip);
+        TripPolicy.validateNotDeleted(trip);
+        TripPolicy.validateNotCompleted(trip);
+
+        return trip;
     }
 }

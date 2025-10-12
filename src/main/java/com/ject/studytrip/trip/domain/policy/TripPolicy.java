@@ -43,4 +43,10 @@ public class TripPolicy {
             throw new CustomException(TripErrorCode.TRIP_ALREADY_COMPLETED);
         }
     }
+
+    public static void validateNotCompleted(Trip trip) {
+        if (!trip.isCompleted()) {
+            throw new CustomException(TripErrorCode.TRIP_NOT_COMPLETED);
+        }
+    }
 }

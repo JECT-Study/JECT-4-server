@@ -4,6 +4,7 @@ import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.pomodoro.domain.policy.PomodoroPolicy;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PomodoroQueryService {
     private final PomodoroRepository pomodoroRepository;
+    private final PomodoroQueryRepository pomodoroQueryRepository;
 
     public Pomodoro getValidPomodoroByDailyGoal(Long dailyGoalId) {
         Pomodoro pomodoro =
@@ -23,5 +25,9 @@ public class PomodoroQueryService {
         PomodoroPolicy.validateNotDeleted(pomodoro);
 
         return pomodoro;
+    }
+
+    public long getTotalFocusHoursByTripId(Long tripId) {
+        return pomodoroQueryRepository.sumFocusHoursByTripId(tripId);
     }
 }

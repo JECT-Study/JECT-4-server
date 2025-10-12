@@ -3,6 +3,7 @@ package com.ject.studytrip.studylog.domain.policy;
 import com.ject.studytrip.global.exception.CustomException;
 import com.ject.studytrip.studylog.domain.error.StudyLogErrorCode;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,13 @@ public class StudyLogPolicy {
     public static void validateNotDeleted(StudyLog studyLog) {
         if (studyLog.getDeletedAt() != null) {
             throw new CustomException(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED);
+        }
+    }
+
+    public static void validateExistAll(List<StudyLog> foundStudyLogs, List<Long> requestedIds) {
+        boolean isEquals = foundStudyLogs.size() == requestedIds.size();
+        if (!isEquals) {
+            throw new CustomException(StudyLogErrorCode.STUDY_LOG_NOT_FOUND);
         }
     }
 }

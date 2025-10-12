@@ -44,4 +44,8 @@ public class MissionQueryService {
 
         return missions;
     }
+
+    public long countCompletedMissionsByTripId(Long tripId) {
+        return missionQueryRepository.countCompletedMissionsByTripId(tripId);
+    }
 }
