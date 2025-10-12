@@ -1,7 +1,7 @@
 package com.ject.studytrip.studylog.application.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import com.ject.studytrip.BaseUnitTest;
@@ -16,8 +16,10 @@ import com.ject.studytrip.studylog.fixture.StudyLogFixture;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
+import com.ject.studytrip.trip.domain.model.TripReport;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
+import com.ject.studytrip.trip.fixture.TripReportFixture;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,11 +41,17 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
 
     private Member member;
     private Trip courseTrip;
+    private DailyGoal dailyGoal;
+    private StudyLog studyLog1;
+    private StudyLog studyLog2;
 
     @BeforeEach
     void setUp() {
         member = MemberFixture.createMemberFromKakaoWithId(1L);
         courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
+        dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
+        studyLog1 = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+        studyLog2 = StudyLogFixture.createStudyLogWithId(2L, member, dailyGoal);
     }
 
     @Nested
@@ -88,9 +96,6 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
         void shouldReturnStudyLogsByTripIdWithSlice() {
             // given
             Long tripId = courseTrip.getId();
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
-            StudyLog studyLog1 = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
-            StudyLog studyLog2 = StudyLogFixture.createStudyLogWithId(2L, member, dailyGoal);
             List<StudyLog> studyLogs = List.of(studyLog1, studyLog2);
 
             int page = 0;
@@ -134,7 +139,6 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 학습 로그를 조회하면 예외가 발생한다")
         void shouldThrowExceptionWhenStudyLogIsDeleted() {
             // given
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
             StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
             studyLog.updateDeletedAt();
 
@@ -150,7 +154,6 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
         @DisplayName("유효한 학습 로그 ID로 조회하면 학습 로그를 반환한다")
         void shouldReturnStudyLogWhenIdIsValid() {
             // given
-            DailyGoal dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, courseTrip);
             StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
 
             given(studyLogRepository.findById(1L)).willReturn(Optional.of(studyLog));
@@ -161,6 +164,39 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
             // then
             assertThat(result).isEqualTo(studyLog);
             assertThat(result.getDeletedAt()).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("getStudyLogsSliceByTripId 메서드는")
+    class GetStudyLogsSliceByTripReportId {
+
+        @Test
+        @DisplayName("특정 여행 리포트의 학습 로그 목록을 페이징 처리와 최신순으로 정렬하고 반환한다")
+        void shouldReturnStudyLogsByTripReportIdWithSlice() {
+            // given
+            List<StudyLog> studyLogs = List.of(studyLog1, studyLog2);
+            TripReport tripReport = TripReportFixture.createTripReportWithId(1L, member);
+
+            int page = 0;
+            int size = 5;
+            Pageable pageable = PageRequest.of(page, size);
+
+            Slice<StudyLog> mockSlice = new SliceImpl<>(studyLogs, pageable, false);
+
+            given(
+                            studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(
+                                    tripReport.getId(), pageable))
+                    .willReturn(mockSlice);
+
+            // when
+            Slice<StudyLog> result =
+                    studyLogQueryService.getStudyLogsSliceByTripId(tripReport.getId(), page, size);
+
+            // then
+            assertThat(result.getContent().size()).isEqualTo(studyLogs.size());
+            assertThat(result.getContent().get(0)).isEqualTo(studyLog1);
+            assertThat(result.getContent().get(1)).isEqualTo(studyLog2);
         }
     }
 }

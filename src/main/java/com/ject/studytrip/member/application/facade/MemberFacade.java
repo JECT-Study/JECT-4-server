@@ -14,7 +14,7 @@ import com.ject.studytrip.member.presentation.dto.request.ConfirmProfileImageReq
 import com.ject.studytrip.member.presentation.dto.request.PresignProfileImageRequest;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
 import com.ject.studytrip.studylog.application.service.StudyLogQueryService;
-import com.ject.studytrip.trip.application.dto.TripCountInfo;
+import com.ject.studytrip.trip.application.dto.TripCount;
 import com.ject.studytrip.trip.application.service.TripQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -62,7 +62,7 @@ public class MemberFacade {
     @Transactional(readOnly = true)
     public MemberDetail getMemberDetail(Long memberId) {
         Member member = memberQueryService.getValidMember(memberId);
-        TripCountInfo tripCount = tripQueryService.getActiveTripCountsByMemberId(memberId);
+        TripCount tripCount = tripQueryService.getActiveTripCountsByMemberId(memberId);
         long studyLogCount = studyLogQueryService.getActiveStudyLogCountByMemberId(memberId);
 
         MemberInfo memberInfo = MemberInfo.from(member);

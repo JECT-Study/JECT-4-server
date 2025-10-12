@@ -23,4 +23,10 @@ public class TripTestHelper {
         trip.updateDeletedAt();
         return tripRepository.save(trip);
     }
+
+    public Trip saveCompletedTrip(Member member, TripCategory category) {
+        Trip trip = TripFixture.createTrip(member, category);
+        trip.updateCompleted();
+        return tripRepository.save(trip);
+    }
 }

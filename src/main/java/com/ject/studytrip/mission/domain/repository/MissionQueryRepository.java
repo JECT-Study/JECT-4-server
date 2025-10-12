@@ -11,4 +11,6 @@ public interface MissionQueryRepository {
     long deleteAllByDeletedAtIsNotNull();
 
     long deleteAllByDeletedStampOwner();
+
+    long countCompletedMissionsByTripId(Long tripId);
 }

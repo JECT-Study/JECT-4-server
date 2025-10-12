@@ -14,6 +14,7 @@ public enum TripErrorCode implements ErrorCode {
     COURSE_TRIP_END_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "코스형 여행은 종료일이 필수입니다."),
     TRIP_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 여행입니다."),
     TRIP_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 여행입니다."),
+    TRIP_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "여행이 아직 완료되지 않았습니다."),
 
     // 403
     NOT_TRIP_OWNER(HttpStatus.FORBIDDEN, "요청한 여행 정보를 수정/삭제할 권한이 부족합니다."),
