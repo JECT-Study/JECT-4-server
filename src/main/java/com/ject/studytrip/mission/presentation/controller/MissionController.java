@@ -2,6 +2,7 @@ package com.ject.studytrip.mission.presentation.controller;
 
 import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.mission.application.dto.MissionInfo;
+import com.ject.studytrip.mission.application.dto.MissionsInfo;
 import com.ject.studytrip.mission.application.facade.MissionFacade;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
@@ -77,10 +78,10 @@ public class MissionController {
             @AuthenticationPrincipal String memberId,
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId,
             @PathVariable @NotNull(message = "스탬프 ID는 필수 요청 파라미터입니다.") Long stampId) {
-        List<MissionInfo> results =
+        MissionsInfo results =
                 missionFacade.getMissionsByStamp(Long.valueOf(memberId), tripId, stampId);
         List<LoadMissionInfoResponse> responses =
-                results.stream().map(LoadMissionInfoResponse::of).toList();
+                results.missionInfos().stream().map(LoadMissionInfoResponse::of).toList();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(StandardResponse.success(HttpStatus.OK.value(), responses));

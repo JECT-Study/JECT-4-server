@@ -8,6 +8,7 @@ import com.ject.studytrip.mission.application.service.MissionQueryService;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.stamp.application.dto.StampDetail;
 import com.ject.studytrip.stamp.application.dto.StampInfo;
+import com.ject.studytrip.stamp.application.dto.StampsInfo;
 import com.ject.studytrip.stamp.application.service.StampCommandService;
 import com.ject.studytrip.stamp.application.service.StampQueryService;
 import com.ject.studytrip.stamp.domain.model.Stamp;
@@ -119,11 +120,11 @@ public class StampFacade {
             key =
                     "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamps(#memberId, #tripId)")
     @Transactional(readOnly = true)
-    public List<StampInfo> getStampsByTrip(Long memberId, Long tripId) {
+    public StampsInfo getStampsByTrip(Long memberId, Long tripId) {
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
         List<Stamp> stamps = stampQueryService.getStampsByTripId(trip.getId());
 
-        return stamps.stream().map(StampInfo::from).toList();
+        return StampsInfo.of(stamps.stream().map(StampInfo::from).toList());
     }
 
     @Cacheable(

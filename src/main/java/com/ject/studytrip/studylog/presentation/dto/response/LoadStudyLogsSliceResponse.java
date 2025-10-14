@@ -6,21 +6,21 @@ import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import org.springframework.data.domain.Slice;
 
 public record LoadStudyLogsSliceResponse(
         @Schema(description = "학습 로그 목록") List<StudyLogResponse> studyLogs,
         @Schema(description = "다음 데이터 존재 여부") boolean hasNext) {
-    public static LoadStudyLogsSliceResponse of(Slice<StudyLogDetail> results) {
+    public static LoadStudyLogsSliceResponse of(
+            List<StudyLogDetail> studyLogDetails, boolean hasNext) {
         return new LoadStudyLogsSliceResponse(
-                results.getContent().stream()
+                studyLogDetails.stream()
                         .map(
                                 result ->
                                         StudyLogResponse.of(
                                                 result.studyLogInfo(),
                                                 result.studyLogDailyMissionInfos()))
                         .toList(),
-                results.hasNext());
+                hasNext);
     }
 
     private record StudyLogResponse(

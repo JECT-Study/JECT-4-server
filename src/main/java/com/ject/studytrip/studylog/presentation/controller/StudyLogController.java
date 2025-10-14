@@ -2,8 +2,8 @@ package com.ject.studytrip.studylog.presentation.controller;
 
 import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.studylog.application.dto.PresignedStudyLogImageInfo;
-import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
+import com.ject.studytrip.studylog.application.dto.StudyLogSliceInfo;
 import com.ject.studytrip.studylog.application.facade.StudyLogFacade;
 import com.ject.studytrip.studylog.presentation.dto.request.ConfirmStudyLogImageRequest;
 import com.ject.studytrip.studylog.presentation.dto.request.CreateStudyLogRequest;
@@ -18,7 +18,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,13 +56,15 @@ public class StudyLogController {
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId,
             @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
             @RequestParam(name = "size", defaultValue = "5") @Min(1) @Max(10) int size) {
-        Slice<StudyLogDetail> result =
+        StudyLogSliceInfo result =
                 studyLogFacade.getStudyLogsByTrip(Long.valueOf(memberId), tripId, page, size);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         StandardResponse.success(
-                                HttpStatus.OK.value(), LoadStudyLogsSliceResponse.of(result)));
+                                HttpStatus.OK.value(),
+                                LoadStudyLogsSliceResponse.of(
+                                        result.studyLogDetails(), result.hasNext())));
     }
 
     @Operation(
