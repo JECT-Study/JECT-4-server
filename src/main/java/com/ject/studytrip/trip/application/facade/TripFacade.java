@@ -11,6 +11,7 @@ import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.trip.application.dto.TripCategoryInfo;
 import com.ject.studytrip.trip.application.dto.TripDetail;
 import com.ject.studytrip.trip.application.dto.TripInfo;
+import com.ject.studytrip.trip.application.dto.TripSliceInfo;
 import com.ject.studytrip.trip.application.service.TripCommandService;
 import com.ject.studytrip.trip.application.service.TripQueryService;
 import com.ject.studytrip.trip.domain.model.Trip;
@@ -27,7 +28,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,7 +106,7 @@ public class TripFacade {
             key =
                     "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trips(#memberId, #page, #size)")
     @Transactional(readOnly = true)
-    public Slice<TripInfo> getTripsByMember(Long memberId, int page, int size) {
+    public TripSliceInfo getTripsByMember(Long memberId, int page, int size) {
         Slice<Trip> tripSlice = tripQueryService.getTripsSliceByMemberId(memberId, page, size);
 
         List<TripInfo> tripInfos =
@@ -126,7 +126,7 @@ public class TripFacade {
                                         Comparator.nullsLast(Comparator.naturalOrder())))
                         .toList();
 
-        return new SliceImpl<>(tripInfos, tripSlice.getPageable(), tripSlice.hasNext());
+        return TripSliceInfo.of(tripInfos, tripSlice.hasNext());
     }
 
     @Cacheable(

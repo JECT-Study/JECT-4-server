@@ -3,6 +3,7 @@ package com.ject.studytrip.stamp.presentation.controller;
 import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.stamp.application.dto.StampDetail;
 import com.ject.studytrip.stamp.application.dto.StampInfo;
+import com.ject.studytrip.stamp.application.dto.StampsInfo;
 import com.ject.studytrip.stamp.application.facade.StampFacade;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
@@ -85,9 +86,9 @@ public class StampController {
     @GetMapping("/{tripId}/stamps")
     public ResponseEntity<StandardResponse> loadStampsByTrip(
             @AuthenticationPrincipal String memberId, @PathVariable Long tripId) {
-        List<StampInfo> result = stampFacade.getStampsByTrip(Long.valueOf(memberId), tripId);
+        StampsInfo result = stampFacade.getStampsByTrip(Long.valueOf(memberId), tripId);
         List<LoadStampInfoResponse> response =
-                result.stream().map(LoadStampInfoResponse::of).toList();
+                result.stampsInfos().stream().map(LoadStampInfoResponse::of).toList();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(StandardResponse.success(HttpStatus.OK.value(), response));

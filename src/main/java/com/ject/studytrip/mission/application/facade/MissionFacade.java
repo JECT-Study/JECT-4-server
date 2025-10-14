@@ -3,6 +3,7 @@ package com.ject.studytrip.mission.application.facade;
 import static com.ject.studytrip.global.common.constants.CacheNameConstants.*;
 
 import com.ject.studytrip.mission.application.dto.MissionInfo;
+import com.ject.studytrip.mission.application.dto.MissionsInfo;
 import com.ject.studytrip.mission.application.service.MissionCommandService;
 import com.ject.studytrip.mission.application.service.MissionQueryService;
 import com.ject.studytrip.mission.domain.model.Mission;
@@ -97,11 +98,11 @@ public class MissionFacade {
             key =
                     "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).missions(#memberId, #tripId, #stampId)")
     @Transactional(readOnly = true)
-    public List<MissionInfo> getMissionsByStamp(Long memberId, Long tripId, Long stampId) {
+    public MissionsInfo getMissionsByStamp(Long memberId, Long tripId, Long stampId) {
         Stamp stamp = getValidStampFromTripOwnedByMember(memberId, tripId, stampId);
         List<Mission> missions = missionQueryService.getMissionsByStampId(stamp.getId());
 
-        return missions.stream().map(MissionInfo::from).toList();
+        return MissionsInfo.of(missions.stream().map(MissionInfo::from).toList());
     }
 
     private Stamp getValidStampFromTripOwnedByMember(Long memberId, Long tripId, Long stampId) {

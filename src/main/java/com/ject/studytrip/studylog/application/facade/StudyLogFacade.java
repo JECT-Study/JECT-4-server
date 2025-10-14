@@ -14,6 +14,7 @@ import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.studylog.application.dto.PresignedStudyLogImageInfo;
 import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
+import com.ject.studytrip.studylog.application.dto.StudyLogSliceInfo;
 import com.ject.studytrip.studylog.application.service.*;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
@@ -30,7 +31,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,8 +88,7 @@ public class StudyLogFacade {
             key =
                     "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).studyLogs(#memberId, #tripId, #page, #size)")
     @Transactional(readOnly = true)
-    public Slice<StudyLogDetail> getStudyLogsByTrip(
-            Long memberId, Long tripId, int page, int size) {
+    public StudyLogSliceInfo getStudyLogsByTrip(Long memberId, Long tripId, int page, int size) {
         // 1. 유효성 검증 및 엔티티 조회
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
 
@@ -133,7 +132,7 @@ public class StudyLogFacade {
                 dailyMission -> missionCommandService.completeMission(dailyMission.getMission()));
     }
 
-    private Slice<StudyLogDetail> buildStudyLogDetailsSlice(Slice<StudyLog> studyLogSlice) {
+    private StudyLogSliceInfo buildStudyLogDetailsSlice(Slice<StudyLog> studyLogSlice) {
         List<Long> studyLogIds = studyLogSlice.getContent().stream().map(StudyLog::getId).toList();
 
         // 학습 로그별 학습 로그 데일리 미션 목록 그룹화
@@ -150,7 +149,6 @@ public class StudyLogFacade {
                                                 groupedStudyLogDailyMissions.get(studyLog.getId())))
                         .toList();
 
-        return new SliceImpl<>(
-                studyLogDetails, studyLogSlice.getPageable(), studyLogSlice.hasNext());
+        return StudyLogSliceInfo.of(studyLogDetails, studyLogSlice.hasNext());
     }
 }

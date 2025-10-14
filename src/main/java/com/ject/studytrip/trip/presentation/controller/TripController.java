@@ -4,6 +4,7 @@ import com.ject.studytrip.global.common.response.StandardResponse;
 import com.ject.studytrip.trip.application.dto.TripCategoryInfo;
 import com.ject.studytrip.trip.application.dto.TripDetail;
 import com.ject.studytrip.trip.application.dto.TripInfo;
+import com.ject.studytrip.trip.application.dto.TripSliceInfo;
 import com.ject.studytrip.trip.application.facade.TripFacade;
 import com.ject.studytrip.trip.presentation.dto.request.CreateTripRequest;
 import com.ject.studytrip.trip.presentation.dto.request.UpdateTripRequest;
@@ -16,7 +17,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -89,13 +89,13 @@ public class TripController {
             @AuthenticationPrincipal String memberId,
             @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
             @RequestParam(name = "size", defaultValue = "5") @Min(1) @Max(10) int size) {
-        Slice<TripInfo> result = tripFacade.getTripsByMember(Long.valueOf(memberId), page, size);
+        TripSliceInfo result = tripFacade.getTripsByMember(Long.valueOf(memberId), page, size);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         StandardResponse.success(
                                 HttpStatus.OK.value(),
-                                LoadTripsSliceResponse.of(result.getContent(), result.hasNext())));
+                                LoadTripsSliceResponse.of(result.tripInfos(), result.hasNext())));
     }
 
     @Operation(summary = "여행 상세 조회", description = "특정 여행을 조회하는 API 입니다.")
