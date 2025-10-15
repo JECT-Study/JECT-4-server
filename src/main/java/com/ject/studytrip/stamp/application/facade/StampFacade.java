@@ -46,7 +46,8 @@ public class StampFacade {
                 @CacheEvict(
                         cacheNames = TRIP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public StampInfo createStamp(Long memberId, Long tripId, CreateStampRequest request) {
@@ -66,7 +67,12 @@ public class StampFacade {
                 @CacheEvict(
                         cacheNames = STAMP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)"),
+                @CacheEvict(
+                        cacheNames = TRIP,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void updateStamp(Long memberId, Long tripId, Long stampId, UpdateStampRequest request) {
@@ -82,7 +88,12 @@ public class StampFacade {
                         cacheNames = STAMPS,
                         key =
                                 "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamps(#memberId, #tripId)"),
-                @CacheEvict(cacheNames = STAMP, allEntries = true)
+                @CacheEvict(cacheNames = STAMP, allEntries = true),
+                @CacheEvict(
+                        cacheNames = TRIP,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void updateStampOrders(Long memberId, Long tripId, UpdateStampOrderRequest request) {
@@ -104,7 +115,8 @@ public class StampFacade {
                 @CacheEvict(
                         cacheNames = TRIP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void deleteStamp(Long memberId, Long tripId, Long stampId) {
@@ -154,7 +166,8 @@ public class StampFacade {
                 @CacheEvict(
                         cacheNames = TRIP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void completeStamp(Long memberId, Long tripId, Long stampId) {

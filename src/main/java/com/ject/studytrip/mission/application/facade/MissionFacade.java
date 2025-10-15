@@ -41,7 +41,12 @@ public class MissionFacade {
                 @CacheEvict(
                         cacheNames = STAMP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)"),
+                @CacheEvict(
+                        cacheNames = TRIP,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public MissionInfo createMission(
@@ -62,7 +67,12 @@ public class MissionFacade {
                 @CacheEvict(
                         cacheNames = STAMP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)"),
+                @CacheEvict(
+                        cacheNames = TRIP,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void updateMissionNameIfPresent(
@@ -86,7 +96,12 @@ public class MissionFacade {
                 @CacheEvict(
                         cacheNames = STAMP,
                         key =
-                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)")
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamp(#memberId, #tripId, #stampId)"),
+                @CacheEvict(
+                        cacheNames = TRIP,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
+                @CacheEvict(cacheNames = TRIPS, allEntries = true)
             })
     @Transactional
     public void deleteMission(Long memberId, Long tripId, Long stampId, Long missionId) {
