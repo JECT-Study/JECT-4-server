@@ -8,9 +8,12 @@ import com.ject.studytrip.image.application.service.ImageService;
 import com.ject.studytrip.mission.application.service.DailyMissionQueryService;
 import com.ject.studytrip.mission.application.service.MissionCommandService;
 import com.ject.studytrip.mission.domain.model.DailyMission;
+import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.pomodoro.application.service.PomodoroCommandService;
 import com.ject.studytrip.pomodoro.application.service.PomodoroQueryService;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
+import com.ject.studytrip.stamp.application.service.StampCommandService;
+import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.studylog.application.dto.PresignedStudyLogImageInfo;
 import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
@@ -46,6 +49,7 @@ public class StudyLogFacade {
     private final DailyGoalQueryService dailyGoalQueryService;
     private final PomodoroQueryService pomodoroQueryService;
 
+    private final StampCommandService stampCommandService;
     private final MissionCommandService missionCommandService;
     private final StudyLogCommandService studyLogCommandService;
     private final StudyLogDailyMissionCommandService studyLogDailyMissionCommandService;
@@ -65,7 +69,7 @@ public class StudyLogFacade {
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
         DailyGoal dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.getId(), dailyGoalId);
         List<DailyMission> selectedDailyMissions =
-                dailyMissionQueryService.getValidDailyMissionsByIds(
+                dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
                         dailyGoal.getId(), request.selectedDailyMissionIds());
         Pomodoro pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoalId);
 
@@ -127,9 +131,36 @@ public class StudyLogFacade {
         studyLogDailyMissionCommandService.createStudyLogDailyMissions(
                 studyLog, selectedDailyMissions);
 
-        // 미션 완료 처리
-        selectedDailyMissions.forEach(
-                dailyMission -> missionCommandService.completeMission(dailyMission.getMission()));
+        List<Mission> missions =
+                selectedDailyMissions.stream().map(DailyMission::getMission).toList();
+
+        // 스탬프 ID를 기준으로 Stamp 집계
+        Map<Long, Stamp> stampById = new HashMap<>();
+
+        // 스탬프 ID를 기준으로 완료된 미션 수 집계
+        Map<Long, Integer> completeMissionCountByStampId = new HashMap<>();
+
+        missions.forEach(
+                mission -> {
+                    Stamp stamp = mission.getStamp();
+                    stampById.putIfAbsent(stamp.getId(), stamp);
+
+                    // 미션 완료 처리
+                    missionCommandService.completeMission(mission);
+
+                    // 스탬프별 완료한 미션 개수 누적(없으면 1, 있으면 +1)
+                    completeMissionCountByStampId.merge(stamp.getId(), 1, Integer::sum);
+                });
+
+        // 스탬프별 완료된 미션 수 증가
+        completeMissionCountByStampId.forEach(
+                (stampId, completeMissions) -> {
+                    Stamp stamp = stampById.get(stampId);
+                    stampCommandService.increaseCompletedMissions(stamp, completeMissions);
+                });
+
+        // NOTE: 현재는 데이터/트래픽이 적어 단건씩 처리 + 증분 갱신 방법 사용
+        //       동시성/규모가 커지면 벌크 완료 + 스탬프의 완료된 미션 수 재계산으로 리팩토링도 가능할 것 같음
     }
 
     private StudyLogSliceInfo buildStudyLogDetailsSlice(Slice<StudyLog> studyLogSlice) {

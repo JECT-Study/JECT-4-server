@@ -10,6 +10,7 @@ import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,7 +24,8 @@ public class StampCommandService {
     private final StampQueryRepository stampQueryRepository;
 
     public Stamp createStamp(Trip trip, CreateStampRequest request) {
-        Stamp newStamp = StampFactory.create(trip, request.name(), request.order());
+        Stamp newStamp =
+                StampFactory.create(trip, request.name(), request.order(), request.endDate());
 
         List<Stamp> existingStamps =
                 stampRepository.findAllByTripIdAndDeletedAtIsNull(trip.getId());
@@ -31,6 +33,7 @@ public class StampCommandService {
         combinedStamps.add(newStamp);
 
         StampPolicy.validateStampOrders(trip.getCategory(), combinedStamps);
+        StampPolicy.validateEndDate(trip.getEndDate(), newStamp.getEndDate());
 
         return stampRepository.save(newStamp);
     }
@@ -38,7 +41,10 @@ public class StampCommandService {
     public void createStamps(Trip trip, List<CreateStampRequest> requests) {
         List<Stamp> stamps =
                 requests.stream()
-                        .map(stamp -> StampFactory.create(trip, stamp.name(), stamp.order()))
+                        .map(
+                                stamp ->
+                                        StampFactory.create(
+                                                trip, stamp.name(), stamp.order(), stamp.endDate()))
                         .toList();
 
         StampPolicy.validateStampOrders(trip.getCategory(), stamps);
@@ -46,8 +52,12 @@ public class StampCommandService {
         stampRepository.saveAll(stamps);
     }
 
-    public void updateStampName(Stamp stamp, UpdateStampRequest request) {
+    public void updateStamp(Trip trip, Stamp stamp, UpdateStampRequest request) {
         stamp.updateName(request.name());
+
+        LocalDate endDate = request.endDate();
+        StampPolicy.validateEndDate(trip.getEndDate(), endDate);
+        stamp.updateEndDate(endDate);
     }
 
     public void updateStampOrders(Trip trip, UpdateStampOrderRequest request) {
@@ -128,5 +138,17 @@ public class StampCommandService {
         for (Stamp stamp : affectedStamps) {
             stamp.updateStampOrder(stamp.getStampOrder() - 1);
         }
+    }
+
+    public void increaseTotalMissions(Stamp stamp) {
+        stamp.increaseTotalMissions();
+    }
+
+    public void decreaseTotalMissions(Stamp stamp) {
+        stamp.decreaseTotalMissions();
+    }
+
+    public void increaseCompletedMissions(Stamp stamp, int count) {
+        stamp.increaseCompletedMissions(count);
     }
 }

@@ -4,6 +4,7 @@ import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.mission.domain.model.QDailyMission;
 import com.ject.studytrip.mission.domain.model.QMission;
 import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
+import com.ject.studytrip.stamp.domain.model.QStamp;
 import com.ject.studytrip.trip.domain.model.QDailyGoal;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 public class DailyMissionQueryRepositoryAdapter implements DailyMissionQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final QDailyMission dailyMission = QDailyMission.dailyMission;
+    private final QStamp stamp = QStamp.stamp;
     private final QMission mission = QMission.mission;
     private final QDailyGoal dailyGoal = QDailyGoal.dailyGoal;
 
@@ -26,6 +28,18 @@ public class DailyMissionQueryRepositoryAdapter implements DailyMissionQueryRepo
                 .join(dailyMission.mission, mission)
                 .fetchJoin()
                 .where(dailyMission.dailyGoal.id.eq(dailyGoalId), dailyMission.deletedAt.isNull())
+                .fetch();
+    }
+
+    @Override
+    public List<DailyMission> findAllWithMissionAndStampByIds(List<Long> ids) {
+        return queryFactory
+                .selectFrom(dailyMission)
+                .join(dailyMission.mission, mission)
+                .fetchJoin()
+                .join(mission.stamp, stamp)
+                .fetchJoin()
+                .where(dailyMission.id.in(ids))
                 .fetch();
     }
 

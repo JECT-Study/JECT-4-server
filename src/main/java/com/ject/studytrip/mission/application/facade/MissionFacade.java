@@ -9,6 +9,7 @@ import com.ject.studytrip.mission.application.service.MissionQueryService;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
+import com.ject.studytrip.stamp.application.service.StampCommandService;
 import com.ject.studytrip.stamp.application.service.StampQueryService;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.trip.application.service.TripQueryService;
@@ -28,6 +29,7 @@ public class MissionFacade {
     private final StampQueryService stampQueryService;
     private final MissionQueryService missionQueryService;
 
+    private final StampCommandService stampCommandService;
     private final MissionCommandService missionCommandService;
 
     @Caching(
@@ -47,6 +49,7 @@ public class MissionFacade {
         Stamp stamp = getValidStampFromTripOwnedByMember(memberId, tripId, stampId);
         Mission mission = missionCommandService.createMission(stamp, request);
 
+        stampCommandService.increaseTotalMissions(stamp);
         return MissionInfo.from(mission);
     }
 
@@ -91,6 +94,7 @@ public class MissionFacade {
         Mission mission = missionQueryService.getValidMission(stamp.getId(), missionId);
 
         missionCommandService.deleteMission(mission);
+        stampCommandService.decreaseTotalMissions(stamp);
     }
 
     @Cacheable(

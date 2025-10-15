@@ -1,5 +1,6 @@
 package com.ject.studytrip.studylog.presentation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -119,6 +120,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
             // given
             CreateStudyLogRequest request =
                     fixture.withSelectedDailyMissionIds(List.of(dailyMission.getId())).build();
+            int initialCompletedMissions = stamp.getCompletedMissions();
 
             // when
             ResultActions resultActions =
@@ -129,6 +131,36 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.data.studyLogId").isNumber());
+
+            // 스탬프의 완료된 미션 수가 증가했는지 확인
+            assertThat(stamp.getCompletedMissions()).isEqualTo(initialCompletedMissions + 1);
+        }
+
+        @Test
+        @DisplayName("여러 미션을 선택한 경우 스탬프의 완료된 미션 수가 올바르게 증가한다")
+        void shouldUpdateCompletedMissionsWhenMultipleMissionsSelected() throws Exception {
+            // given
+            Mission mission2 = missionTestHelper.saveMission(stamp);
+            DailyMission dailyMission2 =
+                    dailyMissionTestHelper.saveDailyMission(mission2, dailyGoal);
+            CreateStudyLogRequest request =
+                    fixture.withSelectedDailyMissionIds(
+                                    List.of(dailyMission.getId(), dailyMission2.getId()))
+                            .build();
+            int initialCompletedMissions = stamp.getCompletedMissions();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), dailyGoal.getId(), request);
+
+            // then
+            resultActions
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.data.studyLogId").isNumber());
+
+            // 스탬프의 완료된 미션 수가 2개 증가했는지 확인
+            assertThat(stamp.getCompletedMissions()).isEqualTo(initialCompletedMissions + 2);
         }
 
         @Test

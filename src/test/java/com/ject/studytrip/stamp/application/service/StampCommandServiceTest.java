@@ -104,11 +104,37 @@ class StampCommandServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("스탬프 종료일이 과거 날짜라면 예외가 발생한다")
+        void shouldThrowExceptionWhenEndDateIsInPast() {
+            // given
+            CreateStampRequest request = fixture.withEndDateInPast().build();
+
+            // when & then
+            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_END_DATE_CANNOT_BE_IN_PAST.getMessage());
+        }
+
+        @Test
+        @DisplayName("스탬프 종료일이 여행 종료일보다 이후라면 예외가 발생한다")
+        void shouldThrowExceptionWhenEndDateIsAfterTripEndDate() {
+            // given
+            CreateStampRequest request = fixture.withEndDateAfterTripEndDate().build();
+
+            // when & then
+            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(
+                            StampErrorCode.STAMP_END_DATE_AFTER_TRIP_END_DATE_NOT_ALLOWED
+                                    .getMessage());
+        }
+
+        @Test
         @DisplayName("유효한 요청으로 스탬프를 생성하면 스탬프가 저장되고 반환된다")
         void shouldCreateValidStamp() {
             // given
             CreateStampRequest request = fixture.build();
-            Stamp saved = Stamp.of(courseTrip, request.name(), request.order());
+            Stamp saved = Stamp.of(courseTrip, request.name(), request.order(), request.endDate());
             given(stampRepository.save(any())).willReturn(saved);
 
             // when
@@ -192,26 +218,71 @@ class StampCommandServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("updateStampName 메서드는")
-    class UpdateStampName {
+    @DisplayName("updateStamp 메서드는")
+    class UpdateStamp {
         private final UpdateStampRequestFixture fixture = new UpdateStampRequestFixture();
 
         @Test
         @DisplayName("유효한 정보로 스탬프의 이름을 수정하면 스탬프가 업데이트된다")
-        void shouldUpdateStampNameOrDeadline() {
+        void shouldUpdateStampName() {
             // given
             UpdateStampRequest request = fixture.buildUpdateName();
 
             // when
-            stampCommandService.updateStampName(courseStamp1, request);
+            stampCommandService.updateStamp(courseTrip, courseStamp1, request);
 
             // then
             assertThat(courseStamp1.getName()).isEqualTo(request.name());
         }
+
+        @Test
+        @DisplayName("유효한 정보로 스탬프의 종료일을 수정하면 스탬프가 업데이트된다")
+        void shouldUpdateStampEndDate() {
+            // given
+            UpdateStampRequest request = fixture.buildUpdateEndDate();
+
+            // when
+            stampCommandService.updateStamp(courseTrip, courseStamp1, request);
+
+            // then
+            assertThat(courseStamp1.getEndDate()).isEqualTo(request.endDate());
+        }
+
+        @Test
+        @DisplayName("과거 날짜로 스탬프의 종료일을 수정하면 예외가 발생한다")
+        void shouldThrowExceptionWhenEndDateIsInPast() {
+            // given
+            UpdateStampRequest request = fixture.withEndDateInPast().buildUpdateEndDate();
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    stampCommandService.updateStamp(
+                                            courseTrip, courseStamp1, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_END_DATE_CANNOT_BE_IN_PAST.getMessage());
+        }
+
+        @Test
+        @DisplayName("여행 종료일보다 이후 날짜로 스탬프의 종료일을 수정하면 예외가 발생한다")
+        void shouldThrowExceptionWhenEndDateIsAfterTripEndDate() {
+            // given
+            UpdateStampRequest request = fixture.withEndDateAfterTripEndDate().buildUpdateEndDate();
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    stampCommandService.updateStamp(
+                                            courseTrip, courseStamp1, request))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(
+                            StampErrorCode.STAMP_END_DATE_AFTER_TRIP_END_DATE_NOT_ALLOWED
+                                    .getMessage());
+        }
     }
 
     @Nested
-    @DisplayName("updateStamp 메서드는")
+    @DisplayName("updateStampOrders 메서드는")
     class UpdateStampOrders {
         private final UpdateStampOrderRequestFixture fixture = new UpdateStampOrderRequestFixture();
 
@@ -485,6 +556,64 @@ class StampCommandServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseTotalMissions 메서드는")
+    class IncreaseTotalMissions {
+
+        @Test
+        @DisplayName("스탬프의 총 미션 수를 1 증가시킨다")
+        void shouldIncreaseTotalMissions() {
+            // given
+            int initialTotalMissions = courseStamp1.getTotalMissions();
+
+            // when
+            stampCommandService.increaseTotalMissions(courseStamp1);
+
+            // then
+            assertThat(courseStamp1.getTotalMissions()).isEqualTo(initialTotalMissions + 1);
+        }
+    }
+
+    @Nested
+    @DisplayName("decreaseTotalMissions 메서드는")
+    class DecreaseTotalMissions {
+
+        @Test
+        @DisplayName("스탬프의 총 미션 수를 1 감소시킨다")
+        void shouldDecreaseTotalMissions() {
+            // given
+            courseStamp1.increaseTotalMissions();
+            courseStamp1.increaseTotalMissions();
+            int initialTotalMissions = courseStamp1.getTotalMissions();
+
+            // when
+            stampCommandService.decreaseTotalMissions(courseStamp1);
+
+            // then
+            assertThat(courseStamp1.getTotalMissions()).isEqualTo(initialTotalMissions - 1);
+        }
+    }
+
+    @Nested
+    @DisplayName("increaseCompletedMissions 메서드는")
+    class IncreaseCompletedMissions {
+
+        @Test
+        @DisplayName("스탬프의 완료된 미션 수를 지정된 개수만큼 증가시킨다")
+        void shouldIncreaseCompletedMissions() {
+            // given
+            int initialCompletedMissions = courseStamp1.getCompletedMissions();
+            int increaseCount = 3;
+
+            // when
+            stampCommandService.increaseCompletedMissions(courseStamp1, increaseCount);
+
+            // then
+            assertThat(courseStamp1.getCompletedMissions())
+                    .isEqualTo(initialCompletedMissions + increaseCount);
         }
     }
 }

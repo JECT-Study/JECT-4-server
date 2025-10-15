@@ -17,18 +17,31 @@ public class DailyMissionQueryService {
     public List<DailyMission> getValidDailyMissionsByIds(
             Long dailyGoalId, List<Long> dailyMissionIds) {
         List<DailyMission> dailyMissions = dailyMissionRepository.findAllByIdIn(dailyMissionIds);
+        validateDailyMissions(dailyMissions, dailyMissionIds, dailyGoalId);
 
-        DailyMissionPolicy.validateExistAll(dailyMissions, dailyMissionIds);
-        dailyMissions.forEach(
-                dailyMission -> {
-                    DailyMissionPolicy.validateBelongsToDailyGoal(dailyMission, dailyGoalId);
-                    DailyMissionPolicy.validateNotDeleted(dailyMission);
-                });
+        return dailyMissions;
+    }
+
+    public List<DailyMission> getValidDailyMissionsWithMissionAndStampByIds(
+            Long dailyGoalId, List<Long> dailyMissionIds) {
+        List<DailyMission> dailyMissions =
+                dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds);
+        validateDailyMissions(dailyMissions, dailyMissionIds, dailyGoalId);
 
         return dailyMissions;
     }
 
     public List<DailyMission> getDailyMissionsByDailyGoal(Long dailyGoalId) {
         return dailyMissionQueryRepository.findAllByDailyGoalIdFetchJoinMission(dailyGoalId);
+    }
+
+    private void validateDailyMissions(
+            List<DailyMission> dailyMissions, List<Long> dailyMissionIds, Long dailyGoalId) {
+        DailyMissionPolicy.validateExistAll(dailyMissions, dailyMissionIds);
+        dailyMissions.forEach(
+                dailyMission -> {
+                    DailyMissionPolicy.validateBelongsToDailyGoal(dailyMission, dailyGoalId);
+                    DailyMissionPolicy.validateNotDeleted(dailyMission);
+                });
     }
 }

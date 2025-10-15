@@ -73,7 +73,7 @@ public class StampFacade {
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
         Stamp stamp = stampQueryService.getValidStamp(trip.getId(), stampId);
 
-        stampCommandService.updateStampName(stamp, request);
+        stampCommandService.updateStamp(trip, stamp, request);
     }
 
     @Caching(

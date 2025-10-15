@@ -124,6 +124,87 @@ class DailyMissionQueryServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("getValidDailyMissionsWithMissionAndStampByIds 메서드는")
+    class GetValidDailyMissionsWithMissionAndStampByIds {
+
+        @Test
+        @DisplayName("요청한 ID 개수와 조회된 데일리 미션 개수가 다르면 예외가 발생한다")
+        void shouldThrowExceptionWhenSomeDailyMissionsDoNotExist() {
+            // given
+            List<Long> ids = List.of(1L, 2L);
+            given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(ids))
+                    .willReturn(List.of(dailyMission));
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    dailyMissionQueryService
+                                            .getValidDailyMissionsWithMissionAndStampByIds(
+                                                    dailyGoal.getId(), ids))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(DailyMissionErrorCode.DAILY_MISSION_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("데일리 미션이 요청한 데일리 목표에 속하지 않으면 예외가 발생한다")
+        void shouldThrowExceptionWhenDailyMissionDoesNotBelongToDailyGoal() {
+            // given
+            DailyGoal otherGoal = DailyGoalFixture.createDailyGoalWithId(999L, dailyGoal.getTrip());
+            List<Long> ids = List.of(dailyMission.getId());
+            given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(ids))
+                    .willReturn(List.of(dailyMission));
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    dailyMissionQueryService
+                                            .getValidDailyMissionsWithMissionAndStampByIds(
+                                                    otherGoal.getId(), ids))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(
+                            DailyMissionErrorCode.DAILY_MISSION_NOT_BELONG_TO_DAILY_GOAL
+                                    .getMessage());
+        }
+
+        @Test
+        @DisplayName("데일리 미션이 이미 삭제된 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenDailyMissionIsDeleted() {
+            // given
+            dailyMission.updateDeletedAt(); // deleted
+            List<Long> ids = List.of(dailyMission.getId());
+            given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(ids))
+                    .willReturn(List.of(dailyMission));
+
+            // when & then
+            Assertions.assertThatThrownBy(
+                            () ->
+                                    dailyMissionQueryService
+                                            .getValidDailyMissionsWithMissionAndStampByIds(
+                                                    dailyGoal.getId(), ids))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(DailyMissionErrorCode.DAILY_MISSION_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("ID 리스트로 유효한 데일리 미션을 미션과 스탬프와 함께 조회해 반환한다")
+        void shouldGetDailyMissionsWithMissionAndStampByIds() {
+            // given
+            List<Long> ids = List.of(dailyMission.getId());
+            List<DailyMission> dailyMissions = List.of(dailyMission);
+            given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(ids))
+                    .willReturn(dailyMissions);
+
+            // when
+            List<DailyMission> result =
+                    dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
+                            dailyGoal.getId(), ids);
+
+            // then
+            assertThat(result.isEmpty()).isFalse();
+        }
+    }
+
+    @Nested
     @DisplayName("getDailyMissionsByDailyGoal 메서드는")
     class GetDailyMissionsByDailyGoal {
 
