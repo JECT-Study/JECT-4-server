@@ -45,7 +45,15 @@ public class StampController {
                                 HttpStatus.CREATED.value(), CreateStampResponse.of(result)));
     }
 
-    @Operation(summary = "스탬프 수정", description = "특정 스탬프의 이름을 수정합니다.")
+    @Operation(
+            summary = "스탬프 수정",
+            description =
+                    """
+                    특정 스탬프의 이름과 종료일을 수정합니다.
+
+                    - 이름과 종료일 중 변경하지 않는 필드는 요청 바디에서 생략해도 됩니다.
+                    - 종료일을 '없음'으로 변경하려면 `endDate: null`로 명시적으로 전달해야 합니다.
+                    """)
     @PatchMapping("/{tripId}/stamps/{stampId}")
     public ResponseEntity<StandardResponse> updateStamp(
             @AuthenticationPrincipal String memberId,

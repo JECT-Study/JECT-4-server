@@ -18,6 +18,9 @@ public enum StampErrorCode implements ErrorCode {
     STAMP_LIST_CANNOT_BE_EMPTY(HttpStatus.BAD_REQUEST, "스탬프 목록은 비어있을 수 없습니다."),
     STAMP_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 완료된 스탬프입니다."),
     ALL_STAMPS_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "모든 스탬프가 완료되지 않았습니다."),
+    STAMP_END_DATE_CANNOT_BE_IN_PAST(HttpStatus.BAD_REQUEST, "스탬프의 종료일은 과거일 수 없습니다."),
+    STAMP_END_DATE_AFTER_TRIP_END_DATE_NOT_ALLOWED(
+            HttpStatus.BAD_REQUEST, "스탬프의 종료일은 여행 종료일보다 이후일 수 없습니다."),
 
     // 403
     STAMP_NOT_BELONG_TO_TRIP(HttpStatus.FORBIDDEN, "해당 스탬프는 요청한 여행에 속하지 않습니다."),

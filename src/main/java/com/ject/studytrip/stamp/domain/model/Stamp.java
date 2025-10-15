@@ -5,6 +5,7 @@ import static org.springframework.util.StringUtils.hasText;
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.trip.domain.model.Trip;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.*;
 
@@ -28,13 +29,22 @@ public class Stamp extends BaseTimeEntity {
 
     private int stampOrder;
 
+    private LocalDate endDate;
+
+    private int totalMissions;
+
+    private int completedMissions;
+
     private boolean completed;
 
-    public static Stamp of(Trip trip, String name, int stampOrder) {
+    public static Stamp of(Trip trip, String name, int stampOrder, LocalDate endDate) {
         return Stamp.builder()
                 .trip(trip)
                 .name(name)
                 .stampOrder(stampOrder)
+                .endDate(endDate)
+                .totalMissions(0)
+                .completedMissions(0)
                 .completed(false)
                 .build();
     }
@@ -47,11 +57,27 @@ public class Stamp extends BaseTimeEntity {
         this.stampOrder = newOrder;
     }
 
+    public void updateEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
     public void updateCompleted() {
         this.completed = true;
     }
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public void increaseTotalMissions() {
+        this.totalMissions += 1;
+    }
+
+    public void decreaseTotalMissions() {
+        this.totalMissions -= 1;
+    }
+
+    public void increaseCompletedMissions(int count) {
+        this.completedMissions += count;
     }
 }
