@@ -97,8 +97,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
         @DisplayName("유효한 요청으로 특정 여행의 스탬프를 생성하고, 여행 총 스탬프 수가 증가한다")
         void shouldCreateStamp() throws Exception {
             // given
-            CreateStampRequest request =
-                    createStampRequestFixture.withStampOrder(NEXT_STAMP_ORDER).build();
+            CreateStampRequest request = createStampRequestFixture.build();
 
             // when
             ResultActions resultActions = getResultActions(token, courseTrip.getId(), request);
@@ -225,48 +224,6 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(TripErrorCode.TRIP_ALREADY_DELETED.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("탐험형 여행에 순서가 존재하는 스탬프를 추가하면 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampOrderExistsInExplorationTrip() throws Exception {
-            // given
-            CreateStampRequest request = createStampRequestFixture.build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, exploreTrip.getId(), request);
-
-            // when & then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.INVALID_STAMP_ORDER_FOR_EXPLORATION_TRIP
-                                                    .getStatus()
-                                                    .value()));
-        }
-
-        @Test
-        @DisplayName("코스형 여행에 유효하지 않은 순서(중복, 범위 이탈)가 존재하는 스탬프를 추가하면 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampOrderOutOfRangeInCourseTrip() throws Exception {
-            // given
-            CreateStampRequest request = createStampRequestFixture.build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, courseTrip.getId(), request);
-
-            // when & then
-            resultActions
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(
-                            jsonPath("$.status")
-                                    .value(
-                                            StampErrorCode.INVALID_STAMP_ORDER_RANGE_FOR_COURSE_TRIP
-                                                    .getStatus()
-                                                    .value()));
         }
     }
 

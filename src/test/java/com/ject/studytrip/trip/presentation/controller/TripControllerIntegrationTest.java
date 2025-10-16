@@ -16,9 +16,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.helper.MemberTestHelper;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
-import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
 import com.ject.studytrip.stamp.helper.StampTestHelper;
-import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
@@ -208,71 +206,6 @@ public class TripControllerIntegrationTest extends BaseIntegrationTest {
             // when & then
             resultActions.andExpect(
                     status().is(TripErrorCode.TRIP_STAMP_REQUIRED.getStatus().value()));
-        }
-
-        @Test
-        @DisplayName("탐험형 여행을 선택하고 스탬프 순서가 존재할 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampOrderExistsInExplorationTrip() throws Exception {
-            // given
-            List<CreateStampRequest> stampRequests =
-                    List.of(new CreateStampRequestFixture().build());
-            CreateTripRequest request =
-                    new CreateTripRequestFixture()
-                            .withCategory(TRIP_CATEGORY_EXPLORE)
-                            .withStamps(stampRequests)
-                            .build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, request);
-
-            // when & then
-            resultActions.andExpect(
-                    status().is(
-                                    StampErrorCode.INVALID_STAMP_ORDER_FOR_EXPLORATION_TRIP
-                                            .getStatus()
-                                            .value()));
-        }
-
-        @Test
-        @DisplayName("코스형 여행을 선택하고 스탬프 순서가 1 미만 또는 최대 총 개수를 초과하면 400 예외가 발생한다")
-        void shouldThrowExceptionWhenStampOrderOutOfRangeInCourseTrip() throws Exception {
-            // given
-            List<CreateStampRequest> stampRequests =
-                    List.of(new CreateStampRequestFixture().withStampOrder(2).build());
-            CreateTripRequest request =
-                    new CreateTripRequestFixture().withStamps(stampRequests).build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, request);
-
-            // when & then
-            resultActions.andExpect(
-                    status().is(
-                                    StampErrorCode.INVALID_STAMP_ORDER_RANGE_FOR_COURSE_TRIP
-                                            .getStatus()
-                                            .value()));
-        }
-
-        @Test
-        @DisplayName("코스형 여행을 선택하고 스탬프 순서에 중복이 존재할 경우 400 예외가 발생한다")
-        void shouldThrowExceptionWhenDuplicateStampOrderInCourseTrip() throws Exception {
-            // given
-            List<CreateStampRequest> stampRequests =
-                    List.of(
-                            new CreateStampRequestFixture().withStampOrder(1).build(),
-                            new CreateStampRequestFixture().withStampOrder(1).build());
-            CreateTripRequest request =
-                    new CreateTripRequestFixture().withStamps(stampRequests).build();
-
-            // when
-            ResultActions resultActions = getResultActions(token, request);
-
-            // when & then
-            resultActions.andExpect(
-                    status().is(
-                                    StampErrorCode.DUPLICATE_STAMP_ORDER_FOR_COURSE_TRIP
-                                            .getStatus()
-                                            .value()));
         }
     }
 
