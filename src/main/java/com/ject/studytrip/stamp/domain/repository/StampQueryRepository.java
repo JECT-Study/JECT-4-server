@@ -14,4 +14,6 @@ public interface StampQueryRepository {
     long deleteAllByDeletedAtIsNotNull();
 
     long deleteAllByDeletedTripOwner();
+
+    Integer findMaxStampOrderByTripId(Long tripId);
 }

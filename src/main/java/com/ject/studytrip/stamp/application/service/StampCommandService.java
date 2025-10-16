@@ -24,30 +24,49 @@ public class StampCommandService {
     private final StampQueryRepository stampQueryRepository;
 
     public Stamp createStamp(Trip trip, CreateStampRequest request) {
-        Stamp newStamp =
-                StampFactory.create(trip, request.name(), request.order(), request.endDate());
+        int nextOrder = 0;
+        if (trip.getCategory() == TripCategory.COURSE) {
+            nextOrder = computeNextStampOrder(trip.getId());
+        }
 
-        List<Stamp> existingStamps =
-                stampRepository.findAllByTripIdAndDeletedAtIsNull(trip.getId());
-        List<Stamp> combinedStamps = new ArrayList<>(existingStamps);
-        combinedStamps.add(newStamp);
+        Stamp stamp = StampFactory.create(trip, request.name(), nextOrder, request.endDate());
+        StampPolicy.validateEndDate(trip.getEndDate(), stamp.getEndDate());
 
-        StampPolicy.validateStampOrders(trip.getCategory(), combinedStamps);
-        StampPolicy.validateEndDate(trip.getEndDate(), newStamp.getEndDate());
-
-        return stampRepository.save(newStamp);
+        return stampRepository.save(stamp);
     }
 
     public void createStamps(Trip trip, List<CreateStampRequest> requests) {
-        List<Stamp> stamps =
-                requests.stream()
-                        .map(
-                                stamp ->
-                                        StampFactory.create(
-                                                trip, stamp.name(), stamp.order(), stamp.endDate()))
-                        .toList();
+        if (requests == null || requests.isEmpty()) return;
 
-        StampPolicy.validateStampOrders(trip.getCategory(), stamps);
+        final List<Stamp> stamps =
+                switch (trip.getCategory()) {
+                        // 탐험형 여행일 경우
+                        // order 0 으로 전부 고정
+                    case EXPLORE -> requests.stream()
+                            .map(
+                                    stamp ->
+                                            StampFactory.create(
+                                                    trip, stamp.name(), 0, stamp.endDate()))
+                            .toList();
+
+                        // 코스형 여행일 경우
+                        // nextOrder 부터 1씩 증가하며 order 저장
+                    case COURSE -> {
+                        int nextOrder = computeNextStampOrder(trip.getId());
+
+                        List<Stamp> stampList = new ArrayList<>();
+                        for (CreateStampRequest request : requests) {
+                            Stamp stamp =
+                                    StampFactory.create(
+                                            trip, request.name(), nextOrder++, request.endDate());
+                            stampList.add(stamp);
+                        }
+
+                        yield stampList;
+                    }
+                };
+
+        stamps.forEach(stamp -> StampPolicy.validateEndDate(trip.getEndDate(), stamp.getEndDate()));
 
         stampRepository.saveAll(stamps);
     }
@@ -150,5 +169,10 @@ public class StampCommandService {
 
     public void increaseCompletedMissions(Stamp stamp, int count) {
         stamp.increaseCompletedMissions(count);
+    }
+
+    private int computeNextStampOrder(Long tripId) {
+        Integer lastOrder = stampQueryRepository.findMaxStampOrderByTripId(tripId);
+        return lastOrder == null ? 1 : lastOrder + 1;
     }
 }

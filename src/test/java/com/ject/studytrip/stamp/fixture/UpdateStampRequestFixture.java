@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class UpdateStampRequestFixture {
     private String name = "TEST STAMP";
-    private LocalDate endDate = LocalDate.now().plusDays(7);
+    private java.time.LocalDate endDate = java.time.LocalDate.now().plusDays(7);
 
     public UpdateStampRequestFixture withName(String name) {
         this.name = name;

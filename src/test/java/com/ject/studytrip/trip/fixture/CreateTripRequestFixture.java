@@ -13,10 +13,7 @@ public class CreateTripRequestFixture {
     private String memo = "TEST 여행입니다.";
     private String category = TripCategory.COURSE.name();
     private LocalDate endDate = LocalDate.now().plusDays(10);
-    private List<CreateStampRequest> stamps =
-            List.of(
-                    new CreateStampRequestFixture().build(),
-                    new CreateStampRequestFixture().withStampOrder(2).build());
+    private List<CreateStampRequest> stamps = List.of(new CreateStampRequestFixture().build());
 
     public CreateTripRequestFixture withName(String name) {
         this.name = name;

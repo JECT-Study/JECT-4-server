@@ -6,16 +6,10 @@ import java.time.LocalDate;
 public class CreateStampRequestFixture {
 
     private String name = "TEST STAMP";
-    private int stampOrder = 1;
-    private LocalDate endDate = LocalDate.now().plusDays(7);
+    private java.time.LocalDate endDate = java.time.LocalDate.now().plusDays(7);
 
     public CreateStampRequestFixture withName(String name) {
         this.name = name;
-        return this;
-    }
-
-    public CreateStampRequestFixture withStampOrder(int stampOrder) {
-        this.stampOrder = stampOrder;
         return this;
     }
 
@@ -30,6 +24,6 @@ public class CreateStampRequestFixture {
     }
 
     public CreateStampRequest build() {
-        return new CreateStampRequest(name, stampOrder, endDate);
+        return new CreateStampRequest(name, endDate);
     }
 }

@@ -64,46 +64,6 @@ class StampCommandServiceTest extends BaseUnitTest {
         private final CreateStampRequestFixture fixture = new CreateStampRequestFixture();
 
         @Test
-        @DisplayName("탐험형 여행에 순서가 지정된 스탬프를 등록하면 예외가 발생한다")
-        void shouldThrowExceptionWhenOrderSpecifiedForExploreTrip() {
-            // given
-            CreateStampRequest request = fixture.withStampOrder(1).build();
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamp(exploreTrip, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(
-                            StampErrorCode.INVALID_STAMP_ORDER_FOR_EXPLORATION_TRIP.getMessage());
-        }
-
-        @Test
-        @DisplayName("코스형 여행에 순서가 유효 범위를 벗어난 경우 예외가 발생한다")
-        void shouldThrowExceptionWhenOrderOutOfRange() {
-            // given
-            CreateStampRequest request = fixture.withStampOrder(1000).build();
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(
-                            StampErrorCode.INVALID_STAMP_ORDER_RANGE_FOR_COURSE_TRIP.getMessage());
-        }
-
-        @Test
-        @DisplayName("코스형 여행에 중복된 순서의 스탬프를 등록하면 예외가 발생한다")
-        void shouldThrowExceptionWhenDuplicateOrderForCourseTrip() {
-            // given
-            CreateStampRequest request = fixture.withStampOrder(1).build();
-            given(stampRepository.findAllByTripIdAndDeletedAtIsNull(courseTrip.getId()))
-                    .willReturn(List.of(courseStamp1));
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(StampErrorCode.DUPLICATE_STAMP_ORDER_FOR_COURSE_TRIP.getMessage());
-        }
-
-        @Test
         @DisplayName("스탬프 종료일이 과거 날짜라면 예외가 발생한다")
         void shouldThrowExceptionWhenEndDateIsInPast() {
             // given
@@ -130,11 +90,47 @@ class StampCommandServiceTest extends BaseUnitTest {
         }
 
         @Test
-        @DisplayName("유효한 요청으로 스탬프를 생성하면 스탬프가 저장되고 반환된다")
+        @DisplayName("탐험형 여행에서는 order가 항상 0으로 저장된다")
+        void shouldCreateExploreStampWithOrderZero() {
+            // given
+            CreateStampRequest request = fixture.build();
+            // exploreTrip은 order 고정(0), save 응답 스텁
+            Stamp saved = Stamp.of(exploreTrip, request.name(), 0, request.endDate());
+            given(stampRepository.save(any())).willReturn(saved);
+
+            // when
+            Stamp stamp = stampCommandService.createStamp(exploreTrip, request);
+
+            // then
+            assertThat(stamp.getStampOrder()).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("코스형 여행에서는 마지막 order 다음 값으로 저장된다")
+        void shouldCreateCourseStampWithNextSequentialOrder() {
+            // given
+            CreateStampRequest request = fixture.build();
+
+            // 마지막 스탬프 순서가 2라고 가정, 신규는 3으로 저장
+            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId())).willReturn(2);
+            Stamp saved = Stamp.of(courseTrip, request.name(), 3, request.endDate());
+            given(stampRepository.save(any())).willReturn(saved);
+
+            // when
+            Stamp stamp = stampCommandService.createStamp(courseTrip, request);
+
+            // then
+            assertThat(stamp.getStampOrder()).isEqualTo(3);
+        }
+
+        @Test
+        @DisplayName("유효한 요청으로 스탬프를 생성하면 저장되고 반환된다")
         void shouldCreateValidStamp() {
             // given
             CreateStampRequest request = fixture.build();
-            Stamp saved = Stamp.of(courseTrip, request.name(), request.order(), request.endDate());
+            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId()))
+                    .willReturn(null);
+            Stamp saved = Stamp.of(courseTrip, request.name(), 1, request.endDate());
             given(stampRepository.save(any())).willReturn(saved);
 
             // when
@@ -142,7 +138,7 @@ class StampCommandServiceTest extends BaseUnitTest {
 
             // then
             assertThat(stamp.getName()).isEqualTo(saved.getName());
-            assertThat(stamp.getStampOrder()).isEqualTo(saved.getStampOrder());
+            assertThat(stamp.getStampOrder()).isEqualTo(1);
         }
     }
 
@@ -152,65 +148,27 @@ class StampCommandServiceTest extends BaseUnitTest {
         private final CreateStampRequestFixture fixture = new CreateStampRequestFixture();
 
         @Test
-        @DisplayName("탐험형 여행에서 순서가 1 이상이면 예외가 발생한다")
-        void shouldThrowExceptionWhenOrderExistsInExploreTrip() {
+        @DisplayName("탐험형 여행에서는 전달한 모든 스탬프의 order가 0으로 저장된다")
+        void shouldCreateExploreStampsWithOrderZero() {
             // given
-            List<CreateStampRequest> requests = List.of(fixture.withStampOrder(1).build());
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamps(exploreTrip, requests))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(
-                            StampErrorCode.INVALID_STAMP_ORDER_FOR_EXPLORATION_TRIP.getMessage());
-        }
-
-        @Test
-        @DisplayName("코스형 여행에서 순서가 1 미만 또는 총 개수 초과라면 예외가 발생한다")
-        void shouldThrowExceptionWhenStampOrderIsOutOfRangeForCourseTrip() {
-            // given
-            List<CreateStampRequest> requests = List.of(fixture.withStampOrder(2).build());
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamps(courseTrip, requests))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(
-                            StampErrorCode.INVALID_STAMP_ORDER_RANGE_FOR_COURSE_TRIP.getMessage());
-        }
-
-        @Test
-        @DisplayName("코스형 여행에서 순서가 중복되면 예외가 발생한다")
-        void shouldThrowExceptionWhenDuplicateOrderInCourseTrip() {
-            // given
-            List<CreateStampRequest> requests =
-                    List.of(fixture.withStampOrder(1).build(), fixture.withStampOrder(1).build());
-
-            // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamps(courseTrip, requests))
-                    .isInstanceOf(CustomException.class)
-                    .hasMessage(StampErrorCode.DUPLICATE_STAMP_ORDER_FOR_COURSE_TRIP.getMessage());
-        }
-
-        @Test
-        @DisplayName("코스형 여행의 유효한 스탬프 리스트를 넘기면 저장된다")
-        void shouldCreateStampsForCourseTrip() {
-            // given
-            List<CreateStampRequest> requests = List.of(fixture.build());
+            List<CreateStampRequest> requests = List.of(fixture.build(), fixture.build());
 
             // when
-            stampCommandService.createStamps(courseTrip, requests);
+            stampCommandService.createStamps(exploreTrip, requests);
 
             // then
             verify(stampRepository).saveAll(anyList());
         }
 
         @Test
-        @DisplayName("탐험형 여행의 유효한 스탬프 리스트를 넘기면 저장된다")
-        void shouldCreateStampsForExploreTrip() {
+        @DisplayName("코스형 여행에서는 마지막 order 다음 값부터 순차적으로 저장된다")
+        void shouldCreateCourseStampsSequentiallyFromNextOrder() {
             // given
-            List<CreateStampRequest> requests = List.of(fixture.withStampOrder(0).build());
+            List<CreateStampRequest> requests = List.of(fixture.build(), fixture.build());
+            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId())).willReturn(5);
 
             // when
-            stampCommandService.createStamps(exploreTrip, requests);
+            stampCommandService.createStamps(courseTrip, requests);
 
             // then
             verify(stampRepository).saveAll(anyList());
@@ -225,6 +183,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         @Test
         @DisplayName("유효한 정보로 스탬프의 이름을 수정하면 스탬프가 업데이트된다")
         void shouldUpdateStampName() {
+
             // given
             UpdateStampRequest request = fixture.buildUpdateName();
 

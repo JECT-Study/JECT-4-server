@@ -75,4 +75,13 @@ public class StampQueryRepositoryAdapter implements StampQueryRepository {
                                         .where(trip.deletedAt.isNotNull())))
                 .execute();
     }
+
+    @Override
+    public Integer findMaxStampOrderByTripId(Long tripId) {
+        return queryFactory
+                .select(stamp.stampOrder.max().coalesce(0))
+                .from(stamp)
+                .where(stamp.trip.id.eq(tripId), stamp.deletedAt.isNull())
+                .fetchOne();
+    }
 }
