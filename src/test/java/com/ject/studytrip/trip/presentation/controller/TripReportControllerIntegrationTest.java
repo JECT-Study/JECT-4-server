@@ -4,8 +4,7 @@ import static com.ject.studytrip.auth.fixture.TokenFixture.TOKEN_PREFIX;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,7 +137,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Request Param 페이징 데이터 타입이 올바르지 않으면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenWhenPagingParameterTypeMismatch() throws Exception {
-            // Given
+            // given
             String page = "test";
             String size = "test";
 
@@ -160,7 +159,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Request Param 페이징 데이터가 유효하지 않으면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenWhenPagingParameterIsInvalid() throws Exception {
-            // Given
+            // given
             String page = "-1";
             String size = "100";
 
@@ -278,7 +277,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
             ResultActions resultActions =
                     getResultActions(accessToken, invalidTripId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
 
-            // when & then
+            // then
             resultActions
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.success").value(false))
@@ -386,7 +385,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Request Param 페이징 데이터 타입이 올바르지 않으면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenWhenPagingParameterTypeMismatch() throws Exception {
-            // Given
+            // given
             String page = "test";
             String size = "test";
 
@@ -408,7 +407,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Request Param 페이징 데이터가 유효하지 않으면 400 Bad Request를 반환한다")
         void shouldReturnBadRequestWhenWhenPagingParameterIsInvalid() throws Exception {
-            // Given
+            // given
             String page = "-1";
             String size = "100";
 
@@ -483,7 +482,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
             ResultActions resultActions =
                     getResultActions(accessToken, invalidId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
 
-            // when & then
+            // then
             resultActions
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.success").value(false))
@@ -496,6 +495,34 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.data.message")
                                     .value(TripReportErrorCode.TRIP_REPORT_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 여행 리포트일 경우 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripReportAlreadyDeleted() throws Exception {
+            // given
+            tripReport.updateDeletedAt();
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(
+                            accessToken, tripReport.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED
+                                                    .getMessage()));
         }
 
         @Test
@@ -633,6 +660,140 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.data.tripReportId").isNumber());
+        }
+    }
+
+    @Nested
+    @DisplayName("여행 리포트 삭제 API")
+    class DeleteTripReport {
+        private ResultActions getResultActions(String accessToken, Object tripReportId)
+                throws Exception {
+            return mockMvc.perform(
+                    delete("/api/trip-reports/{tripReportId}", tripReportId)
+                            .header(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + accessToken));
+        }
+
+        @Test
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions("", tripReport.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getStatus().value()));
+        }
+
+        @Test
+        @DisplayName("PathVariable 여행 리포트 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripReportIdTypeMismatch() throws Exception {
+            // given
+            String invalidId = "abc";
+
+            // when
+            ResultActions resultActions = getResultActions(accessToken, invalidId);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getStatus()
+                                                    .value()));
+        }
+
+        @Test
+        @DisplayName("여행 리포트의 소유자가 아니라면 403 Forbidden을 반환한다.")
+        void shouldReturnForbiddenWhenNotTripReportOwner() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions(newAccessToken, tripReport.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            TripReportErrorCode.NOT_TRIP_REPORT_OWNER
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripReportErrorCode.NOT_TRIP_REPORT_OWNER.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 여행 리포트 ID가 들어오면 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenTripReportIdIsInvalid() throws Exception {
+            // given
+            Long invalidId = -1L;
+
+            // when
+            ResultActions resultActions = getResultActions(accessToken, invalidId);
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            TripReportErrorCode.TRIP_REPORT_NOT_FOUND
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(TripReportErrorCode.TRIP_REPORT_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 여행 리포트일 경우 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenTripReportAlreadyDeleted() throws Exception {
+            // given
+            tripReport.updateDeletedAt();
+
+            // when
+            ResultActions resultActions = getResultActions(accessToken, tripReport.getId());
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("여행 리포트 ID가 유효하면 여행 리포트를 삭제한다.")
+        void shouldDeleteTripReportWhenTripReportIdIsValid() throws Exception {
+            // given
+            Long tripReportId = tripReport.getId();
+
+            // when
+            ResultActions resultActions = getResultActions(accessToken, tripReportId);
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.data").doesNotExist());
         }
     }
 

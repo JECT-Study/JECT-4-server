@@ -16,6 +16,11 @@ public class TripReportQueryRepositoryAdapter implements TripReportQueryReposito
     private final QMember member = QMember.member;
 
     @Override
+    public long deleteAllByDeletedAtIsNotNull() {
+        return queryFactory.delete(tripReport).where(tripReport.deletedAt.isNotNull()).execute();
+    }
+
+    @Override
     public long deleteAllByDeletedMemberOwner() {
         return queryFactory
                 .delete(tripReport)

@@ -5,6 +5,7 @@ import static org.flywaydb.core.internal.util.StringUtils.hasText;
 import com.ject.studytrip.global.common.entity.BaseTimeEntity;
 import com.ject.studytrip.member.domain.model.Member;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -71,5 +72,9 @@ public class TripReport extends BaseTimeEntity {
 
     public void updateImageUrl(String imageUrl) {
         if (hasText(imageUrl)) this.imageUrl = imageUrl;
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

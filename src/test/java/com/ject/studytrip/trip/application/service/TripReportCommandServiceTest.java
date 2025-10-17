@@ -76,6 +76,52 @@ class TripReportCommandServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("deleteTripReport 메서드는")
+    class DeleteTripReport {
+
+        @Test
+        @DisplayName("특정 여행 리포트의 deletedAt 필드를 현재 시간으로 업데이트한다")
+        void shouldDeleteTripForUpdateDeletedAt() {
+            // when
+            tripReportCommandService.deleteTripReport(tripReport);
+
+            // then
+            assertThat(tripReport.getDeletedAt()).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteTripReports 메서드는")
+    class HardDeleteTripReports {
+
+        @Test
+        @DisplayName("삭제된 여행 리포트가 하나라도 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenDeletedTripReportDoesNotExist() {
+            // given
+            given(tripReportQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReports();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 여행 리포트가 하나라도 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenDeletedTripReportExist() {
+            // given
+            given(tripReportQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReports();
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
     @DisplayName("hardDeleteTripReportsOwnedByDeletedMember 메서드는")
     class HardDeleteTripReportsOwnedByDeletedMember {
 

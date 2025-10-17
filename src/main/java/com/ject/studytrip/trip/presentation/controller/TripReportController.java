@@ -92,6 +92,17 @@ public class TripReportController {
                                 HttpStatus.CREATED.value(), CreateTripReportResponse.of(result)));
     }
 
+    @Operation(summary = "여행 리포트 삭제", description = "사용자가 작성한 여행 리포트를 삭제합니다.")
+    @DeleteMapping("/api/trip-reports/{tripReportId}")
+    public ResponseEntity<StandardResponse> deleteTripReport(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable @NotNull(message = "여행 리포트 ID는 필수 요청 파라미터입니다.") Long tripReportId) {
+        tripReportFacade.deleteTripReport(Long.valueOf(memberId), tripReportId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(StandardResponse.success(HttpStatus.OK.value(), null));
+    }
+
     @Operation(
             summary = "여행 리포트 이미지 업로드용 Presigned URL 발급",
             description =

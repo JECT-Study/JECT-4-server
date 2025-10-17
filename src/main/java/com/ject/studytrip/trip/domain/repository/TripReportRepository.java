@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface TripReportRepository {
     Optional<TripReport> findById(Long tripReportId);
 
-    List<TripReport> findAllByMemberIdOrderByCreatedAtDesc(Long memberId);
+    List<TripReport> findAllByMemberIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long memberId);
 
     TripReport save(TripReport tripReport);
 }
