@@ -133,14 +133,18 @@ class TripQueryServiceTest extends BaseUnitTest {
     class GetTripsSliceByMemberId {
 
         @Test
-        @DisplayName("로그인된 사용자의 여행 목록을 DB에서 조회하고 슬라이스 처리해 반환한다")
+        @DisplayName("로그인된 사용자의 완료되지 않고 삭제되지 않은 여행 목록을 DB에서 조회하고 슬라이스 처리해 반환한다")
         void shouldGetTripsReturnSlicePaged() {
             // given
             Long memberId = member.getId();
             List<Trip> trips = List.of(trip);
             Pageable pageable = PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE);
             Slice<Trip> results = new SliceImpl<>(trips, pageable, false);
-            given(tripQueryRepository.findSliceByMemberId(memberId, pageable)).willReturn(results);
+            given(
+                            tripQueryRepository
+                                    .findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(
+                                            memberId, pageable))
+                    .willReturn(results);
 
             // when
             Slice<Trip> sliceTrips =

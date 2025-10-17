@@ -83,7 +83,8 @@ public class TripController {
 
     @Operation(
             summary = "여행 목록 조회",
-            description = "여행 목록을 조회하는 API 입니다. 무한 스크롤을 위해 슬라이스를 적용하고, D-DAY 정보가 이른 순으로 정렬합니다.")
+            description =
+                    "여행 목록을 조회하는 API 입니다. 무한 스크롤을 위해 슬라이스를 적용하고, D-DAY 정보가 이른 순으로 정렬합니다. 완료되지 않은 여행 목록만 조회합니다.")
     @GetMapping
     public ResponseEntity<StandardResponse> loadTrips(
             @AuthenticationPrincipal String memberId,

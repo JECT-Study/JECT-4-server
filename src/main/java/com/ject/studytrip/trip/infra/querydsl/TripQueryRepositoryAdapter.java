@@ -23,11 +23,15 @@ public class TripQueryRepositoryAdapter implements TripQueryRepository {
     private final QMember member = QMember.member;
 
     @Override
-    public Slice<Trip> findSliceByMemberId(Long memberId, Pageable pageable) {
+    public Slice<Trip> findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(
+            Long memberId, Pageable pageable) {
         List<Trip> content =
                 queryFactory
                         .selectFrom(trip)
-                        .where(trip.member.id.eq(memberId).and(trip.deletedAt.isNull()))
+                        .where(
+                                trip.member.id.eq(memberId),
+                                trip.completed.isFalse(),
+                                trip.deletedAt.isNull())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
                         .fetch();

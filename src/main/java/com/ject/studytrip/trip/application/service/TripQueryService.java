@@ -38,7 +38,8 @@ public class TripQueryService {
     }
 
     public Slice<Trip> getTripsSliceByMemberId(Long memberId, int page, int size) {
-        return tripQueryRepository.findSliceByMemberId(memberId, PageRequest.of(page, size));
+        return tripQueryRepository.findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(
+                memberId, PageRequest.of(page, size));
     }
 
     public TripCount getActiveTripCountsByMemberId(Long memberId) {
