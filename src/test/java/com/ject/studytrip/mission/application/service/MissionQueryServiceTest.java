@@ -34,7 +34,6 @@ class MissionQueryServiceTest extends BaseUnitTest {
     @Mock private MissionRepository missionRepository;
     @Mock private MissionQueryRepository missionQueryRepository;
 
-    private Trip exploreTrip;
     private Stamp courseStamp;
     private Stamp exploreStamp;
     private Mission courseMission;
@@ -45,7 +44,7 @@ class MissionQueryServiceTest extends BaseUnitTest {
     void setUp() {
         Member member = MemberFixture.createMemberFromKakao();
         Trip courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE);
-        exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE);
+        Trip exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE);
         courseStamp = StampFixture.createStampWithId(1L, courseTrip, 1);
         exploreStamp = StampFixture.createStampWithId(2L, exploreTrip, 0);
         courseMission = MissionFixture.createMissionWithId(1L, courseStamp);
@@ -196,42 +195,6 @@ class MissionQueryServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result).containsExactly(courseMission);
-        }
-    }
-
-    @Nested
-    @DisplayName("countCompletedMissionsByTripId 메서드는")
-    class CountCompletedMissionsByTripId {
-
-        @Test
-        @DisplayName("유효하지 않은 여행 ID가 들어오면 0을 반환한다.")
-        void shouldReturnZeroWhenTripIdIsInvalid() {
-            // given
-            Long invalidTripId = -1L;
-            given(missionQueryRepository.countCompletedMissionsByTripId(invalidTripId))
-                    .willReturn(0L);
-
-            // when
-            long result = missionQueryService.countCompletedMissionsByTripId(invalidTripId);
-
-            // then
-            assertThat(result).isEqualTo(0L);
-        }
-
-        @Test
-        @DisplayName("유효한 여행 ID가 들어오면 완료된 미션들의 개수를 반환한다.")
-        void shouldReturnCompletedMissionCountWhenTripIdIsValid() {
-            // given
-            Long tripId = exploreTrip.getId();
-            exploreMission1.updateCompleted();
-            exploreMission2.updateCompleted();
-            given(missionQueryRepository.countCompletedMissionsByTripId(tripId)).willReturn(2L);
-
-            // when
-            long result = missionQueryService.countCompletedMissionsByTripId(tripId);
-
-            // then
-            assertThat(result).isEqualTo(2L);
         }
     }
 }

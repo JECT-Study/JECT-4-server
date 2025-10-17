@@ -23,7 +23,7 @@ public class TripReportCommandService {
                         request.content(),
                         request.startDate(),
                         request.endDate(),
-                        request.completedMissionCount(),
+                        request.studyLogCount(),
                         request.totalFocusHours(),
                         request.studyDays(),
                         request.imageTitle());

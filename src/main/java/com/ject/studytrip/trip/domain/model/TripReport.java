@@ -29,7 +29,7 @@ public class TripReport extends BaseTimeEntity {
     private String endDate;
 
     @Column(nullable = false)
-    private long completedMissionCount;
+    private long studyLogCount;
 
     @Column(nullable = false)
     private long totalFocusHours;
@@ -51,7 +51,7 @@ public class TripReport extends BaseTimeEntity {
             String content,
             String startDate,
             String endDate,
-            long completedMissionCount,
+            long studyLogCount,
             long totalFocusHours,
             long studyDays,
             String imageTitle) {
@@ -60,7 +60,7 @@ public class TripReport extends BaseTimeEntity {
                 .content(content)
                 .startDate(startDate)
                 .endDate(endDate)
-                .completedMissionCount(completedMissionCount)
+                .studyLogCount(studyLogCount)
                 .totalFocusHours(totalFocusHours)
                 .studyDays(studyDays)
                 .imageTitle(imageTitle)
