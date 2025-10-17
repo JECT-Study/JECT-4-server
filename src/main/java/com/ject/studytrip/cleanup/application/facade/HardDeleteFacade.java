@@ -10,6 +10,8 @@ import com.ject.studytrip.studylog.application.service.StudyLogCommandService;
 import com.ject.studytrip.studylog.application.service.StudyLogDailyMissionCommandService;
 import com.ject.studytrip.trip.application.service.DailyGoalCommandService;
 import com.ject.studytrip.trip.application.service.TripCommandService;
+import com.ject.studytrip.trip.application.service.TripReportCommandService;
+import com.ject.studytrip.trip.application.service.TripReportStudyLogCommandService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,8 @@ public class HardDeleteFacade {
     private final StudyLogDailyMissionCommandService studyLogDailyMissionCommandService;
     private final DailyGoalCommandService dailyGoalCommandService;
     private final PomodoroCommandService pomodoroCommandService;
+    private final TripReportCommandService tripReportCommandService;
+    private final TripReportStudyLogCommandService tripReportStudyLogCommandService;
 
     private final HardDeleteExecutor executor;
 
@@ -46,6 +50,10 @@ public class HardDeleteFacade {
             "dailyMissionsOwnedByDeletedMission";
     private static final String DAILY_MISSIONS_OWNED_BY_DELETED_DAILY_GOAL =
             "dailyMissionsOwnedByDeletedDailyGoal";
+    private static final String TRIP_REPORT_STUDY_LOGS_OWNED_BY_DELETED_MEMBER =
+            "tripReportStudyLogsOwnedByDeletedMember";
+    private static final String TRIP_REPORTS_OWNED_BY_DELETED_MEMBER =
+            "tripReportsOwnedByDeletedMember";
 
     private static final String POMODOROS = "pomodoros";
     private static final String STUDY_LOG_DAILY_MISSIONS = "studyLogDailyMissions";
@@ -68,6 +76,8 @@ public class HardDeleteFacade {
         deletePomodoros(phases); // 뽀모도로 삭제
         deleteStudyLogDailyMissions(phases); // StudyLogDailyMission 삭제
         deleteDailyMissions(phases); // 데일리 미션 삭제
+        deleteTripReportStudyLogs(phases); // TripReportStudyLog 삭제
+        deleteTripReports(phases); // 여행 리포트 삭제
         deleteStudyLogs(phases); // 학습 로그 삭제
         deleteDailyGoals(phases); // 데일리 목표 삭제
         deleteMissions(phases); // 미션 삭제
@@ -120,6 +130,23 @@ public class HardDeleteFacade {
         phases.put(
                 DAILY_MISSIONS,
                 executor.run(DAILY_MISSIONS, dailyMissionCommandService::hardDeleteDailyMissions));
+    }
+
+    private void deleteTripReportStudyLogs(Map<String, Long> phases) {
+        phases.put(
+                TRIP_REPORT_STUDY_LOGS_OWNED_BY_DELETED_MEMBER,
+                executor.run(
+                        TRIP_REPORT_STUDY_LOGS_OWNED_BY_DELETED_MEMBER,
+                        tripReportStudyLogCommandService
+                                ::hardDeleteTripReportStudyLogsOwnedByDeletedMember));
+    }
+
+    private void deleteTripReports(Map<String, Long> phases) {
+        phases.put(
+                TRIP_REPORTS_OWNED_BY_DELETED_MEMBER,
+                executor.run(
+                        TRIP_REPORTS_OWNED_BY_DELETED_MEMBER,
+                        tripReportCommandService::hardDeleteTripReportsOwnedByDeletedMember));
     }
 
     private void deleteStudyLogs(Map<String, Long> phases) {
