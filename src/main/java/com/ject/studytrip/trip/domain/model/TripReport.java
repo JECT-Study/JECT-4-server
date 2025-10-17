@@ -47,10 +47,10 @@ public class TripReport extends BaseTimeEntity {
 
     public static TripReport of(
             Member member,
-            String startDate,
-            String endDate,
             String title,
             String content,
+            String startDate,
+            String endDate,
             long completedMissionCount,
             long totalFocusHours,
             long studyDays,
