@@ -8,6 +8,7 @@ import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.model.TripReport;
+import com.ject.studytrip.trip.domain.repository.TripReportQueryRepository;
 import com.ject.studytrip.trip.domain.repository.TripReportRepository;
 import com.ject.studytrip.trip.fixture.CreateTripReportRequestFixture;
 import com.ject.studytrip.trip.fixture.TripReportFixture;
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 class TripReportCommandServiceTest extends BaseUnitTest {
     @InjectMocks private TripReportCommandService tripReportCommandService;
     @Mock private TripReportRepository tripReportRepository;
+    @Mock private TripReportQueryRepository tripReportQueryRepository;
 
     private Member member;
     private TripReport tripReport;
@@ -70,6 +72,37 @@ class TripReportCommandServiceTest extends BaseUnitTest {
             // then
             assertThat(tripReport.getImageUrl()).isEqualTo(NEW_IMAGE_URL);
             assertThat(tripReport.getImageUrl()).isNotEqualTo(oldImageUrl);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteTripReportsOwnedByDeletedMember 메서드는")
+    class HardDeleteTripReportsOwnedByDeletedMember {
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 여행 리포트가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenTripReportsOwnedByDeletedMemberDoNotExist() {
+            // given
+            given(tripReportQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReportsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("삭제된 멤버가 소유한 여행 리포트가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenTripReportsOwnedByDeletedMemberExist() {
+            // given
+            given(tripReportQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReportsOwnedByDeletedMember();
+
+            // then
+            assertThat(result).isEqualTo(5L);
         }
     }
 }
