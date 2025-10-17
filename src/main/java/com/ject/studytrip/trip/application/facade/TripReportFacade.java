@@ -61,9 +61,10 @@ public class TripReportFacade {
                                 0,
                                 ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1)
                         : 0L;
+        List<Long> studyLogIds = studyLogQueryService.getStudyLogIdsByTripId(trip.getId());
 
         TripRetrospectSummary summary =
-                TripRetrospectSummary.of(studyLogCount, totalFocusHours, studyDays);
+                TripRetrospectSummary.of(studyLogCount, totalFocusHours, studyDays, studyLogIds);
         TripInfo tripInfo = TripInfo.from(trip, 0, 100);
         StudyLogSliceInfo studyLogDetailSlice = buildStudyLogDetailsSlice(studyLogSlice);
 

@@ -278,4 +278,45 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
             assertThat(result.getContent().get(1)).isEqualTo(studyLog2);
         }
     }
+
+    @Nested
+    @DisplayName("getStudyLogIdsByTripId 메서드는")
+    class GetStudyLogIdsByTripId {
+
+        @Test
+        @DisplayName("학습 로그가 존재하지 않으면 빈 리스트를 반환한다.")
+        void shouldReturnEmptyListWhenStudyLogDoesNotExist() {
+            // given
+            Long tripId = courseTrip.getId();
+            studyLog1.updateDeletedAt();
+            studyLog2.updateDeletedAt();
+            given(studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId))
+                    .willReturn(List.of());
+
+            // when
+            List<Long> result = studyLogQueryService.getStudyLogIdsByTripId(tripId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("학습 로그가 하나라도 존재하면 학습 로그 ID 목록을 반환한다.")
+        void shouldReturnStudyLogIdsWhenStudyLogExists() {
+            // given
+            Long tripId = courseTrip.getId();
+            Long studyLogId1 = studyLog1.getId();
+            Long studyLogId2 = studyLog2.getId();
+            given(studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId))
+                    .willReturn(List.of(studyLogId1, studyLogId2));
+
+            // when
+            List<Long> result = studyLogQueryService.getStudyLogIdsByTripId(tripId);
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0)).isEqualTo(studyLogId1);
+            assertThat(result.get(1)).isEqualTo(studyLogId2);
+        }
+    }
 }

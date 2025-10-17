@@ -56,4 +56,8 @@ public class StudyLogQueryService {
         return studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(
                 tripReportId, PageRequest.of(page, size));
     }
+
+    public List<Long> getStudyLogIdsByTripId(Long tripId) {
+        return studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId);
+    }
 }

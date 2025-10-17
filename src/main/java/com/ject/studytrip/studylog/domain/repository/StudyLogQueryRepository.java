@@ -1,6 +1,7 @@
 package com.ject.studytrip.studylog.domain.repository;
 
 import com.ject.studytrip.studylog.domain.model.StudyLog;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -19,4 +20,6 @@ public interface StudyLogQueryRepository {
 
     Slice<StudyLog> findSliceByTripReportIdOrderByCreatedAtDesc(
             Long tripReportId, Pageable pageable);
+
+    List<Long> findAllIdsByTripIdOrderByCreatedDesc(Long tripId);
 }
