@@ -104,6 +104,15 @@ public class TripReportFacade {
         return TripReportInfo.from(tripReport);
     }
 
+    @Transactional
+    public void deleteTripReport(Long memberId, Long tripReportId) {
+        Member member = memberQueryService.getValidMember(memberId);
+        TripReport tripReport =
+                tripReportQueryService.getValidTripReport(member.getId(), tripReportId);
+
+        tripReportCommandService.deleteTripReport(tripReport);
+    }
+
     @Transactional(readOnly = true)
     public PresignedTripReportImageInfo issuePresignedUrl(
             Long tripReportId, PresignTripReportImageRequest request) {

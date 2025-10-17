@@ -29,6 +29,7 @@ public record LoadTripReportsResponse(
 
     private record LoadTripReportInfoResponse(
             @Schema(description = "여행 리포트 ID") Long tripReportId,
+            @Schema(description = "여행 리포트 제목") String title,
             @Schema(description = "여행 시작일 (여행 회고)") String startDate,
             @Schema(description = "여행 종료일 (여행 회고)") String endDate,
             @Schema(description = "총 학습 시간") long totalFocusHours,
@@ -36,6 +37,7 @@ public record LoadTripReportsResponse(
         private static LoadTripReportInfoResponse of(TripReportInfo tripReportInfo) {
             return new LoadTripReportInfoResponse(
                     tripReportInfo.tripReportId(),
+                    tripReportInfo.title(),
                     tripReportInfo.startDate(),
                     tripReportInfo.endDate(),
                     tripReportInfo.totalFocusHours(),

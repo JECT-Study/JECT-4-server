@@ -5,5 +5,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TripReportJpaRepository extends JpaRepository<TripReport, Long> {
-    List<TripReport> findAllByMember_IdOrderByCreatedAtDesc(Long memberId);
+    List<TripReport> findAllByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(Long memberId);
 }

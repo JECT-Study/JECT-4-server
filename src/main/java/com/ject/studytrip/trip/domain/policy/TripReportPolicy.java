@@ -13,4 +13,9 @@ public class TripReportPolicy {
             throw new CustomException(TripReportErrorCode.NOT_TRIP_REPORT_OWNER);
         }
     }
+
+    public static void validateNotDeleted(TripReport tripReport) {
+        if (tripReport.getDeletedAt() != null)
+            throw new CustomException(TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED);
+    }
 }

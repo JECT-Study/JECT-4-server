@@ -35,6 +35,14 @@ public class TripReportCommandService {
         tripReport.updateImageUrl(imageUrl);
     }
 
+    public void deleteTripReport(TripReport tripReport) {
+        tripReport.updateDeletedAt();
+    }
+
+    public long hardDeleteTripReports() {
+        return tripReportQueryRepository.deleteAllByDeletedAtIsNotNull();
+    }
+
     public long hardDeleteTripReportsOwnedByDeletedMember() {
         return tripReportQueryRepository.deleteAllByDeletedMemberOwner();
     }

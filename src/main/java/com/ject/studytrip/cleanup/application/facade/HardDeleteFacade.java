@@ -67,6 +67,7 @@ public class HardDeleteFacade {
     private static final String TRIPS = "trips";
     private static final String DAILY_GOALS_OWNED_BY_DELETED_TRIP = "dailyGoalsOwnedByDeletedTrip";
     private static final String DAILY_GOALS = "dailyGoals";
+    private static final String TRIP_REPORTS = "tripReports";
     private static final String MEMBERS = "members";
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -147,6 +148,9 @@ public class HardDeleteFacade {
                 executor.run(
                         TRIP_REPORTS_OWNED_BY_DELETED_MEMBER,
                         tripReportCommandService::hardDeleteTripReportsOwnedByDeletedMember));
+        phases.put(
+                TRIP_REPORTS,
+                executor.run(TRIP_REPORTS, tripReportCommandService::hardDeleteTripReports));
     }
 
     private void deleteStudyLogs(Map<String, Long> phases) {

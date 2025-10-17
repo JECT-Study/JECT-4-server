@@ -59,6 +59,23 @@ class TripReportQueryServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("여행 리포트가 이미 삭제되었다면 예외가 발생한다.")
+        void shouldThrowExceptionWhenTripReportAlreadyDeleted() {
+            // given
+            Long tripReportId = tripReport1.getId();
+            tripReport1.updateDeletedAt();
+            given(tripReportRepository.findById(tripReportId)).willReturn(Optional.of(tripReport1));
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    tripReportQueryService.getValidTripReport(
+                                            member.getId(), tripReportId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
         @DisplayName("여행 리포트가 존재하면 여행 리포트를 반환한다.")
         void shouldReturnValidTripReportWhenTripReportExist() {
             // given
@@ -140,7 +157,10 @@ class TripReportQueryServiceTest extends BaseUnitTest {
         void shouldReturnEmptyListWhenTripReportDoNotExist() {
             // given
             Long memberId = member.getId();
-            given(tripReportRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId))
+            given(
+                            tripReportRepository
+                                    .findAllByMemberIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                                            memberId))
                     .willReturn(List.of());
 
             // when
@@ -155,7 +175,10 @@ class TripReportQueryServiceTest extends BaseUnitTest {
         void shouldReturnTripReportsWhenTripReportExists() {
             // given
             Long memberId = member.getId();
-            given(tripReportRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId))
+            given(
+                            tripReportRepository
+                                    .findAllByMemberIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                                            memberId))
                     .willReturn(List.of(tripReport1, tripReport2));
 
             // when

@@ -30,11 +30,13 @@ public class TripReportQueryService {
                                                 TripReportErrorCode.TRIP_REPORT_NOT_FOUND));
 
         TripReportPolicy.validateOwner(memberId, tripReport);
+        TripReportPolicy.validateNotDeleted(tripReport);
 
         return tripReport;
     }
 
     public List<TripReport> getTripReportsByMemberId(Long memberId) {
-        return tripReportRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId);
+        return tripReportRepository.findAllByMemberIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                memberId);
     }
 }

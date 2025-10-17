@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum TripReportErrorCode implements ErrorCode {
+    // 400
+    TRIP_REPORT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 여행 리포트입니다."),
+
     // 403
     NOT_TRIP_REPORT_OWNER(HttpStatus.FORBIDDEN, "요청한 여행 리포트 정보를 조회할 권한이 없습니다."),
 

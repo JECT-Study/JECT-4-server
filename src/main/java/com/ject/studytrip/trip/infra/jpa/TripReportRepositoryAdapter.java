@@ -18,8 +18,9 @@ public class TripReportRepositoryAdapter implements TripReportRepository {
     }
 
     @Override
-    public List<TripReport> findAllByMemberIdOrderByCreatedAtDesc(Long memberId) {
-        return tripReportJpaRepository.findAllByMember_IdOrderByCreatedAtDesc(memberId);
+    public List<TripReport> findAllByMemberIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long memberId) {
+        return tripReportJpaRepository.findAllByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                memberId);
     }
 
     @Override
