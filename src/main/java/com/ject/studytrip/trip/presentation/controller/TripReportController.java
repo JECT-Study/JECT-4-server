@@ -119,6 +119,7 @@ public class TripReportController {
             @RequestBody @Valid PresignTripReportImageRequest request) {
         PresignedTripReportImageInfo info =
                 tripReportFacade.issuePresignedUrl(tripReportId, request);
+
         return ResponseEntity.ok()
                 .body(
                         StandardResponse.success(
@@ -165,6 +166,7 @@ public class TripReportController {
             @PathVariable @NotNull(message = "여행 리포트 ID는 필수 요청 파라미터입니다.") Long tripReportId,
             @RequestBody @Valid ConfirmTripReportImageRequest request) {
         tripReportFacade.confirmImage(tripReportId, request);
+
         return ResponseEntity.ok().body(StandardResponse.success(HttpStatus.OK.value(), null));
     }
 }

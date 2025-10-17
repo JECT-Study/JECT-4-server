@@ -48,6 +48,10 @@ public class StudyLogQueryService {
         return studyLogs;
     }
 
+    public long getStudyLogCountByTripId(Long tripId) {
+        return studyLogQueryRepository.countStudyLogsByTripId(tripId);
+    }
+
     public Slice<StudyLog> getStudyLogsSliceByTripReportId(Long tripReportId, int page, int size) {
         return studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(
                 tripReportId, PageRequest.of(page, size));

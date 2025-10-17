@@ -168,6 +168,56 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("getStudyLogCountByTripId 메서드는")
+    class GetStudyLogCountByTripId {
+
+        @Test
+        @DisplayName("해당 여행의 학습 로그가 존재하지 않으면 0을 반환한다.")
+        void shouldReturnZeroWhenStudyLogDoesNotExistForTrip() {
+            // given
+            Long tripId = courseTrip.getId();
+            studyLog1.updateDeletedAt();
+            studyLog2.updateDeletedAt();
+            given(studyLogQueryRepository.countStudyLogsByTripId(tripId)).willReturn(0L);
+
+            // when
+            long result = studyLogQueryService.getStudyLogCountByTripId(tripId);
+
+            // then
+            assertThat(result).isZero();
+        }
+
+        @Test
+        @DisplayName("해당 여행의 데일리 목표가 존재하지 않으면 0을 반환한다.")
+        void shouldReturnZeroWhenDailyGoalDoesNotExistForTrip() {
+            // given
+            Long tripId = courseTrip.getId();
+            dailyGoal.updateDeletedAt();
+            given(studyLogQueryRepository.countStudyLogsByTripId(tripId)).willReturn(0L);
+
+            // when
+            long result = studyLogQueryService.getStudyLogCountByTripId(tripId);
+
+            // then
+            assertThat(result).isZero();
+        }
+
+        @Test
+        @DisplayName("해당 여행의 학습 로그가 존재하면 그 개수를 반환한다.")
+        void shouldReturnCountWhenStudyLogExistsForTrip() {
+            // given
+            Long tripId = courseTrip.getId();
+            given(studyLogQueryRepository.countStudyLogsByTripId(tripId)).willReturn(2L);
+
+            // when
+            long result = studyLogQueryService.getStudyLogCountByTripId(tripId);
+
+            // then
+            assertThat(result).isEqualTo(2L);
+        }
+    }
+
+    @Nested
     @DisplayName("getStudyLogsSliceByTripId 메서드는")
     class GetStudyLogsSliceByTripReportId {
 

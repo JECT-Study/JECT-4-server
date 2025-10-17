@@ -13,7 +13,7 @@ public class TripReportFactory {
             String content,
             String startDate,
             String endDate,
-            long completedMissionCount,
+            long studyLogCount,
             long totalFocusHours,
             long studyDays,
             String imageTitle) {
@@ -23,7 +23,7 @@ public class TripReportFactory {
                 content,
                 startDate,
                 endDate,
-                completedMissionCount,
+                studyLogCount,
                 totalFocusHours,
                 studyDays,
                 imageTitle);

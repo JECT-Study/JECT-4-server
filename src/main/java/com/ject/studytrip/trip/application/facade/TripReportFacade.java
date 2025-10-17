@@ -4,7 +4,6 @@ import com.ject.studytrip.image.application.dto.PresignedImageInfo;
 import com.ject.studytrip.image.application.service.ImageService;
 import com.ject.studytrip.member.application.service.MemberQueryService;
 import com.ject.studytrip.member.domain.model.Member;
-import com.ject.studytrip.mission.application.service.MissionQueryService;
 import com.ject.studytrip.pomodoro.application.service.PomodoroQueryService;
 import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
 import com.ject.studytrip.studylog.application.dto.StudyLogSliceInfo;
@@ -37,7 +36,6 @@ public class TripReportFacade {
 
     private final MemberQueryService memberQueryService;
     private final TripQueryService tripQueryService;
-    private final MissionQueryService missionQueryService;
     private final StudyLogQueryService studyLogQueryService;
     private final StudyLogDailyMissionQueryService studyLogDailyMissionQueryService;
     private final PomodoroQueryService pomodoroQueryService;
@@ -55,8 +53,7 @@ public class TripReportFacade {
         Slice<StudyLog> studyLogSlice =
                 studyLogQueryService.getStudyLogsSliceByTripId(trip.getId(), page, size);
 
-        long completedMissionCount =
-                missionQueryService.countCompletedMissionsByTripId(trip.getId());
+        long studyLogCount = studyLogQueryService.getStudyLogCountByTripId(trip.getId());
         long totalFocusHours = pomodoroQueryService.getTotalFocusHoursByTripId(trip.getId());
         long studyDays =
                 trip.getEndDate() != null
@@ -66,7 +63,7 @@ public class TripReportFacade {
                         : 0L;
 
         TripRetrospectSummary summary =
-                TripRetrospectSummary.of(completedMissionCount, totalFocusHours, studyDays);
+                TripRetrospectSummary.of(studyLogCount, totalFocusHours, studyDays);
         TripInfo tripInfo = TripInfo.from(trip, 0, 100);
         StudyLogSliceInfo studyLogDetailSlice = buildStudyLogDetailsSlice(studyLogSlice);
 

@@ -302,7 +302,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$.data").isNotEmpty())
                     .andExpect(jsonPath("$.data.name").isString())
                     .andExpect(jsonPath("$.data.totalFocusHours").isNumber())
-                    .andExpect(jsonPath("$.data.completedMissionCount").isNumber())
+                    .andExpect(jsonPath("$.data.studyLogCount").isNumber())
                     .andExpect(jsonPath("$.data.studyDays").isNumber())
                     .andExpect(jsonPath("$.data.history").isNotEmpty());
         }
@@ -521,8 +521,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
                             jsonPath("$.data.totalFocusHours")
                                     .value(tripReport.getTotalFocusHours()))
                     .andExpect(
-                            jsonPath("$.data.completedMissionCount")
-                                    .value(tripReport.getCompletedMissionCount()))
+                            jsonPath("$.data.studyLogCount").value(tripReport.getStudyLogCount()))
                     .andExpect(jsonPath("$.data.studyDays").value(tripReport.getStudyDays()))
                     .andExpect(jsonPath("$.data.imageTitle").value(tripReport.getImageTitle()))
                     .andExpect(jsonPath("$.data.imageUrl").value(tripReport.getImageUrl()))

@@ -8,7 +8,7 @@ public class CreateTripReportRequestFixture {
     private static final String TRIP_REPORT_CONTENT = "TEST CONTENT";
     private static final String TRIP_START_DATE = "2018.01.01";
     private static final String TRIP_END_DATE = "2018.01.31";
-    private static final long TRIP_REPORT_COMPLETED_MISSION_COUNT = 10L;
+    private static final long STUDY_LOG_COUNT = 10L;
     private static final long TRIP_REPORT_TOTAL_FOCUS_HOURS = 100L;
     private static final long TRIP_REPORT_STUDY_DAYS = 10L;
     private static final String TRIP_REPORT_IMAGE_TITLE = "TEST IMAGE TITLE";
@@ -26,7 +26,7 @@ public class CreateTripReportRequestFixture {
                 TRIP_REPORT_CONTENT,
                 TRIP_START_DATE,
                 TRIP_END_DATE,
-                TRIP_REPORT_COMPLETED_MISSION_COUNT,
+                STUDY_LOG_COUNT,
                 TRIP_REPORT_TOTAL_FOCUS_HOURS,
                 TRIP_REPORT_STUDY_DAYS,
                 TRIP_REPORT_IMAGE_TITLE,

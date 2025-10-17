@@ -4,7 +4,6 @@ import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.domain.model.QMission;
 import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
 import com.ject.studytrip.stamp.domain.model.QStamp;
-import com.ject.studytrip.trip.domain.model.QTrip;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -17,7 +16,6 @@ public class MissionQueryRepositoryAdapter implements MissionQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final QMission mission = QMission.mission;
     private final QStamp stamp = QStamp.stamp;
-    private final QTrip trip = QTrip.trip;
 
     @Override
     public List<Mission> findAllByIdsInFetchJoinStamp(List<Long> ids) {
@@ -60,50 +58,4 @@ public class MissionQueryRepositoryAdapter implements MissionQueryRepository {
                                         .where(stamp.deletedAt.isNotNull())))
                 .execute();
     }
-
-    @Override
-    public long countCompletedMissionsByTripId(Long tripId) {
-        Long count =
-                queryFactory
-                        .select(mission.id.count())
-                        .from(mission)
-                        .join(mission.stamp, stamp)
-                        .join(stamp.trip, trip)
-                        .where(
-                                trip.id.eq(tripId),
-                                mission.completed.isTrue(),
-                                mission.deletedAt.isNull(),
-                                stamp.deletedAt.isNull(),
-                                trip.deletedAt.isNull())
-                        .fetchOne();
-
-        return count != null ? count : 0L;
-    }
-
-    //    @Override
-    //    public long countByStampIdAndDeletedAtIsNull(Long stampId) {
-    //        Long count =
-    //                queryFactory
-    //                        .select(mission.count())
-    //                        .from(mission)
-    //                        .where(mission.stamp.id.eq(stampId), mission.deletedAt.isNull())
-    //                        .fetchOne();
-    //
-    //        return Optional.ofNullable(count).orElse(0L);
-    //    }
-    //
-    //    @Override
-    //    public long countByStampIdAndCompletedIsTrueAndDeletedAtIsNull(Long stampId) {
-    //        Long count =
-    //                queryFactory
-    //                        .select(mission.count())
-    //                        .from(mission)
-    //                        .where(
-    //                                mission.stamp.id.eq(stampId),
-    //                                mission.completed.isTrue(),
-    //                                mission.deletedAt.isNull())
-    //                        .fetchOne();
-    //
-    //        return Optional.ofNullable(count).orElse(0L);
-    //    }
 }

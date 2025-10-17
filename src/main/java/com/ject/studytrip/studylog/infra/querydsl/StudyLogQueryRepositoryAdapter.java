@@ -88,6 +88,22 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
     }
 
     @Override
+    public long countStudyLogsByTripId(Long tripId) {
+        Long count =
+                queryFactory
+                        .select(studyLog.count())
+                        .from(studyLog)
+                        .join(studyLog.dailyGoal, dailyGoal)
+                        .where(
+                                dailyGoal.trip.id.eq(tripId),
+                                studyLog.deletedAt.isNull(),
+                                dailyGoal.deletedAt.isNull())
+                        .fetchOne();
+
+        return count == null ? 0L : count;
+    }
+
+    @Override
     public Slice<StudyLog> findSliceByTripReportIdOrderByCreatedAtDesc(
             Long tripReportId, Pageable pageable) {
         List<StudyLog> content =
