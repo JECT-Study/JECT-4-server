@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,15 +50,22 @@ public class StudyLogController {
 
     @Operation(
             summary = "여행의 학습 로그 목록 조회",
-            description = "특정 여행의 학습 로그 목록을 조회하는 API 입니다. 슬라이스를 적용하고 최신순으로 정렬합니다.")
+            description =
+                    "특정 여행의 학습 로그 목록을 조회하는 API 입니다. 슬라이스를 적용하고 정렬 옵션 LATEST(최신순)/OLDEST(과거순)을 적용합니다.")
     @GetMapping("/api/trips/{tripId}/study-logs")
     public ResponseEntity<StandardResponse> loadStudyLogsByTrip(
             @AuthenticationPrincipal String memberId,
             @PathVariable @NotNull(message = "여행 ID는 필수 요청 파라미터입니다.") Long tripId,
             @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
-            @RequestParam(name = "size", defaultValue = "5") @Min(1) @Max(10) int size) {
+            @RequestParam(name = "size", defaultValue = "5") @Min(1) @Max(10) int size,
+            @RequestParam(name = "order", defaultValue = "LATEST")
+                    @Pattern(
+                            regexp = "LATEST|OLDEST",
+                            message = "정렬은 최신순(LATEST) 또는 과거순(OLDEST)만 허용됩니다.")
+                    String order) {
         StudyLogSliceInfo result =
-                studyLogFacade.getStudyLogsByTrip(Long.valueOf(memberId), tripId, page, size);
+                studyLogFacade.getStudyLogsByTrip(
+                        Long.valueOf(memberId), tripId, page, size, order);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(

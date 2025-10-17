@@ -6,6 +6,7 @@ import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
 import com.ject.studytrip.trip.domain.model.QDailyGoal;
 import com.ject.studytrip.trip.domain.model.QTripReportStudyLog;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -38,7 +39,7 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
     }
 
     @Override
-    public Slice<StudyLog> findSliceByTripIdOrderByCreatedAtDesc(Long tripId, Pageable pageable) {
+    public Slice<StudyLog> findSliceByTripId(Long tripId, Pageable pageable, String order) {
         List<StudyLog> content =
                 queryFactory
                         .selectFrom(studyLog)
@@ -46,7 +47,7 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
                         .where(dailyGoal.trip.id.eq(tripId), dailyGoal.deletedAt.isNull())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
-                        .orderBy(studyLog.createdAt.desc())
+                        .orderBy(orderSpecifiers(order))
                         .fetch();
 
         List<StudyLog> result = content;
@@ -123,5 +124,11 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
         List<StudyLog> result = hasNext ? content.subList(0, pageable.getPageSize()) : content;
 
         return new SliceImpl<>(result, pageable, hasNext);
+    }
+
+    private OrderSpecifier<?>[] orderSpecifiers(String order) {
+        return (order.equalsIgnoreCase("OLDEST"))
+                ? new OrderSpecifier<?>[] {studyLog.createdAt.asc(), studyLog.id.asc()}
+                : new OrderSpecifier<?>[] {studyLog.createdAt.desc(), studyLog.id.desc()};
     }
 }

@@ -14,10 +14,7 @@ import com.ject.studytrip.pomodoro.application.service.PomodoroQueryService;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.stamp.application.service.StampCommandService;
 import com.ject.studytrip.stamp.domain.model.Stamp;
-import com.ject.studytrip.studylog.application.dto.PresignedStudyLogImageInfo;
-import com.ject.studytrip.studylog.application.dto.StudyLogDetail;
-import com.ject.studytrip.studylog.application.dto.StudyLogInfo;
-import com.ject.studytrip.studylog.application.dto.StudyLogSliceInfo;
+import com.ject.studytrip.studylog.application.dto.*;
 import com.ject.studytrip.studylog.application.service.*;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
@@ -90,15 +87,16 @@ public class StudyLogFacade {
     @Cacheable(
             cacheNames = STUDY_LOGS,
             key =
-                    "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).studyLogs(#memberId, #tripId, #page, #size)")
+                    "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).studyLogs(#memberId, #tripId, #page, #size, #order)")
     @Transactional(readOnly = true)
-    public StudyLogSliceInfo getStudyLogsByTrip(Long memberId, Long tripId, int page, int size) {
+    public StudyLogSliceInfo getStudyLogsByTrip(
+            Long memberId, Long tripId, int page, int size, String order) {
         // 1. 유효성 검증 및 엔티티 조회
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
 
         // 2. 페이징된 학습 로그 목록 조회
         Slice<StudyLog> studyLogSlice =
-                studyLogQueryService.getStudyLogsSliceByTripId(trip.getId(), page, size);
+                studyLogQueryService.getStudyLogsSliceByTripId(trip.getId(), page, size, order);
 
         // 3. 학습 로그 상세 정보 구성
         return buildStudyLogDetailsSlice(studyLogSlice);
