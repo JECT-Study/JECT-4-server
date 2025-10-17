@@ -126,6 +126,20 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
         return new SliceImpl<>(result, pageable, hasNext);
     }
 
+    @Override
+    public List<Long> findAllIdsByTripIdOrderByCreatedDesc(Long tripId) {
+        return queryFactory
+                .select(studyLog.id)
+                .from(studyLog)
+                .join(studyLog.dailyGoal, dailyGoal)
+                .where(
+                        dailyGoal.trip.id.eq(tripId),
+                        studyLog.deletedAt.isNull(),
+                        dailyGoal.deletedAt.isNull())
+                .orderBy(studyLog.createdAt.desc())
+                .fetch();
+    }
+
     private OrderSpecifier<?>[] orderSpecifiers(String order) {
         return (order.equalsIgnoreCase("OLDEST"))
                 ? new OrderSpecifier<?>[] {studyLog.createdAt.asc(), studyLog.id.asc()}

@@ -302,6 +302,7 @@ class TripReportControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$.data.name").isString())
                     .andExpect(jsonPath("$.data.totalFocusHours").isNumber())
                     .andExpect(jsonPath("$.data.studyLogCount").isNumber())
+                    .andExpect(jsonPath("$.data.studyLogIds").isArray())
                     .andExpect(jsonPath("$.data.studyDays").isNumber())
                     .andExpect(jsonPath("$.data.history").isNotEmpty());
         }
