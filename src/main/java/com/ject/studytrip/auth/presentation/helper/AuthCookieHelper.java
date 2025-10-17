@@ -11,8 +11,8 @@ public final class AuthCookieHelper {
                 OAUTH_SIGNUP_KEY, value, Duration.ofMillis(OAUTH_SIGNUP_COOKIE_TTL_MILLIS));
     }
 
-    public static ResponseCookie setRefreshTokenCookie(String value, long maxAge) {
-        return setResponseCookie(AUTH_REFRESH_TOKEN, value, Duration.ofMillis(maxAge));
+    public static ResponseCookie setRefreshTokenCookie(String value, long maxAgeInSeconds) {
+        return setResponseCookie(AUTH_REFRESH_TOKEN, value, Duration.ofSeconds(maxAgeInSeconds));
     }
 
     private static ResponseCookie setResponseCookie(String name, String value, Duration maxAge) {
