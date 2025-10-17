@@ -93,28 +93,56 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
 
         @Test
         @DisplayName("특정 여행의 학습 로그 목록을 페이징 처리와 최신순으로 정렬하고 반환한다")
-        void shouldReturnStudyLogsByTripIdWithSlice() {
+        void shouldReturnStudyLogsByTripIdWithLatestOrder() {
             // given
             Long tripId = courseTrip.getId();
             List<StudyLog> studyLogs = List.of(studyLog1, studyLog2);
 
             int page = 0;
             int size = 5;
+            String order = "LATEST";
             Pageable pageable = PageRequest.of(page, size);
 
             Slice<StudyLog> mockSlice = new SliceImpl<>(studyLogs, pageable, false);
 
-            given(studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(tripId, pageable))
+            given(studyLogQueryRepository.findSliceByTripId(tripId, pageable, order))
                     .willReturn(mockSlice);
 
             // when
             Slice<StudyLog> result =
-                    studyLogQueryService.getStudyLogsSliceByTripId(tripId, page, size);
+                    studyLogQueryService.getStudyLogsSliceByTripId(tripId, page, size, order);
 
             // then
             assertThat(result.getContent().size()).isEqualTo(studyLogs.size());
             assertThat(result.getContent().get(0)).isEqualTo(studyLog1);
             assertThat(result.getContent().get(1)).isEqualTo(studyLog2);
+        }
+
+        @Test
+        @DisplayName("특정 여행의 학습 로그 목록을 페이징 처리와 과거순으로 정렬하고 반환한다")
+        void shouldReturnStudyLogsByTripIdWithOldestOrder() {
+            // given
+            Long tripId = courseTrip.getId();
+            List<StudyLog> studyLogs = List.of(studyLog2, studyLog1); // 과거순이므로 순서 반대
+
+            int page = 0;
+            int size = 5;
+            String order = "OLDEST";
+            Pageable pageable = PageRequest.of(page, size);
+
+            Slice<StudyLog> mockSlice = new SliceImpl<>(studyLogs, pageable, false);
+
+            given(studyLogQueryRepository.findSliceByTripId(tripId, pageable, order))
+                    .willReturn(mockSlice);
+
+            // when
+            Slice<StudyLog> result =
+                    studyLogQueryService.getStudyLogsSliceByTripId(tripId, page, size, order);
+
+            // then
+            assertThat(result.getContent().size()).isEqualTo(studyLogs.size());
+            assertThat(result.getContent().get(0)).isEqualTo(studyLog2);
+            assertThat(result.getContent().get(1)).isEqualTo(studyLog1);
         }
     }
 
@@ -218,7 +246,7 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
     }
 
     @Nested
-    @DisplayName("getStudyLogsSliceByTripId 메서드는")
+    @DisplayName("getStudyLogsSliceByTripReportId 메서드는")
     class GetStudyLogsSliceByTripReportId {
 
         @Test
@@ -235,13 +263,14 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
             Slice<StudyLog> mockSlice = new SliceImpl<>(studyLogs, pageable, false);
 
             given(
-                            studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(
+                            studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(
                                     tripReport.getId(), pageable))
                     .willReturn(mockSlice);
 
             // when
             Slice<StudyLog> result =
-                    studyLogQueryService.getStudyLogsSliceByTripId(tripReport.getId(), page, size);
+                    studyLogQueryService.getStudyLogsSliceByTripReportId(
+                            tripReport.getId(), page, size);
 
             // then
             assertThat(result.getContent().size()).isEqualTo(studyLogs.size());

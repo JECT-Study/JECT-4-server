@@ -567,13 +567,16 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
     class ListStudyLogs {
         private static final String DEFAULT_PAGE = "0";
         private static final String DEFAULT_PAGE_SIZE = "5";
+        private static final String DEFAULT_ORDER = "LATEST";
 
         private ResultActions getResultActions(
-                String token, Object tripId, String page, String size) throws Exception {
+                String token, Object tripId, String page, String size, String order)
+                throws Exception {
             return mockMvc.perform(
                     get("/api/trips/{tripId}/study-logs", tripId)
                             .param("page", page)
                             .param("size", size)
+                            .param("order", order)
                             .header(HttpHeaders.AUTHORIZATION, TokenFixture.TOKEN_PREFIX + token));
         }
 
@@ -588,7 +591,12 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
 
             // when
             ResultActions resultActions =
-                    getResultActions(token, courseTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(
+                            token,
+                            courseTrip.getId(),
+                            DEFAULT_PAGE,
+                            DEFAULT_PAGE_SIZE,
+                            DEFAULT_ORDER);
 
             // then
             resultActions
@@ -604,11 +612,59 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("order 파라미터를 OLDEST로 지정하면 과거순으로 정렬된 학습 로그 목록을 반환한다")
+        void shouldLoadStudyLogsByTripWithOldestOrder() throws Exception {
+            // given
+            StudyLog studyLog = studyLogTestHelper.saveStudyLog(member, dailyGoal);
+            List<StudyLogDailyMission> studyLogDailyMissions =
+                    studyLogDailyMissionTestHelper.saveStudyLogDailyMissions(
+                            studyLog, dailyMission);
+
+            // when
+            ResultActions resultActions =
+                    getResultActions(
+                            token, courseTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE, "OLDEST");
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.data.studyLogs").isNotEmpty())
+                    .andExpect(jsonPath("$.data.hasNext").value(false))
+                    .andExpect(jsonPath("$.data.studyLogs[0].studyLogId").value(studyLog.getId()))
+                    .andExpect(jsonPath("$.data.studyLogs[0].dailyMissions").isNotEmpty())
+                    .andExpect(
+                            jsonPath("$.data.studyLogs[0].dailyMissions")
+                                    .value(Matchers.hasSize(studyLogDailyMissions.size())));
+        }
+
+        @Test
+        @DisplayName("order 파라미터가 유효하지 않은 값이면 400 Bad Request를 반환한다")
+        void shouldReturnBadRequestWhenOrderIsInvalid() throws Exception {
+            // when
+            ResultActions resultActions =
+                    getResultActions(
+                            token, courseTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE, "INVALID");
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_NOT_VALID
+                                                    .getStatus()
+                                                    .value()));
+        }
+
+        @Test
         @DisplayName("인증되지 않은 사용자일 경우 401 Unauthorized를 반환한다")
         void shouldReturnUnauthorizedWhenUnauthenticated() throws Exception {
             // when
             ResultActions resultActions =
-                    getResultActions("", courseTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(
+                            "", courseTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_ORDER);
 
             // then
             resultActions
@@ -627,7 +683,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
 
             // when
             ResultActions resultActions =
-                    getResultActions(token, tripId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(token, tripId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_ORDER);
 
             // then
             resultActions
@@ -649,7 +705,8 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
             String size = "test";
 
             // when
-            ResultActions resultActions = getResultActions(token, courseTrip, page, size);
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip, page, size, DEFAULT_ORDER);
 
             // then
             resultActions
@@ -671,7 +728,8 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
             String size = "100";
 
             // when
-            ResultActions resultActions = getResultActions(token, courseTrip.getId(), page, size);
+            ResultActions resultActions =
+                    getResultActions(token, courseTrip.getId(), page, size, DEFAULT_ORDER);
 
             // then
             resultActions
@@ -693,7 +751,7 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
 
             // when
             ResultActions resultActions =
-                    getResultActions(token, tripId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(token, tripId, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_ORDER);
 
             // when & then
             resultActions
@@ -713,7 +771,8 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
 
             // when
             ResultActions resultActions =
-                    getResultActions(token, newTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(
+                            token, newTrip.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_ORDER);
 
             // then
             resultActions
@@ -732,7 +791,8 @@ public class StudyLogControllerIntegrationTest extends BaseIntegrationTest {
 
             // when
             ResultActions resultActions =
-                    getResultActions(token, deleted.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
+                    getResultActions(
+                            token, deleted.getId(), DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_ORDER);
 
             // then
             resultActions

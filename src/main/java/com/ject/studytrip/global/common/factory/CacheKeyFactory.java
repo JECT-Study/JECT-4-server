@@ -33,7 +33,16 @@ public class CacheKeyFactory {
         return "member:" + memberId + ":trip:" + tripId + ":dailyGoal:" + dailyGoalId;
     }
 
-    public static String studyLogs(Long memberId, Long tripId, int page, int size) {
-        return "member:" + memberId + ":trip:" + tripId + ":page:" + page + ":size:" + size;
+    public static String studyLogs(Long memberId, Long tripId, int page, int size, String order) {
+        return "member:"
+                + memberId
+                + ":trip:"
+                + tripId
+                + ":page:"
+                + page
+                + ":size:"
+                + size
+                + ":order:"
+                + order.toLowerCase();
     }
 }

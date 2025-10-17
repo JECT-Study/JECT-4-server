@@ -51,7 +51,7 @@ public class TripReportFacade {
         Member member = memberQueryService.getValidMember(memberId);
         Trip trip = tripQueryService.getValidCompletedTrip(member.getId(), tripId); // 완료된 여행
         Slice<StudyLog> studyLogSlice =
-                studyLogQueryService.getStudyLogsSliceByTripId(trip.getId(), page, size);
+                studyLogQueryService.getStudyLogsSliceByTripId(trip.getId(), page, size, "LATEST");
 
         long studyLogCount = studyLogQueryService.getStudyLogCountByTripId(trip.getId());
         long totalFocusHours = pomodoroQueryService.getTotalFocusHoursByTripId(trip.getId());

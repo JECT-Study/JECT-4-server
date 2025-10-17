@@ -22,9 +22,9 @@ public class StudyLogQueryService {
         return studyLogQueryRepository.countActiveStudyLogsByMemberId(memberId);
     }
 
-    public Slice<StudyLog> getStudyLogsSliceByTripId(Long tripId, int page, int size) {
-        return studyLogQueryRepository.findSliceByTripIdOrderByCreatedAtDesc(
-                tripId, PageRequest.of(page, size));
+    public Slice<StudyLog> getStudyLogsSliceByTripId(
+            Long tripId, int page, int size, String order) {
+        return studyLogQueryRepository.findSliceByTripId(tripId, PageRequest.of(page, size), order);
     }
 
     public StudyLog getValidStudyLog(Long studyLogId) {
