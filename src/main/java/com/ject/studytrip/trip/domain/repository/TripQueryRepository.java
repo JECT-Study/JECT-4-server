@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface TripQueryRepository {
-    Slice<Trip> findSliceByMemberId(Long memberId, Pageable pageable);
+    Slice<Trip> findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(
+            Long memberId, Pageable pageable);
 
     long countActiveTripsByMemberIdAndCategory(Long memberId, TripCategory category);
 
