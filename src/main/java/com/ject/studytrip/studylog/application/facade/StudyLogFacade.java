@@ -1,7 +1,6 @@
 package com.ject.studytrip.studylog.application.facade;
 
-import static com.ject.studytrip.global.common.constants.CacheNameConstants.MISSIONS;
-import static com.ject.studytrip.global.common.constants.CacheNameConstants.STUDY_LOGS;
+import static com.ject.studytrip.global.common.constants.CacheNameConstants.*;
 
 import com.ject.studytrip.image.application.dto.PresignedImageInfo;
 import com.ject.studytrip.image.application.service.ImageService;
@@ -57,7 +56,12 @@ public class StudyLogFacade {
     @Caching(
             evict = {
                 @CacheEvict(cacheNames = STUDY_LOGS, allEntries = true),
-                @CacheEvict(cacheNames = MISSIONS, allEntries = true)
+                @CacheEvict(cacheNames = MISSIONS, allEntries = true),
+                @CacheEvict(cacheNames = STAMP, allEntries = true),
+                @CacheEvict(
+                        cacheNames = STAMPS,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamps(#memberId, #tripId)")
             })
     @Transactional
     public StudyLogInfo createStudyLog(
