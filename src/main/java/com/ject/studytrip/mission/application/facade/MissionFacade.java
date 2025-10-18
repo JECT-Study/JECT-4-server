@@ -46,7 +46,11 @@ public class MissionFacade {
                         cacheNames = TRIP,
                         key =
                                 "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).trip(#memberId, #tripId)"),
-                @CacheEvict(cacheNames = TRIPS, allEntries = true)
+                @CacheEvict(cacheNames = TRIPS, allEntries = true),
+                @CacheEvict(
+                        cacheNames = STAMPS,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).stamps(#memberId, #tripId)")
             })
     @Transactional
     public MissionInfo createMission(
