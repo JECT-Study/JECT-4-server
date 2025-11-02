@@ -8,7 +8,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.MemberCategory;
 import com.ject.studytrip.member.domain.model.SocialProvider;
 import com.ject.studytrip.member.domain.policy.MemberPolicy;
-import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
+import com.ject.studytrip.member.domain.repository.MemberCommandRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberCommandService {
     private final MemberRepository memberRepository;
-    private final MemberQueryRepository memberQueryRepository;
+    private final MemberCommandRepository memberCommandRepository;
 
     public Member createMemberFromKakao(CreateMemberCommand command) {
         validateMemberIsUnique(SocialProvider.KAKAO, command.socialId());
@@ -52,7 +52,7 @@ public class MemberCommandService {
     }
 
     public long hardDeleteMembers() {
-        return memberQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return memberCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public void hardDeleteMemberById(Long memberId) {

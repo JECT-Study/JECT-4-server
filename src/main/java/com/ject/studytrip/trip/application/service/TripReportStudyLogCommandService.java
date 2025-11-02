@@ -4,7 +4,7 @@ import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.trip.domain.factory.TripReportStudyLogFactory;
 import com.ject.studytrip.trip.domain.model.TripReport;
 import com.ject.studytrip.trip.domain.model.TripReportStudyLog;
-import com.ject.studytrip.trip.domain.repository.TripReportStudyLogQueryRepository;
+import com.ject.studytrip.trip.domain.repository.TripReportStudyLogCommandRepository;
 import com.ject.studytrip.trip.domain.repository.TripReportStudyLogRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TripReportStudyLogCommandService {
     private final TripReportStudyLogRepository tripReportStudyLogRepository;
-    private final TripReportStudyLogQueryRepository tripReportStudyLogQueryRepository;
+    private final TripReportStudyLogCommandRepository tripReportStudyLogCommandRepository;
 
     public void createTripReportStudyLogs(TripReport tripReport, List<StudyLog> studyLogs) {
         List<TripReportStudyLog> tripReportStudyLogs =
@@ -26,10 +26,10 @@ public class TripReportStudyLogCommandService {
     }
 
     public long hardDeleteTripReportStudyLogsOwnedByDeletedMember() {
-        return tripReportStudyLogQueryRepository.deleteAllByDeletedMemberOwner();
+        return tripReportStudyLogCommandRepository.deleteAllByDeletedMemberOwner();
     }
 
     public long hardDeleteTripReportStudyLogsByMember(Long memberId) {
-        return tripReportStudyLogQueryRepository.deleteAllByMemberId(memberId);
+        return tripReportStudyLogCommandRepository.deleteAllByMemberId(memberId);
     }
 }

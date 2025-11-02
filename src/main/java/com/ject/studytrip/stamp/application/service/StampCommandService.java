@@ -3,7 +3,7 @@ package com.ject.studytrip.stamp.application.service;
 import com.ject.studytrip.stamp.domain.factory.StampFactory;
 import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.domain.policy.StampPolicy;
-import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
+import com.ject.studytrip.stamp.domain.repository.StampCommandRepository;
 import com.ject.studytrip.stamp.domain.repository.StampRepository;
 import com.ject.studytrip.stamp.presentation.dto.request.CreateStampRequest;
 import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampOrderRequest;
@@ -21,21 +21,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StampCommandService {
     private final StampRepository stampRepository;
-    private final StampQueryRepository stampQueryRepository;
+    private final StampCommandRepository stampCommandRepository;
 
-    public Stamp createStamp(Trip trip, CreateStampRequest request) {
-        int nextOrder = 0;
-        if (trip.getCategory() == TripCategory.COURSE) {
-            nextOrder = computeNextStampOrder(trip.getId());
-        }
-
+    public Stamp createStamp(Trip trip, int nextOrder, CreateStampRequest request) {
         Stamp stamp = StampFactory.create(trip, request.name(), nextOrder, request.endDate());
         StampPolicy.validateEndDate(trip.getEndDate(), stamp.getEndDate());
 
         return stampRepository.save(stamp);
     }
 
-    public void createStamps(Trip trip, List<CreateStampRequest> requests) {
+    public void createStamps(Trip trip, int nextOrder, List<CreateStampRequest> requests) {
         if (requests == null || requests.isEmpty()) return;
 
         final List<Stamp> stamps =
@@ -52,13 +47,13 @@ public class StampCommandService {
                         // 코스형 여행일 경우
                         // nextOrder 부터 1씩 증가하며 order 저장
                     case COURSE -> {
-                        int nextOrder = computeNextStampOrder(trip.getId());
+                        int order = nextOrder;
 
                         List<Stamp> stampList = new ArrayList<>();
                         for (CreateStampRequest request : requests) {
                             Stamp stamp =
                                     StampFactory.create(
-                                            trip, request.name(), nextOrder++, request.endDate());
+                                            trip, request.name(), order++, request.endDate());
                             stampList.add(stamp);
                         }
 
@@ -118,12 +113,8 @@ public class StampCommandService {
         }
     }
 
-    public void deleteStamp(Long tripId, TripCategory tripCategory, Stamp stamp) {
+    public void deleteStamp(Stamp stamp) {
         stamp.updateDeletedAt();
-
-        if (tripCategory == TripCategory.COURSE) {
-            shiftStampOrdersAfterDeleted(tripId, stamp.getStampOrder());
-        }
     }
 
     public void completeStamp(Stamp stamp) {
@@ -132,31 +123,29 @@ public class StampCommandService {
         stamp.updateCompleted();
     }
 
+    public void shiftStampOrders(List<Stamp> affectedStamps) {
+        for (Stamp stamp : affectedStamps) {
+            stamp.updateStampOrder(stamp.getStampOrder() - 1);
+        }
+    }
+
     public void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
         StampPolicy.validateStampBelongsToTrip(tripId, stamp);
     }
 
     public void validateAllStampsCompletedByTripId(Long tripId) {
         boolean exists =
-                stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId);
+                stampCommandRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId);
+
         StampPolicy.validateAllCompleted(exists);
     }
 
     public long hardDeleteStamps() {
-        return stampQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return stampCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteStampsOwnedByDeletedTrip() {
-        return stampQueryRepository.deleteAllByDeletedTripOwner();
-    }
-
-    private void shiftStampOrdersAfterDeleted(Long tripId, int deletedStampOrder) {
-        List<Stamp> affectedStamps =
-                stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedStampOrder);
-
-        for (Stamp stamp : affectedStamps) {
-            stamp.updateStampOrder(stamp.getStampOrder() - 1);
-        }
+        return stampCommandRepository.deleteAllByDeletedTripOwner();
     }
 
     public void increaseTotalMissions(Stamp stamp) {
@@ -171,12 +160,7 @@ public class StampCommandService {
         stamp.increaseCompletedMissions(count);
     }
 
-    private int computeNextStampOrder(Long tripId) {
-        Integer lastOrder = stampQueryRepository.findMaxStampOrderByTripId(tripId);
-        return lastOrder == null ? 1 : lastOrder + 1;
-    }
-
     public long hardDeleteStampsByMember(Long memberId) {
-        return stampQueryRepository.deleteAllByMemberId(memberId);
+        return stampCommandRepository.deleteAllByMemberId(memberId);
     }
 }

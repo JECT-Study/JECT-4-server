@@ -4,7 +4,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.studylog.domain.factory.StudyLogFactory;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.policy.StudyLogPolicy;
-import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
+import com.ject.studytrip.studylog.domain.repository.StudyLogCommandRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogRepository;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StudyLogCommandService {
     private final StudyLogRepository studyLogRepository;
-    private final StudyLogQueryRepository studyLogQueryRepository;
+    private final StudyLogCommandRepository studyLogCommandRepository;
 
     public StudyLog createStudyLog(Member member, DailyGoal dailyGoal, String content) {
         StudyLog studyLog = StudyLogFactory.create(member, dailyGoal, content);
@@ -23,15 +23,15 @@ public class StudyLogCommandService {
     }
 
     public long hardDeleteStudyLogs() {
-        return studyLogQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return studyLogCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteStudyLogsOwnedByDeletedMember() {
-        return studyLogQueryRepository.deleteAllByDeletedMemberOwner();
+        return studyLogCommandRepository.deleteAllByDeletedMemberOwner();
     }
 
     public long hardDeleteStudyLogsOwnedByDeletedDailyGoal() {
-        return studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner();
+        return studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner();
     }
 
     public void updateImageUrl(StudyLog studyLog, String imageUrl) {
@@ -41,6 +41,6 @@ public class StudyLogCommandService {
     }
 
     public long hardDeleteStudyLogsByMember(Long memberId) {
-        return studyLogQueryRepository.deleteByMemberId(memberId);
+        return studyLogCommandRepository.deleteByMemberId(memberId);
     }
 }

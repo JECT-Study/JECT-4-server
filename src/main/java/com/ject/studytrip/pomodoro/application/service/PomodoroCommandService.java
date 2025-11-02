@@ -3,7 +3,7 @@ package com.ject.studytrip.pomodoro.application.service;
 import com.ject.studytrip.pomodoro.domain.factory.PomodoroFactory;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
 import com.ject.studytrip.pomodoro.domain.policy.PomodoroPolicy;
-import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroCommandRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import com.ject.studytrip.pomodoro.presentation.dto.request.CreatePomodoroRequest;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PomodoroCommandService {
     private final PomodoroRepository pomodoroRepository;
-    private final PomodoroQueryRepository pomodoroQueryRepository;
+    private final PomodoroCommandRepository pomodoroCommandRepository;
 
     public Pomodoro createPomodoro(DailyGoal dailyGoal, CreatePomodoroRequest request) {
         int focusDurationInSeconds = request.focusDurationInMinute() * 60;
@@ -37,14 +37,14 @@ public class PomodoroCommandService {
     }
 
     public long hardDeletePomodoros() {
-        return pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return pomodoroCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeletePomodorosOwnedByDeletedDailyGoal() {
-        return pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner();
+        return pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner();
     }
 
     public long hardDeletePomodorosByMember(Long memberId) {
-        return pomodoroQueryRepository.deleteAllByMemberId(memberId);
+        return pomodoroCommandRepository.deleteAllByMemberId(memberId);
     }
 }

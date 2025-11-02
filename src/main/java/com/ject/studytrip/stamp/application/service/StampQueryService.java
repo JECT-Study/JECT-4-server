@@ -6,6 +6,7 @@ import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.domain.policy.StampPolicy;
 import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
 import com.ject.studytrip.stamp.domain.repository.StampRepository;
+import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import java.util.Comparator;
 import java.util.List;
@@ -55,6 +56,18 @@ public class StampQueryService {
         }
 
         return getExplorationStampName(stamps);
+    }
+
+    public int getNextStampOrderByTrip(Trip trip) {
+        if (trip.getCategory() != TripCategory.COURSE) {
+            return 0;
+        }
+
+        return stampQueryRepository.findNextStampOrderByTripId(trip.getId());
+    }
+
+    public List<Stamp> getStampsToShiftAfterDeleted(Long tripId, int deletedStampOrder) {
+        return stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedStampOrder);
     }
 
     private String getExplorationStampName(List<Stamp> stamps) {

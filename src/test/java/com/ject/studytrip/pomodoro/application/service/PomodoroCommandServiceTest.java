@@ -11,7 +11,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode;
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro;
-import com.ject.studytrip.pomodoro.domain.repository.PomodoroQueryRepository;
+import com.ject.studytrip.pomodoro.domain.repository.PomodoroCommandRepository;
 import com.ject.studytrip.pomodoro.domain.repository.PomodoroRepository;
 import com.ject.studytrip.pomodoro.fixture.PomodoroFixture;
 import com.ject.studytrip.pomodoro.presentation.dto.request.CreatePomodoroRequest;
@@ -31,7 +31,7 @@ import org.mockito.Mock;
 public class PomodoroCommandServiceTest extends BaseUnitTest {
     @InjectMocks private PomodoroCommandService pomodoroCommandService;
     @Mock private PomodoroRepository pomodoroRepository;
-    @Mock private PomodoroQueryRepository pomodoroQueryRepository;
+    @Mock private PomodoroCommandRepository pomodoroCommandRepository;
 
     private DailyGoal dailyGoal;
     private Pomodoro pomodoro;
@@ -124,7 +124,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 뽀모도로가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedPomodorosDoNotExist() {
             // given
-            given(pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(pomodoroCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodoros();
@@ -137,7 +137,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 뽀모도로가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedPomodorosExist() {
             // given
-            given(pomodoroQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(pomodoroCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodoros();
@@ -155,7 +155,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenPomodorosOwnedByDeletedDailyGoal() {
             // given
-            given(pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+            given(pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodorosOwnedByDeletedDailyGoal();
@@ -168,7 +168,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenPomodorosOwnedByDeletedDailyGoal() {
             // given
-            given(pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+            given(pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodorosOwnedByDeletedDailyGoal();
@@ -187,7 +187,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenPomodorosOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(pomodoroQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodorosByMember(memberId);
@@ -201,7 +201,7 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenPomodorosOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(pomodoroQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = pomodoroCommandService.hardDeletePomodorosByMember(memberId);

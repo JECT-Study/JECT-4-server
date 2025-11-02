@@ -8,7 +8,7 @@ import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.model.TripReport;
-import com.ject.studytrip.trip.domain.repository.TripReportQueryRepository;
+import com.ject.studytrip.trip.domain.repository.TripReportCommandRepository;
 import com.ject.studytrip.trip.domain.repository.TripReportRepository;
 import com.ject.studytrip.trip.fixture.CreateTripReportRequestFixture;
 import com.ject.studytrip.trip.fixture.TripReportFixture;
@@ -24,7 +24,7 @@ import org.mockito.Mock;
 class TripReportCommandServiceTest extends BaseUnitTest {
     @InjectMocks private TripReportCommandService tripReportCommandService;
     @Mock private TripReportRepository tripReportRepository;
-    @Mock private TripReportQueryRepository tripReportQueryRepository;
+    @Mock private TripReportCommandRepository tripReportCommandRepository;
 
     private Member member;
     private TripReport tripReport;
@@ -98,7 +98,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행 리포트가 하나라도 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedTripReportDoesNotExist() {
             // given
-            given(tripReportQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(tripReportCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReports();
@@ -111,7 +111,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행 리포트가 하나라도 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedTripReportExist() {
             // given
-            given(tripReportQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(tripReportCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReports();
@@ -129,7 +129,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행 리포트가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenTripReportsOwnedByDeletedMemberDoNotExist() {
             // given
-            given(tripReportQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+            given(tripReportCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReportsOwnedByDeletedMember();
@@ -142,7 +142,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행 리포트가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenTripReportsOwnedByDeletedMemberExist() {
             // given
-            given(tripReportQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+            given(tripReportCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReportsOwnedByDeletedMember();
@@ -161,7 +161,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenTripReportsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(tripReportQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(tripReportCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReportsByMember(memberId);
@@ -175,7 +175,7 @@ class TripReportCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenTripReportsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(tripReportQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(tripReportCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = tripReportCommandService.hardDeleteTripReportsByMember(memberId);

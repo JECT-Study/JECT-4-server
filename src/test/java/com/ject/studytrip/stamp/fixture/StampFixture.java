@@ -20,4 +20,8 @@ public class StampFixture {
 
         return stamp;
     }
+
+    public static Stamp createStampWithName(Trip trip, String name, int order) {
+        return StampFactory.create(trip, name, order, DEFAULT_END_DATE);
+    }
 }

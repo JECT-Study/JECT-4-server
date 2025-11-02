@@ -25,9 +25,4 @@ public class MemberQueryRepositoryAdapter implements MemberQueryRepository {
 
         return Optional.ofNullable(memberRole);
     }
-
-    @Override
-    public long deleteAllByDeletedAtIsNotNull() {
-        return queryFactory.delete(member).where(member.deletedAt.isNotNull()).execute();
-    }
 }

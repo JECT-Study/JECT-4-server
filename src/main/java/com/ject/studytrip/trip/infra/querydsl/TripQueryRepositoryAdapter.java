@@ -1,11 +1,10 @@
 package com.ject.studytrip.trip.infra.querydsl;
 
-import com.ject.studytrip.member.domain.model.QMember;
-import com.ject.studytrip.trip.domain.model.QTrip;
+import static com.ject.studytrip.trip.domain.model.QTrip.trip;
+
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.domain.repository.TripQueryRepository;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class TripQueryRepositoryAdapter implements TripQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final QTrip trip = QTrip.trip;
-    private final QMember member = QMember.member;
 
     @Override
     public Slice<Trip> findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(
@@ -58,27 +55,5 @@ public class TripQueryRepositoryAdapter implements TripQueryRepository {
                         .fetchOne();
 
         return Optional.ofNullable(count).orElse(0L);
-    }
-
-    @Override
-    public long deleteAllByDeletedAtIsNotNull() {
-        return queryFactory.delete(trip).where(trip.deletedAt.isNotNull()).execute();
-    }
-
-    @Override
-    public long deleteAllByDeletedMemberOwner() {
-        return queryFactory
-                .delete(trip)
-                .where(
-                        trip.member.id.in(
-                                JPAExpressions.select(member.id)
-                                        .from(member)
-                                        .where(member.deletedAt.isNotNull())))
-                .execute();
-    }
-
-    @Override
-    public long deleteAllByMemberId(Long memberId) {
-        return queryFactory.delete(trip).where(trip.member.id.eq(memberId)).execute();
     }
 }

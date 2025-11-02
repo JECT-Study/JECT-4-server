@@ -4,7 +4,7 @@ import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.studylog.domain.factory.StudyLogDailyMissionFactory;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
-import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionQueryRepository;
+import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionCommandRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StudyLogDailyMissionCommandService {
     private final StudyLogDailyMissionRepository studyLogDailyMissionRepository;
-    private final StudyLogDailyMissionQueryRepository studyLogDailyMissionQueryRepository;
+    private final StudyLogDailyMissionCommandRepository studyLogDailyMissionCommandRepository;
 
     public List<StudyLogDailyMission> createStudyLogDailyMissions(
             StudyLog studyLog, List<DailyMission> dailyMissions) {
@@ -29,18 +29,18 @@ public class StudyLogDailyMissionCommandService {
     }
 
     public long hardDeleteStudyLogDailyMissions() {
-        return studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return studyLogDailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission() {
-        return studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner();
+        return studyLogDailyMissionCommandRepository.deleteAllByDeletedDailyMissionOwner();
     }
 
     public long hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog() {
-        return studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner();
+        return studyLogDailyMissionCommandRepository.deleteAllByDeletedStudyLogOwner();
     }
 
     public long hardDeleteStudyLogDailyMissionsByMember(Long memberId) {
-        return studyLogDailyMissionQueryRepository.deleteAllByMemberId(memberId);
+        return studyLogDailyMissionCommandRepository.deleteAllByMemberId(memberId);
     }
 }

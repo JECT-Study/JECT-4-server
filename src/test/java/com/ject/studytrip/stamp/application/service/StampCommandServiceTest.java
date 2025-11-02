@@ -14,7 +14,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.stamp.domain.error.StampErrorCode;
 import com.ject.studytrip.stamp.domain.model.Stamp;
-import com.ject.studytrip.stamp.domain.repository.StampQueryRepository;
+import com.ject.studytrip.stamp.domain.repository.StampCommandRepository;
 import com.ject.studytrip.stamp.domain.repository.StampRepository;
 import com.ject.studytrip.stamp.fixture.CreateStampRequestFixture;
 import com.ject.studytrip.stamp.fixture.StampFixture;
@@ -39,7 +39,7 @@ import org.mockito.Mock;
 class StampCommandServiceTest extends BaseUnitTest {
     @InjectMocks private StampCommandService stampCommandService;
     @Mock private StampRepository stampRepository;
-    @Mock private StampQueryRepository stampQueryRepository;
+    @Mock private StampCommandRepository stampCommandRepository;
 
     private Member member;
     private Trip courseTrip;
@@ -67,10 +67,12 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("스탬프 종료일이 과거 날짜라면 예외가 발생한다")
         void shouldThrowExceptionWhenEndDateIsInPast() {
             // given
+            int nextOrder = courseStamp2.getStampOrder() + 1;
             CreateStampRequest request = fixture.withEndDateInPast().build();
 
             // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
+            assertThatThrownBy(
+                            () -> stampCommandService.createStamp(courseTrip, nextOrder, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StampErrorCode.STAMP_END_DATE_CANNOT_BE_IN_PAST.getMessage());
         }
@@ -79,10 +81,12 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("스탬프 종료일이 여행 종료일보다 이후라면 예외가 발생한다")
         void shouldThrowExceptionWhenEndDateIsAfterTripEndDate() {
             // given
+            int nextOrder = courseStamp2.getStampOrder() + 1;
             CreateStampRequest request = fixture.withEndDateAfterTripEndDate().build();
 
             // when & then
-            assertThatThrownBy(() -> stampCommandService.createStamp(courseTrip, request))
+            assertThatThrownBy(
+                            () -> stampCommandService.createStamp(courseTrip, nextOrder, request))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(
                             StampErrorCode.STAMP_END_DATE_AFTER_TRIP_END_DATE_NOT_ALLOWED
@@ -94,51 +98,33 @@ class StampCommandServiceTest extends BaseUnitTest {
         void shouldCreateExploreStampWithOrderZero() {
             // given
             CreateStampRequest request = fixture.build();
-            // exploreTrip은 order 고정(0), save 응답 스텁
-            Stamp saved = Stamp.of(exploreTrip, request.name(), 0, request.endDate());
-            given(stampRepository.save(any())).willReturn(saved);
+            Stamp exploreStamp2 = StampFixture.createStampWithName(exploreTrip, request.name(), 0);
+            given(stampRepository.save(any(Stamp.class))).willReturn(exploreStamp2);
 
             // when
-            Stamp stamp = stampCommandService.createStamp(exploreTrip, request);
+            exploreStamp2 = stampCommandService.createStamp(exploreTrip, 0, request);
 
             // then
-            assertThat(stamp.getStampOrder()).isEqualTo(0);
+            assertThat(exploreStamp2.getTrip()).isEqualTo(exploreTrip);
+            assertThat(exploreStamp2.getName()).isEqualTo(request.name());
+            assertThat(exploreStamp2.getStampOrder()).isEqualTo(0);
         }
 
         @Test
         @DisplayName("코스형 여행에서는 마지막 order 다음 값으로 저장된다")
         void shouldCreateCourseStampWithNextSequentialOrder() {
             // given
+            int nextOrder = courseStamp2.getStampOrder() + 1;
             CreateStampRequest request = fixture.build();
-
-            // 마지막 스탬프 순서가 2라고 가정, 신규는 3으로 저장
-            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId())).willReturn(2);
-            Stamp saved = Stamp.of(courseTrip, request.name(), 3, request.endDate());
-            given(stampRepository.save(any())).willReturn(saved);
+            Stamp courseStamp3 =
+                    StampFixture.createStampWithName(courseTrip, request.name(), nextOrder);
+            given(stampRepository.save(any(Stamp.class))).willReturn(courseStamp3);
 
             // when
-            Stamp stamp = stampCommandService.createStamp(courseTrip, request);
+            courseStamp3 = stampCommandService.createStamp(courseTrip, nextOrder, request);
 
             // then
-            assertThat(stamp.getStampOrder()).isEqualTo(3);
-        }
-
-        @Test
-        @DisplayName("유효한 요청으로 스탬프를 생성하면 저장되고 반환된다")
-        void shouldCreateValidStamp() {
-            // given
-            CreateStampRequest request = fixture.build();
-            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId()))
-                    .willReturn(null);
-            Stamp saved = Stamp.of(courseTrip, request.name(), 1, request.endDate());
-            given(stampRepository.save(any())).willReturn(saved);
-
-            // when
-            Stamp stamp = stampCommandService.createStamp(courseTrip, request);
-
-            // then
-            assertThat(stamp.getName()).isEqualTo(saved.getName());
-            assertThat(stamp.getStampOrder()).isEqualTo(1);
+            assertThat(courseStamp3.getStampOrder()).isEqualTo(3);
         }
     }
 
@@ -154,7 +140,7 @@ class StampCommandServiceTest extends BaseUnitTest {
             List<CreateStampRequest> requests = List.of(fixture.build(), fixture.build());
 
             // when
-            stampCommandService.createStamps(exploreTrip, requests);
+            stampCommandService.createStamps(exploreTrip, 0, requests);
 
             // then
             verify(stampRepository).saveAll(anyList());
@@ -164,11 +150,11 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("코스형 여행에서는 마지막 order 다음 값부터 순차적으로 저장된다")
         void shouldCreateCourseStampsSequentiallyFromNextOrder() {
             // given
+            int nextOrder = courseStamp2.getStampOrder() + 1;
             List<CreateStampRequest> requests = List.of(fixture.build(), fixture.build());
-            given(stampQueryRepository.findMaxStampOrderByTripId(courseTrip.getId())).willReturn(5);
 
             // when
-            stampCommandService.createStamps(courseTrip, requests);
+            stampCommandService.createStamps(courseTrip, nextOrder, requests);
 
             // then
             verify(stampRepository).saveAll(anyList());
@@ -367,29 +353,20 @@ class StampCommandServiceTest extends BaseUnitTest {
     class DeleteStamp {
 
         @Test
-        @DisplayName("코스형 여행의 스탬프 삭제 시 deletedAt 필드를 현재 시각으로 설정하고, 삭제된 스탬프 이후 순서들을 하나씩 앞당긴다")
+        @DisplayName("코스형 여행의 스탬프 삭제 시 deletedAt 필드를 현재 시각으로 설정한다.")
         void shouldDeleteCourseTripStamp() {
-            // given
-            given(
-                            stampQueryRepository.findStampsToShiftAfterOrder(
-                                    courseTrip.getId(), courseStamp1.getStampOrder()))
-                    .willReturn(List.of(courseStamp2));
-
             // when
-            stampCommandService.deleteStamp(
-                    courseTrip.getId(), courseTrip.getCategory(), courseStamp1);
+            stampCommandService.deleteStamp(courseStamp1);
 
             // then
             assertThat(courseStamp1.getDeletedAt()).isNotNull();
-            assertThat(courseStamp2.getStampOrder()).isEqualTo(1);
         }
 
         @Test
-        @DisplayName("탐험형 여행의 스탬프 삭제 시 deletedAt 필드를 현재 시각으로 설정한다")
+        @DisplayName("탐험형 여행의 스탬프 삭제 시 deletedAt 필드를 현재 시각으로 설정한다.")
         void shouldDeleteExploreTripStamp() {
             // when
-            stampCommandService.deleteStamp(
-                    exploreTrip.getId(), exploreTrip.getCategory(), exploreStamp1);
+            stampCommandService.deleteStamp(exploreStamp1);
 
             // then
             assertThat(exploreStamp1.getDeletedAt()).isNotNull();
@@ -424,6 +401,31 @@ class StampCommandServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("shiftStampOrders 메서드는")
+    class ShiftStampOrders {
+
+        @Test
+        @DisplayName("시프트할 스탬프가 존재하지 않으면 아무 동작도 수행하지 않는다.")
+        void shouldDoNothingWhenStampsToShiftDoNotExist() {
+            // when
+            stampCommandService.shiftStampOrders(List.of());
+
+            // then
+            assertThat(courseStamp2.getStampOrder()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("시프트할 스탬프가 존재하면 각 스탬프의 order를 1씩 감소시킨다.")
+        void shouldDecreaseOrdersByOneWhenStampsToShiftExist() {
+            // when
+            stampCommandService.shiftStampOrders(List.of(courseStamp2));
+
+            // then
+            assertThat(courseStamp2.getStampOrder()).isEqualTo(1);
+        }
+    }
+
+    @Nested
     @DisplayName("validateAllStampsCompletedByTripId 메서드는")
     class ValidateAllStampsCompletedByTripId {
 
@@ -432,7 +434,9 @@ class StampCommandServiceTest extends BaseUnitTest {
         void shouldThrowExceptionWhenAnyStampIsNotCompleted() {
             // given
             Long tripId = courseTrip.getId();
-            given(stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
+            given(
+                            stampCommandRepository
+                                    .existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
                     .willReturn(true);
 
             // when & then
@@ -447,7 +451,9 @@ class StampCommandServiceTest extends BaseUnitTest {
         void shouldPassWhenAllStampsAreCompleted() {
             // given
             Long tripId = courseTrip.getId();
-            given(stampQueryRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
+            given(
+                            stampCommandRepository
+                                    .existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId))
                     .willReturn(false);
 
             // when & then
@@ -464,7 +470,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 스탬프가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedStampsDoNotExist() {
             // given
-            given(stampQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(stampCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = stampCommandService.hardDeleteStamps();
@@ -477,7 +483,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 스탬프가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedStampsExist() {
             // given
-            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+            given(stampCommandRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
 
             // when
             long result = stampCommandService.hardDeleteStampsOwnedByDeletedTrip();
@@ -495,7 +501,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 소유한 스탬프가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenStampsOwnedByDeletedTripDoNotExist() {
             // given
-            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
+            given(stampCommandRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
 
             // when
             long result = stampCommandService.hardDeleteStampsOwnedByDeletedTrip();
@@ -508,7 +514,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 소유한 스탬프가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenStampsOwnedByDeletedTripExist() {
             // given
-            given(stampQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+            given(stampCommandRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
 
             // when
             long result = stampCommandService.hardDeleteStampsOwnedByDeletedTrip();
@@ -585,7 +591,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenStampsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(stampQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(stampCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = stampCommandService.hardDeleteStampsByMember(memberId);
@@ -599,7 +605,7 @@ class StampCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenStampsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(stampQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(stampCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = stampCommandService.hardDeleteStampsByMember(memberId);

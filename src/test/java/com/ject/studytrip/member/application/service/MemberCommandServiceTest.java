@@ -12,7 +12,7 @@ import com.ject.studytrip.member.application.dto.CreateMemberCommand;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
 import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.domain.model.SocialProvider;
-import com.ject.studytrip.member.domain.repository.MemberQueryRepository;
+import com.ject.studytrip.member.domain.repository.MemberCommandRepository;
 import com.ject.studytrip.member.domain.repository.MemberRepository;
 import com.ject.studytrip.member.fixture.CreateMemberCommandFixture;
 import com.ject.studytrip.member.fixture.MemberFixture;
@@ -33,7 +33,7 @@ class MemberCommandServiceTest extends BaseUnitTest {
 
     @InjectMocks private MemberCommandService memberCommandService;
     @Mock private MemberRepository memberRepository;
-    @Mock private MemberQueryRepository memberQueryRepository;
+    @Mock private MemberCommandRepository memberCommandRepository;
 
     private Member member;
     private Member memberWithoutProfileImage;
@@ -256,7 +256,7 @@ class MemberCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedMembersDoNotExist() {
             // given
-            given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(memberCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = memberCommandService.hardDeleteMembers();
@@ -269,7 +269,7 @@ class MemberCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedMembersExist() {
             // given
-            given(memberQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(memberCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = memberCommandService.hardDeleteMembers();

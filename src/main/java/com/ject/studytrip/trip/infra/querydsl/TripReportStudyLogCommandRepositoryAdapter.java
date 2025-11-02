@@ -1,10 +1,11 @@
 package com.ject.studytrip.trip.infra.querydsl;
 
-import com.ject.studytrip.member.domain.model.QMember;
-import com.ject.studytrip.studylog.domain.model.QStudyLog;
-import com.ject.studytrip.trip.domain.model.QTripReport;
-import com.ject.studytrip.trip.domain.model.QTripReportStudyLog;
-import com.ject.studytrip.trip.domain.repository.TripReportStudyLogQueryRepository;
+import static com.ject.studytrip.member.domain.model.QMember.member;
+import static com.ject.studytrip.studylog.domain.model.QStudyLog.studyLog;
+import static com.ject.studytrip.trip.domain.model.QTripReport.tripReport;
+import static com.ject.studytrip.trip.domain.model.QTripReportStudyLog.tripReportStudyLog;
+
+import com.ject.studytrip.trip.domain.repository.TripReportStudyLogCommandRepository;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -13,12 +14,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class TripReportStudyLogQueryRepositoryAdapter implements TripReportStudyLogQueryRepository {
+public class TripReportStudyLogCommandRepositoryAdapter
+        implements TripReportStudyLogCommandRepository {
     private final JPAQueryFactory queryFactory;
-    private final QTripReportStudyLog tripReportStudyLog = QTripReportStudyLog.tripReportStudyLog;
-    private final QTripReport tripReport = QTripReport.tripReport;
-    private final QStudyLog studyLog = QStudyLog.studyLog;
-    private final QMember member = QMember.member;
 
     @Override
     public long deleteAllByDeletedMemberOwner() {

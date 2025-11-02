@@ -13,7 +13,7 @@ import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.fixture.StudyLogFixture;
 import com.ject.studytrip.trip.domain.model.*;
-import com.ject.studytrip.trip.domain.repository.TripReportStudyLogQueryRepository;
+import com.ject.studytrip.trip.domain.repository.TripReportStudyLogCommandRepository;
 import com.ject.studytrip.trip.domain.repository.TripReportStudyLogRepository;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
@@ -30,7 +30,7 @@ import org.mockito.Mock;
 class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
     @InjectMocks private TripReportStudyLogCommandService tripReportStudyLogCommandService;
     @Mock private TripReportStudyLogRepository tripReportStudyLogRepository;
-    @Mock private TripReportStudyLogQueryRepository tripReportStudyLogQueryRepository;
+    @Mock private TripReportStudyLogCommandRepository tripReportStudyLogCommandRepository;
 
     private TripReport tripReport;
     private List<StudyLog> studyLogs;
@@ -72,7 +72,8 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행 리포트가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenTripReportsOwnedByDeletedMemberDoNotExist() {
             // given
-            given(tripReportStudyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+            given(tripReportStudyLogCommandRepository.deleteAllByDeletedMemberOwner())
+                    .willReturn(0L);
 
             // when
             long result =
@@ -87,7 +88,8 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 학습 로그가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenStudyLogsOwnedByDeletedMemberDoNotExist() {
             // given
-            given(tripReportStudyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+            given(tripReportStudyLogCommandRepository.deleteAllByDeletedMemberOwner())
+                    .willReturn(0L);
 
             // when
             long result =
@@ -102,7 +104,8 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행 리포트 또는 학습 로그가 있으면 삭제된 TripReportStudyLog 개수를 반환한다.")
         void shouldReturnCountWhenTripReportsOrStudyLogsOwnedByDeletedMemberExist() {
             // given
-            given(tripReportStudyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+            given(tripReportStudyLogCommandRepository.deleteAllByDeletedMemberOwner())
+                    .willReturn(5L);
 
             // when
             long result =
@@ -123,7 +126,7 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenTripReportStudyLogsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(tripReportStudyLogQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(tripReportStudyLogCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result =
@@ -139,7 +142,7 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenTripReportStudyLogsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(tripReportStudyLogQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(tripReportStudyLogCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result =

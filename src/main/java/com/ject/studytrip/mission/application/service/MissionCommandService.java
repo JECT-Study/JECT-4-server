@@ -3,7 +3,7 @@ package com.ject.studytrip.mission.application.service;
 import com.ject.studytrip.mission.domain.factory.MissionFactory;
 import com.ject.studytrip.mission.domain.model.Mission;
 import com.ject.studytrip.mission.domain.policy.MissionPolicy;
-import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
+import com.ject.studytrip.mission.domain.repository.MissionCommandRepository;
 import com.ject.studytrip.mission.domain.repository.MissionRepository;
 import com.ject.studytrip.mission.presentation.dto.request.CreateMissionRequest;
 import com.ject.studytrip.mission.presentation.dto.request.UpdateMissionRequest;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MissionCommandService {
     private final MissionRepository missionRepository;
-    private final MissionQueryRepository missionQueryRepository;
+    private final MissionCommandRepository missionCommandRepository;
 
     public Mission createMission(Stamp stamp, CreateMissionRequest request) {
         Mission mission = MissionFactory.create(stamp, request.missionName());
@@ -47,20 +47,20 @@ public class MissionCommandService {
 
     public void validateAllMissionsCompletedByStampId(Long stampId) {
         boolean exists =
-                missionQueryRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(
+                missionCommandRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(
                         stampId);
         MissionPolicy.validateAllCompleted(exists);
     }
 
     public long hardDeleteMissions() {
-        return missionQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return missionCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteMissionsOwnedByDeletedStamp() {
-        return missionQueryRepository.deleteAllByDeletedStampOwner();
+        return missionCommandRepository.deleteAllByDeletedStampOwner();
     }
 
     public long hardDeleteMissionsByMember(Long memberId) {
-        return missionQueryRepository.deleteAllByMemberId(memberId);
+        return missionCommandRepository.deleteAllByMemberId(memberId);
     }
 }

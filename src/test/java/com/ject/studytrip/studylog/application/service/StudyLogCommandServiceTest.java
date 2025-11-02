@@ -11,7 +11,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.studylog.domain.error.StudyLogErrorCode;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
-import com.ject.studytrip.studylog.domain.repository.StudyLogQueryRepository;
+import com.ject.studytrip.studylog.domain.repository.StudyLogCommandRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogRepository;
 import com.ject.studytrip.studylog.fixture.StudyLogFixture;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -31,7 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class StudyLogCommandServiceTest extends BaseUnitTest {
     @InjectMocks private StudyLogCommandService studyLogCommandService;
     @Mock private StudyLogRepository studyLogRepository;
-    @Mock private StudyLogQueryRepository studyLogQueryRepository;
+    @Mock private StudyLogCommandRepository studyLogCommandRepository;
 
     private Member member;
     private Trip courseTrip;
@@ -81,7 +81,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 학습 로그가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedStudyLogsDoNotExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(studyLogCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogs();
@@ -94,7 +94,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 학습 로그가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedStudyLogsExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(studyLogCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogs();
@@ -112,7 +112,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 학습 로그가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenStudyLogsOwnedByDeletedMemberDoNotExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+            given(studyLogCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedMember();
@@ -125,7 +125,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 학습 로그가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenStudyLogsOwnedByDeletedMemberExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+            given(studyLogCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedMember();
@@ -143,7 +143,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenStudyLogsOwnedByDeletedDailyGoalDoNotExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+            given(studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
@@ -156,7 +156,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenStudyLogsOwnedByDeletedDailyGoalExist() {
             // given
-            given(studyLogQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+            given(studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedDailyGoal();
@@ -212,7 +212,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenStudyLogsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(studyLogQueryRepository.deleteByMemberId(memberId)).willReturn(0L);
+            given(studyLogCommandRepository.deleteByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsByMember(memberId);
@@ -226,7 +226,7 @@ class StudyLogCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenStudyLogsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(studyLogQueryRepository.deleteByMemberId(memberId)).willReturn(5L);
+            given(studyLogCommandRepository.deleteByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = studyLogCommandService.hardDeleteStudyLogsByMember(memberId);

@@ -5,7 +5,7 @@ import com.ject.studytrip.trip.domain.factory.TripFactory;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
 import com.ject.studytrip.trip.domain.policy.TripPolicy;
-import com.ject.studytrip.trip.domain.repository.TripQueryRepository;
+import com.ject.studytrip.trip.domain.repository.TripCommandRepository;
 import com.ject.studytrip.trip.domain.repository.TripRepository;
 import com.ject.studytrip.trip.presentation.dto.request.CreateTripRequest;
 import com.ject.studytrip.trip.presentation.dto.request.UpdateTripRequest;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TripCommandService {
     private final TripRepository tripRepository;
-    private final TripQueryRepository tripQueryRepository;
+    private final TripCommandRepository tripCommandRepository;
 
     public Trip createTrip(Member member, CreateTripRequest request) {
         TripCategory category = TripCategory.from(request.category());
@@ -70,14 +70,14 @@ public class TripCommandService {
     }
 
     public long hardDeleteTrips() {
-        return tripQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return tripCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteTripsOwnedByDeletedMember() {
-        return tripQueryRepository.deleteAllByDeletedMemberOwner();
+        return tripCommandRepository.deleteAllByDeletedMemberOwner();
     }
 
     public long hardDeleteTripsByMember(Long memberId) {
-        return tripQueryRepository.deleteAllByMemberId(memberId);
+        return tripCommandRepository.deleteAllByMemberId(memberId);
     }
 }
