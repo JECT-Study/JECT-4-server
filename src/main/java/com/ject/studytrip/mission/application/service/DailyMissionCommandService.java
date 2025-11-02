@@ -3,7 +3,7 @@ package com.ject.studytrip.mission.application.service;
 import com.ject.studytrip.mission.domain.factory.DailyMissionFactory;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.mission.domain.model.Mission;
-import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
+import com.ject.studytrip.mission.domain.repository.DailyMissionCommandRepository;
 import com.ject.studytrip.mission.domain.repository.DailyMissionRepository;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DailyMissionCommandService {
     private final DailyMissionRepository dailyMissionRepository;
-    private final DailyMissionQueryRepository dailyMissionQueryRepository;
+    private final DailyMissionCommandRepository dailyMissionCommandRepository;
 
     public List<DailyMission> createDailyMissions(DailyGoal dailyGoal, List<Mission> missions) {
         List<DailyMission> dailyMissions =
@@ -30,18 +30,18 @@ public class DailyMissionCommandService {
     }
 
     public long hardDeleteDailyMissions() {
-        return dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull();
+        return dailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull();
     }
 
     public long hardDeleteDailyMissionsOwnedByDeletedMission() {
-        return dailyMissionQueryRepository.deleteAllByDeletedMissionOwner();
+        return dailyMissionCommandRepository.deleteAllByDeletedMissionOwner();
     }
 
     public long hardDeleteDailyMissionsOwnedByDeletedDailyGoal() {
-        return dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner();
+        return dailyMissionCommandRepository.deleteAllByDeletedDailyGoalOwner();
     }
 
     public long hardDeleteDailyMissionsByMember(Long memberId) {
-        return dailyMissionQueryRepository.deleteAllByMemberId(memberId);
+        return dailyMissionCommandRepository.deleteAllByMemberId(memberId);
     }
 }

@@ -15,7 +15,7 @@ import com.ject.studytrip.stamp.domain.model.Stamp;
 import com.ject.studytrip.stamp.fixture.StampFixture;
 import com.ject.studytrip.studylog.domain.model.StudyLog;
 import com.ject.studytrip.studylog.domain.model.StudyLogDailyMission;
-import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionQueryRepository;
+import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionCommandRepository;
 import com.ject.studytrip.studylog.domain.repository.StudyLogDailyMissionRepository;
 import com.ject.studytrip.studylog.fixture.StudyLogFixture;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
@@ -35,7 +35,7 @@ import org.mockito.Mock;
 class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
     @InjectMocks private StudyLogDailyMissionCommandService studyLogDailyMissionCommandService;
     @Mock private StudyLogDailyMissionRepository studyLogDailyMissionRepository;
-    @Mock private StudyLogDailyMissionQueryRepository studyLogDailyMissionQueryRepository;
+    @Mock private StudyLogDailyMissionCommandRepository studyLogDailyMissionCommandRepository;
 
     private Member member;
     private Mission mission1;
@@ -88,7 +88,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 StudyLogDailyMission이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedStudyLogDailyMissionsDoNotExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull())
                     .willReturn(0L);
 
             // when
@@ -102,7 +102,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedStudyLogDailyMissionsExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull())
                     .willReturn(5L);
 
             // when
@@ -121,7 +121,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 미션이 소유한 StudyLogDailyMission이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenStudyLogDailyMissionsOwnedByDeletedDailyMissionDoNotExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedDailyMissionOwner())
                     .willReturn(0L);
 
             // when
@@ -137,7 +137,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 미션이 소유한 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenStudyLogDailyMissionsOwnedByDeletedDailyMissionExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedDailyMissionOwner())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedDailyMissionOwner())
                     .willReturn(5L);
 
             // when
@@ -158,7 +158,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 학습 로그가 소유한 StudyLogDailyMission이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDailyMissionsOwnedByDeletedStudyLogDoNotExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedStudyLogOwner())
                     .willReturn(0L);
 
             // when
@@ -174,7 +174,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 학습 로그가 소유한 StudyLogDailyMission이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenStudyLogDailyMissionsOwnedByDeletedStudyLogExist() {
             // given
-            given(studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner())
+            given(studyLogDailyMissionCommandRepository.deleteAllByDeletedStudyLogOwner())
                     .willReturn(5L);
 
             // when
@@ -196,7 +196,8 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenStudyLogDailyMissionsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(studyLogDailyMissionQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(studyLogDailyMissionCommandRepository.deleteAllByMemberId(memberId))
+                    .willReturn(0L);
 
             // when
             long result =
@@ -212,7 +213,8 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenStudyLogDailyMissionsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(studyLogDailyMissionQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(studyLogDailyMissionCommandRepository.deleteAllByMemberId(memberId))
+                    .willReturn(5L);
 
             // when
             long result =

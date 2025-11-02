@@ -253,4 +253,74 @@ class StampQueryServiceTest extends BaseUnitTest {
             assertThat(result).isEqualTo(stamp2.getName());
         }
     }
+
+    @Nested
+    @DisplayName("getNextStampOrderByTrip 메서드는")
+    class GetNextStampOrderByTrip {
+
+        @Test
+        @DisplayName("탐험형 여행일 경우 0을 반환한다.")
+        void shouldReturnZeroForExploreTrip() {
+            // when
+            int result = stampQueryService.getNextStampOrderByTrip(exploreTrip);
+
+            // then
+            assertThat(result).isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("코스형 여행일 경우 다음 스탬프 순서를 반환한다.")
+        void shouldReturnNextStampOrderForCourseTrip() {
+            // given
+            given(stampQueryRepository.findNextStampOrderByTripId(courseTrip.getId()))
+                    .willReturn(3);
+
+            // when
+            int result = stampQueryService.getNextStampOrderByTrip(courseTrip);
+
+            // then
+            assertThat(result).isEqualTo(3);
+        }
+    }
+
+    @Nested
+    @DisplayName("getStampsToShiftAfterDeleted 메서드는")
+    class GetStampsToShiftAfterDeleted {
+
+        @Test
+        @DisplayName("시프트할 스탬프가 존재하지 않으면 빈 리스트를 반환한다.")
+        void shouldReturnEmptyListWhenStampsToShiftDoNotExist() {
+            // given
+            Long tripId = courseTrip.getId();
+            int deletedOrder = courseStamp2.getStampOrder();
+            given(stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedOrder))
+                    .willReturn(List.of());
+
+            // when
+            List<Stamp> result =
+                    stampQueryService.getStampsToShiftAfterDeleted(tripId, deletedOrder);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result).isEqualTo(List.of());
+        }
+
+        @Test
+        @DisplayName("시프트할 스탬프가 존재하면 스탬프 리스트를 반환한다.")
+        void shouldReturnStampsWhenStampsToShiftExist() {
+            // given
+            Long tripId = courseTrip.getId();
+            int deletedOrder = courseStamp1.getStampOrder();
+            given(stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedOrder))
+                    .willReturn(List.of(courseStamp2));
+
+            // when
+            List<Stamp> result =
+                    stampQueryService.getStampsToShiftAfterDeleted(tripId, deletedOrder);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result).isEqualTo(List.of(courseStamp2));
+        }
+    }
 }

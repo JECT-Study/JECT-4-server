@@ -51,7 +51,8 @@ public class TripFacade {
     public TripInfo createTrip(Long memberId, CreateTripRequest request) {
         Member member = memberQueryService.getValidMember(memberId);
         Trip trip = tripCommandService.createTrip(member, request);
-        stampCommandService.createStamps(trip, request.stamps());
+        int nextOrder = stampQueryService.getNextStampOrderByTrip(trip);
+        stampCommandService.createStamps(trip, nextOrder, request.stamps());
 
         return TripInfo.from(trip, null, null);
     }

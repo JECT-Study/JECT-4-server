@@ -6,17 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface StudyLogQueryRepository {
-    long countActiveStudyLogsByMemberId(Long memberId);
-
     Slice<StudyLog> findSliceByTripId(Long tripId, Pageable pageable, String order);
-
-    long deleteAllByDeletedAtIsNotNull();
-
-    long deleteAllByDeletedMemberOwner();
-
-    long deleteAllByDeletedDailyGoalOwner();
-
-    long countStudyLogsByTripId(Long tripId);
 
     Slice<StudyLog> findSliceByTripReportIdOrderByCreatedAtDesc(
             Long tripReportId, Pageable pageable);
@@ -25,5 +15,7 @@ public interface StudyLogQueryRepository {
 
     List<String> findImageUrlsByMemberId(Long memberId);
 
-    long deleteByMemberId(Long memberId);
+    long countStudyLogsByTripId(Long tripId);
+
+    long countActiveStudyLogsByMemberId(Long memberId);
 }

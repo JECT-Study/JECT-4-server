@@ -9,7 +9,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.mission.domain.model.DailyMission;
 import com.ject.studytrip.mission.domain.model.Mission;
-import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
+import com.ject.studytrip.mission.domain.repository.DailyMissionCommandRepository;
 import com.ject.studytrip.mission.domain.repository.DailyMissionRepository;
 import com.ject.studytrip.mission.fixture.DailyMissionFixture;
 import com.ject.studytrip.mission.fixture.MissionFixture;
@@ -32,7 +32,7 @@ import org.mockito.Mock;
 class DailyMissionCommandServiceTest extends BaseUnitTest {
     @InjectMocks private DailyMissionCommandService dailyMissionCommandService;
     @Mock private DailyMissionRepository dailyMissionRepository;
-    @Mock private DailyMissionQueryRepository dailyMissionQueryRepository;
+    @Mock private DailyMissionCommandRepository dailyMissionCommandRepository;
 
     private Mission mission;
     private DailyGoal dailyGoal;
@@ -92,7 +92,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 미션이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedDailyMissionsDoNotExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissions();
@@ -105,7 +105,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 미션이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedDailyMissionsExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissions();
@@ -123,7 +123,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 미션이 소유한 데일리 미션이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDailyMissionsOwnedByDeletedMissionDoNotExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedMissionOwner()).willReturn(0L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedMissionOwner()).willReturn(0L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissionsOwnedByDeletedMission();
@@ -136,7 +136,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 미션이 소유한 데일리 미션이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDailyMissionsOwnedByDeletedMissionExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedMissionOwner()).willReturn(5L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedMissionOwner()).willReturn(5L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissionsOwnedByDeletedMission();
@@ -154,7 +154,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 데일리 미션이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDailyMissionsOwnedByDeletedDailyGoalDoNotExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L);
 
             // when
             long result =
@@ -168,7 +168,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 소유한 데일리 미션이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDailyMissionsOwnedByDeletedDailyGoalExist() {
             // given
-            given(dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
+            given(dailyMissionCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L);
 
             // when
             long result =
@@ -188,7 +188,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenDailyMissionsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(dailyMissionQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(dailyMissionCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissionsByMember(memberId);
@@ -202,7 +202,7 @@ class DailyMissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenDailyMissionsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(dailyMissionQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(dailyMissionCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = dailyMissionCommandService.hardDeleteDailyMissionsByMember(memberId);

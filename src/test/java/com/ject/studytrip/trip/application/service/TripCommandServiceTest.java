@@ -12,7 +12,7 @@ import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.error.TripErrorCode;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
-import com.ject.studytrip.trip.domain.repository.TripQueryRepository;
+import com.ject.studytrip.trip.domain.repository.TripCommandRepository;
 import com.ject.studytrip.trip.domain.repository.TripRepository;
 import com.ject.studytrip.trip.fixture.CreateTripRequestFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
@@ -34,7 +34,7 @@ class TripCommandServiceTest extends BaseUnitTest {
 
     @InjectMocks private TripCommandService tripCommandService;
     @Mock private TripRepository tripRepository;
-    @Mock private TripQueryRepository tripQueryRepository;
+    @Mock private TripCommandRepository tripCommandRepository;
 
     private Member member;
     private Trip trip;
@@ -270,7 +270,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedTripsDoNotExist() {
             // given
-            given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(tripCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = tripCommandService.hardDeleteTrips();
@@ -283,7 +283,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedTripsExist() {
             // given
-            given(tripQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(tripCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = tripCommandService.hardDeleteTrips();
@@ -301,7 +301,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenTripsOwnedByDeletedMemberDoNotExist() {
             // given
-            given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
+            given(tripCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(0L);
 
             // when
             long result = tripCommandService.hardDeleteTripsOwnedByDeletedMember();
@@ -314,7 +314,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 멤버가 소유한 여행이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenTripsOwnedByDeletedMemberExist() {
             // given
-            given(tripQueryRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
+            given(tripCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(5L);
 
             // when
             long result = tripCommandService.hardDeleteTripsOwnedByDeletedMember();
@@ -333,7 +333,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenTripsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(tripQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(tripCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = tripCommandService.hardDeleteTripsByMember(memberId);
@@ -347,7 +347,7 @@ class TripCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenTripsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(tripQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(tripCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = tripCommandService.hardDeleteTripsByMember(memberId);

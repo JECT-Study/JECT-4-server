@@ -18,6 +18,7 @@ import com.ject.studytrip.stamp.presentation.dto.request.UpdateStampRequest;
 import com.ject.studytrip.trip.application.service.TripCommandService;
 import com.ject.studytrip.trip.application.service.TripQueryService;
 import com.ject.studytrip.trip.domain.model.Trip;
+import com.ject.studytrip.trip.domain.model.TripCategory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -52,7 +53,8 @@ public class StampFacade {
     @Transactional
     public StampInfo createStamp(Long memberId, Long tripId, CreateStampRequest request) {
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
-        Stamp stamp = stampCommandService.createStamp(trip, request);
+        int nextOrder = stampQueryService.getNextStampOrderByTrip(trip);
+        Stamp stamp = stampCommandService.createStamp(trip, nextOrder, request);
         tripCommandService.increaseTotalStamps(trip);
 
         return StampInfo.from(stamp);
@@ -123,7 +125,8 @@ public class StampFacade {
         Trip trip = tripQueryService.getValidTrip(memberId, tripId);
         Stamp stamp = stampQueryService.getValidStamp(trip.getId(), stampId);
 
-        stampCommandService.deleteStamp(trip.getId(), trip.getCategory(), stamp);
+        stampCommandService.deleteStamp(stamp);
+        shiftStampOrdersIfTripCategoryIsCourse(trip, stamp.getStampOrder());
         tripCommandService.decreaseTotalStamps(trip);
     }
 
@@ -178,5 +181,14 @@ public class StampFacade {
 
         stampCommandService.completeStamp(stamp);
         tripCommandService.increaseCompletedStamps(trip);
+    }
+
+    private void shiftStampOrdersIfTripCategoryIsCourse(Trip trip, int stampOrder) {
+        if (trip.getCategory() != TripCategory.COURSE) return;
+
+        List<Stamp> affectedStamps =
+                stampQueryService.getStampsToShiftAfterDeleted(trip.getId(), stampOrder);
+
+        stampCommandService.shiftStampOrders(affectedStamps);
     }
 }

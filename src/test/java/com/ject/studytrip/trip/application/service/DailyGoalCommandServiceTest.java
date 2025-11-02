@@ -10,7 +10,7 @@ import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.model.DailyGoal;
 import com.ject.studytrip.trip.domain.model.Trip;
 import com.ject.studytrip.trip.domain.model.TripCategory;
-import com.ject.studytrip.trip.domain.repository.DailyGoalQueryRepository;
+import com.ject.studytrip.trip.domain.repository.DailyGoalCommandRepository;
 import com.ject.studytrip.trip.domain.repository.DailyGoalRepository;
 import com.ject.studytrip.trip.fixture.DailyGoalFixture;
 import com.ject.studytrip.trip.fixture.TripFixture;
@@ -25,7 +25,7 @@ import org.mockito.Mock;
 class DailyGoalCommandServiceTest extends BaseUnitTest {
     @InjectMocks private DailyGoalCommandService dailyGoalCommandService;
     @Mock private DailyGoalRepository dailyGoalRepository;
-    @Mock private DailyGoalQueryRepository dailyGoalQueryRepository;
+    @Mock private DailyGoalCommandRepository dailyGoalCommandRepository;
 
     private Trip trip;
     private DailyGoal dailyGoal;
@@ -80,7 +80,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedDailyGoalsDoNotExist() {
             // given
-            given(dailyGoalQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(dailyGoalCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoals();
@@ -93,7 +93,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 데일리 목표가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedDailyGoalsExist() {
             // given
-            given(dailyGoalQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(dailyGoalCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoals();
@@ -111,7 +111,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 소유한 데일리 목표가 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDailyGoalsOwnedByDeletedTripDoNotExist() {
             // given
-            given(dailyGoalQueryRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
+            given(dailyGoalCommandRepository.deleteAllByDeletedTripOwner()).willReturn(0L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoalsOwnedByDeletedTrip();
@@ -124,7 +124,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 여행이 소유한 데일리 목표가 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDailyGoalsOwnedByDeletedTripExist() {
             // given
-            given(dailyGoalQueryRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
+            given(dailyGoalCommandRepository.deleteAllByDeletedTripOwner()).willReturn(5L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoalsOwnedByDeletedTrip();
@@ -143,7 +143,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenDailyGoalsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(dailyGoalQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(dailyGoalCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoalsByMember(memberId);
@@ -157,7 +157,7 @@ class DailyGoalCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenDailyGoalsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(dailyGoalQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(dailyGoalCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = dailyGoalCommandService.hardDeleteDailyGoalsByMember(memberId);

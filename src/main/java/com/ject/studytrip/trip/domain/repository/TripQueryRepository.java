@@ -10,10 +10,4 @@ public interface TripQueryRepository {
             Long memberId, Pageable pageable);
 
     long countActiveTripsByMemberIdAndCategory(Long memberId, TripCategory category);
-
-    long deleteAllByDeletedAtIsNotNull();
-
-    long deleteAllByDeletedMemberOwner();
-
-    long deleteAllByMemberId(Long memberId);
 }

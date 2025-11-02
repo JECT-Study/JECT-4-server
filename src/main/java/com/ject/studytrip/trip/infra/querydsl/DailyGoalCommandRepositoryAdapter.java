@@ -1,8 +1,9 @@
 package com.ject.studytrip.trip.infra.querydsl;
 
-import com.ject.studytrip.trip.domain.model.QDailyGoal;
-import com.ject.studytrip.trip.domain.model.QTrip;
-import com.ject.studytrip.trip.domain.repository.DailyGoalQueryRepository;
+import static com.ject.studytrip.trip.domain.model.QDailyGoal.dailyGoal;
+import static com.ject.studytrip.trip.domain.model.QTrip.trip;
+
+import com.ject.studytrip.trip.domain.repository.DailyGoalCommandRepository;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -11,10 +12,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class DailyGoalQueryRepositoryAdapter implements DailyGoalQueryRepository {
+public class DailyGoalCommandRepositoryAdapter implements DailyGoalCommandRepository {
     private final JPAQueryFactory queryFactory;
-    private final QDailyGoal dailyGoal = QDailyGoal.dailyGoal;
-    private final QTrip trip = QTrip.trip;
 
     @Override
     public long deleteAllByDeletedAtIsNotNull() {

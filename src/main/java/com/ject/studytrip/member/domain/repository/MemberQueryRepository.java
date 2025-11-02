@@ -5,6 +5,4 @@ import java.util.Optional;
 
 public interface MemberQueryRepository {
     Optional<MemberRole> findMemberRoleById(Long memberId);
-
-    long deleteAllByDeletedAtIsNotNull();
 }

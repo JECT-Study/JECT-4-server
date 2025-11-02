@@ -12,7 +12,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.mission.domain.error.MissionErrorCode;
 import com.ject.studytrip.mission.domain.model.Mission;
-import com.ject.studytrip.mission.domain.repository.MissionQueryRepository;
+import com.ject.studytrip.mission.domain.repository.MissionCommandRepository;
 import com.ject.studytrip.mission.domain.repository.MissionRepository;
 import com.ject.studytrip.mission.fixture.CreateMissionRequestFixture;
 import com.ject.studytrip.mission.fixture.MissionFixture;
@@ -39,7 +39,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
 
     @InjectMocks private MissionCommandService missionCommandService;
     @Mock private MissionRepository missionRepository;
-    @Mock private MissionQueryRepository missionQueryRepository;
+    @Mock private MissionCommandRepository missionCommandRepository;
 
     private Stamp courseStamp;
     private Stamp exploreStamp;
@@ -216,7 +216,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
             // given
             Long stampId = courseStamp.getId();
             given(
-                            missionQueryRepository
+                            missionCommandRepository
                                     .existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId))
                     .willReturn(true);
 
@@ -235,7 +235,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
             // given
             Long stampId = courseStamp.getId();
             given(
-                            missionQueryRepository
+                            missionCommandRepository
                                     .existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId))
                     .willReturn(false);
 
@@ -253,7 +253,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 미션이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenDeletedMissionsDoNotExist() {
             // given
-            given(missionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
+            given(missionCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L);
 
             // when
             long result = missionCommandService.hardDeleteMissions();
@@ -266,7 +266,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 미션이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenDeletedMissionsExist() {
             // given
-            given(missionQueryRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
+            given(missionCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L);
 
             // when
             long result = missionCommandService.hardDeleteMissions();
@@ -284,7 +284,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 스탬프가 소유한 미션이 없으면 0을 반환한다.")
         void shouldReturnZeroWhenMissionsOwnedByDeletedStampDoNotExist() {
             // given
-            given(missionQueryRepository.deleteAllByDeletedStampOwner()).willReturn(0L);
+            given(missionCommandRepository.deleteAllByDeletedStampOwner()).willReturn(0L);
 
             // when
             long result = missionCommandService.hardDeleteMissionsOwnedByDeletedStamp();
@@ -297,7 +297,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("삭제된 스탬프가 소유한 미션이 있으면 해당 개수를 반환한다.")
         void shouldReturnCountWhenMissionsOwnedByDeletedStampExist() {
             // given
-            given(missionQueryRepository.deleteAllByDeletedStampOwner()).willReturn(5L);
+            given(missionCommandRepository.deleteAllByDeletedStampOwner()).willReturn(5L);
 
             // when
             long result = missionCommandService.hardDeleteMissionsOwnedByDeletedStamp();
@@ -316,7 +316,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnZeroWhenMissionsOwnedByMemberDoNotExist() {
             // given
             Long memberId = 1L;
-            given(missionQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+            given(missionCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L);
 
             // when
             long result = missionCommandService.hardDeleteMissionsByMember(memberId);
@@ -330,7 +330,7 @@ class MissionCommandServiceTest extends BaseUnitTest {
         void shouldReturnCountWhenMissionsOwnedByMemberExist() {
             // given
             Long memberId = 1L;
-            given(missionQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+            given(missionCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L);
 
             // when
             long result = missionCommandService.hardDeleteMissionsByMember(memberId);
