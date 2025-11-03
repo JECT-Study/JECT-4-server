@@ -4,4 +4,6 @@ public interface DailyGoalQueryRepository {
     long deleteAllByDeletedAtIsNotNull();
 
     long deleteAllByDeletedTripOwner();
+
+    long deleteAllByMemberId(Long memberId);
 }

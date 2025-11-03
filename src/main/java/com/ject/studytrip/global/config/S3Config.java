@@ -1,11 +1,14 @@
 package com.ject.studytrip.global.config;
 
 import com.ject.studytrip.global.config.properties.S3Properties;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.core.retry.RetryMode;
+import software.amazon.awssdk.core.retry.RetryPolicy;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -18,7 +21,21 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
+        RetryPolicy retry =
+                RetryPolicy.builder(RetryMode.STANDARD)
+                        .numRetries(props.retry().maxAttempts())
+                        .build();
+
         return S3Client.builder()
+                .overrideConfiguration(
+                        config ->
+                                config.retryPolicy(retry)
+                                        .apiCallTimeout(
+                                                Duration.ofSeconds(
+                                                        props.timeout().apiCallInSeconds()))
+                                        .apiCallAttemptTimeout(
+                                                Duration.ofSeconds(
+                                                        props.timeout().apiCallAttemptInSeconds())))
                 .region(Region.of(props.region()))
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();

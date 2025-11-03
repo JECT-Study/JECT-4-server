@@ -31,4 +31,8 @@ public class DailyGoalCommandService {
     public long hardDeleteDailyGoalsOwnedByDeletedTrip() {
         return dailyGoalQueryRepository.deleteAllByDeletedTripOwner();
     }
+
+    public long hardDeleteDailyGoalsByMember(Long memberId) {
+        return dailyGoalQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

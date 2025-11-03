@@ -6,6 +6,7 @@ import com.ject.studytrip.mission.domain.model.QMission;
 import com.ject.studytrip.mission.domain.repository.DailyMissionQueryRepository;
 import com.ject.studytrip.stamp.domain.model.QStamp;
 import com.ject.studytrip.trip.domain.model.QDailyGoal;
+import com.ject.studytrip.trip.domain.model.QTrip;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public class DailyMissionQueryRepositoryAdapter implements DailyMissionQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final QDailyMission dailyMission = QDailyMission.dailyMission;
+    private final QTrip trip = QTrip.trip;
     private final QStamp stamp = QStamp.stamp;
     private final QMission mission = QMission.mission;
     private final QDailyGoal dailyGoal = QDailyGoal.dailyGoal;
@@ -73,5 +75,22 @@ public class DailyMissionQueryRepositoryAdapter implements DailyMissionQueryRepo
                                         .from(dailyGoal)
                                         .where(dailyGoal.deletedAt.isNotNull())))
                 .execute();
+    }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(dailyMission.id)
+                        .from(dailyMission)
+                        .join(dailyMission.mission, mission)
+                        .join(mission.stamp, stamp)
+                        .join(stamp.trip, trip)
+                        .where(trip.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory.delete(dailyMission).where(dailyMission.id.in(ids)).execute();
     }
 }

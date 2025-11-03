@@ -319,4 +319,42 @@ class StudyLogQueryServiceTest extends BaseUnitTest {
             assertThat(result.get(1)).isEqualTo(studyLogId2);
         }
     }
+
+    @Nested
+    @DisplayName("getStudyLogImageUrlsByMemberId 메서드는")
+    class GetStudyLogImageUrlsByMemberId {
+
+        @Test
+        @DisplayName("이미지가 없으면 빈 리스트를 반환한다")
+        void shouldReturnEmptyListWhenNoImages() {
+            // given
+            Long memberId = member.getId();
+            given(studyLogQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(List.of());
+
+            // when
+            List<String> result = studyLogQueryService.getStudyLogImageUrlsByMemberId(memberId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("이미지가 존재하면 URL 리스트를 반환한다")
+        void shouldReturnImageUrlsWhenExist() {
+            // given
+            Long memberId = member.getId();
+            List<String> imageUrls =
+                    List.of(
+                            "https://cdn.example.com/studylogs/1.jpg",
+                            "https://cdn.example.com/studylogs/2.jpg");
+            given(studyLogQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(imageUrls);
+
+            // when
+            List<String> result = studyLogQueryService.getStudyLogImageUrlsByMemberId(memberId);
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result).isEqualTo(imageUrls);
+        }
+    }
 }

@@ -59,4 +59,8 @@ public class MissionCommandService {
     public long hardDeleteMissionsOwnedByDeletedStamp() {
         return missionQueryRepository.deleteAllByDeletedStampOwner();
     }
+
+    public long hardDeleteMissionsByMember(Long memberId) {
+        return missionQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

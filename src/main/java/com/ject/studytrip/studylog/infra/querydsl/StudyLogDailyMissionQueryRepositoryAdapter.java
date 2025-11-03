@@ -71,4 +71,22 @@ public class StudyLogDailyMissionQueryRepositoryAdapter
                                         .where(studyLog.deletedAt.isNotNull())))
                 .execute();
     }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(studyLogDailyMission.id)
+                        .from(studyLogDailyMission)
+                        .join(studyLogDailyMission.studyLog, studyLog)
+                        .where(studyLog.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory
+                .delete(studyLogDailyMission)
+                .where(studyLogDailyMission.id.in(ids))
+                .execute();
+    }
 }

@@ -10,6 +10,7 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.fixture.MemberFixture;
 import com.ject.studytrip.trip.domain.error.TripReportErrorCode;
 import com.ject.studytrip.trip.domain.model.TripReport;
+import com.ject.studytrip.trip.domain.repository.TripReportQueryRepository;
 import com.ject.studytrip.trip.domain.repository.TripReportRepository;
 import com.ject.studytrip.trip.fixture.TripReportFixture;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.mockito.Mock;
 class TripReportQueryServiceTest extends BaseUnitTest {
     @InjectMocks private TripReportQueryService tripReportQueryService;
     @Mock private TripReportRepository tripReportRepository;
+    @Mock private TripReportQueryRepository tripReportQueryRepository;
 
     private Member member;
     private TripReport tripReport1;
@@ -188,6 +190,46 @@ class TripReportQueryServiceTest extends BaseUnitTest {
             assertThat(result.size()).isEqualTo(2);
             assertThat(result.get(0).getId()).isEqualTo(tripReport1.getId());
             assertThat(result.get(1).getId()).isEqualTo(tripReport2.getId());
+        }
+    }
+
+    @Nested
+    @DisplayName("getTripReportImageUrlsByMemberId 메서드는")
+    class GetTripReportImageUrlsByMemberId {
+
+        @Test
+        @DisplayName("이미지가 없으면 빈 리스트를 반환한다")
+        void shouldReturnEmptyListWhenNoImages() {
+            // given
+            Long memberId = member.getId();
+            given(tripReportQueryRepository.findImageUrlsByMemberId(memberId))
+                    .willReturn(List.of());
+
+            // when
+            List<String> result = tripReportQueryService.getTripReportImageUrlsByMemberId(memberId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("이미지가 존재하면 URL 리스트를 반환한다")
+        void shouldReturnImageUrlsWhenExist() {
+            // given
+            Long memberId = member.getId();
+            List<String> imageUrls =
+                    List.of(
+                            "https://cdn.example.com/reports/1.jpg",
+                            "https://cdn.example.com/reports/2.jpg");
+            given(tripReportQueryRepository.findImageUrlsByMemberId(memberId))
+                    .willReturn(imageUrls);
+
+            // when
+            List<String> result = tripReportQueryService.getTripReportImageUrlsByMemberId(memberId);
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result).isEqualTo(imageUrls);
         }
     }
 }

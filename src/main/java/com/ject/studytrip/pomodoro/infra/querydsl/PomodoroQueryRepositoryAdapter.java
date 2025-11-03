@@ -6,6 +6,7 @@ import com.ject.studytrip.trip.domain.model.QDailyGoal;
 import com.ject.studytrip.trip.domain.model.QTrip;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -52,5 +53,21 @@ public class PomodoroQueryRepositoryAdapter implements PomodoroQueryRepository {
         long seconds = totalSeconds == null ? 0L : totalSeconds.longValue();
 
         return seconds / 3600L; // 정수 시간(내림)
+    }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(pomodoro.id)
+                        .from(pomodoro)
+                        .join(pomodoro.dailyGoal, dailyGoal)
+                        .join(dailyGoal.trip, trip)
+                        .where(trip.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory.delete(pomodoro).where(pomodoro.id.in(ids)).execute();
     }
 }

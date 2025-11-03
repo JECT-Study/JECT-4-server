@@ -40,4 +40,8 @@ public class DailyMissionCommandService {
     public long hardDeleteDailyMissionsOwnedByDeletedDailyGoal() {
         return dailyMissionQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }
+
+    public long hardDeleteDailyMissionsByMember(Long memberId) {
+        return dailyMissionQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

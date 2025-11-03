@@ -5,6 +5,7 @@ import com.ject.studytrip.trip.domain.model.QTrip;
 import com.ject.studytrip.trip.domain.repository.DailyGoalQueryRepository;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,5 +31,20 @@ public class DailyGoalQueryRepositoryAdapter implements DailyGoalQueryRepository
                                         .from(trip)
                                         .where(trip.deletedAt.isNotNull())))
                 .execute();
+    }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(dailyGoal.id)
+                        .from(dailyGoal)
+                        .join(dailyGoal.trip, trip)
+                        .where(trip.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory.delete(dailyGoal).where(dailyGoal.id.in(ids)).execute();
     }
 }

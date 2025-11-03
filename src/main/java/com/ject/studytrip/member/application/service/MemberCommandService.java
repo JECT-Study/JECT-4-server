@@ -55,6 +55,10 @@ public class MemberCommandService {
         return memberQueryRepository.deleteAllByDeletedAtIsNotNull();
     }
 
+    public void hardDeleteMemberById(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
     private void validateMemberIsUnique(SocialProvider socialProvider, String socialId) {
         boolean isMemberDuplicated =
                 memberRepository.existsBySocialProviderAndSocialId(socialProvider, socialId);

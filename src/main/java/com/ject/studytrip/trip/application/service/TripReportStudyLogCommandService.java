@@ -28,4 +28,8 @@ public class TripReportStudyLogCommandService {
     public long hardDeleteTripReportStudyLogsOwnedByDeletedMember() {
         return tripReportStudyLogQueryRepository.deleteAllByDeletedMemberOwner();
     }
+
+    public long hardDeleteTripReportStudyLogsByMember(Long memberId) {
+        return tripReportStudyLogQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

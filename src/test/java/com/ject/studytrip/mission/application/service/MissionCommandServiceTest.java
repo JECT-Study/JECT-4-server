@@ -306,4 +306,37 @@ class MissionCommandServiceTest extends BaseUnitTest {
             assertThat(result).isEqualTo(5L);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteMissionsByMember 메서드는")
+    class HardDeleteMissionsByMember {
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 미션이 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenMissionsOwnedByMemberDoNotExist() {
+            // given
+            Long memberId = 1L;
+            given(missionQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+
+            // when
+            long result = missionCommandService.hardDeleteMissionsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 미션이 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenMissionsOwnedByMemberExist() {
+            // given
+            Long memberId = 1L;
+            given(missionQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+
+            // when
+            long result = missionCommandService.hardDeleteMissionsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

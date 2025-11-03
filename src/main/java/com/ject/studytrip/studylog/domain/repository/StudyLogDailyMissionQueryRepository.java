@@ -13,4 +13,6 @@ public interface StudyLogDailyMissionQueryRepository {
     long deleteAllByDeletedDailyMissionOwner();
 
     long deleteAllByDeletedStudyLogOwner();
+
+    long deleteAllByMemberId(Long memberId);
 }

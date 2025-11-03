@@ -13,4 +13,6 @@ public interface DailyMissionQueryRepository {
     long deleteAllByDeletedMissionOwner();
 
     long deleteAllByDeletedDailyGoalOwner();
+
+    long deleteAllByMemberId(Long memberId);
 }

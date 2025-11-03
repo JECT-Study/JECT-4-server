@@ -177,4 +177,37 @@ public class PomodoroCommandServiceTest extends BaseUnitTest {
             assertThat(result).isEqualTo(5L);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeletePomodorosByMember 메서드는")
+    class HardDeletePomodorosByMember {
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 뽀모도로가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenPomodorosOwnedByMemberDoNotExist() {
+            // given
+            Long memberId = 1L;
+            given(pomodoroQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+
+            // when
+            long result = pomodoroCommandService.hardDeletePomodorosByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 뽀모도로가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenPomodorosOwnedByMemberExist() {
+            // given
+            Long memberId = 1L;
+            given(pomodoroQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+
+            // when
+            long result = pomodoroCommandService.hardDeletePomodorosByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

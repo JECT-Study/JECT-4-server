@@ -13,9 +13,17 @@ import com.ject.studytrip.member.domain.model.Member;
 import com.ject.studytrip.member.presentation.dto.request.ConfirmProfileImageRequest;
 import com.ject.studytrip.member.presentation.dto.request.PresignProfileImageRequest;
 import com.ject.studytrip.member.presentation.dto.request.UpdateMemberRequest;
+import com.ject.studytrip.mission.application.service.DailyMissionCommandService;
+import com.ject.studytrip.mission.application.service.MissionCommandService;
+import com.ject.studytrip.pomodoro.application.service.PomodoroCommandService;
+import com.ject.studytrip.stamp.application.service.StampCommandService;
+import com.ject.studytrip.studylog.application.service.StudyLogCommandService;
+import com.ject.studytrip.studylog.application.service.StudyLogDailyMissionCommandService;
 import com.ject.studytrip.studylog.application.service.StudyLogQueryService;
 import com.ject.studytrip.trip.application.dto.TripCount;
-import com.ject.studytrip.trip.application.service.TripQueryService;
+import com.ject.studytrip.trip.application.service.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,8 +38,19 @@ public class MemberFacade {
     private final MemberQueryService memberQueryService;
     private final TripQueryService tripQueryService;
     private final StudyLogQueryService studyLogQueryService;
+    private final TripReportQueryService tripReportQueryService;
 
     private final MemberCommandService memberCommandService;
+    private final TripCommandService tripCommandService;
+    private final StampCommandService stampCommandService;
+    private final MissionCommandService missionCommandService;
+    private final DailyGoalCommandService dailyGoalCommandService;
+    private final PomodoroCommandService pomodoroCommandService;
+    private final DailyMissionCommandService dailyMissionCommandService;
+    private final StudyLogCommandService studyLogCommandService;
+    private final StudyLogDailyMissionCommandService studyLogDailyMissionCommandService;
+    private final TripReportCommandService tripReportCommandService;
+    private final TripReportStudyLogCommandService tripReportStudyLogCommandService;
 
     private final ImageService imageService;
 
@@ -93,5 +112,52 @@ public class MemberFacade {
 
         // 새로운 이미지 업데이트
         memberCommandService.updateProfileImage(member, finalKey);
+    }
+
+    @Transactional
+    public void hardDeleteMemberCascade(Long memberId) {
+        Member member = memberQueryService.getValidMember(memberId);
+
+        // 삭제할 이미지 목록
+        List<String> imageUrls = collectImageUrlsForMember(member);
+
+        // 멤버의 모든 데이터 즉시 삭제
+        cascadeHardDeleteByMemberId(member.getId());
+
+        // 이미지 삭제 이벤트 발행
+        // 트랜잭션 커밋 이후 이미지 삭제 처리
+        imageService.publishCleanupBatchEvent(imageUrls);
+    }
+
+    private List<String> collectImageUrlsForMember(Member member) {
+        List<String> imageUrls = new ArrayList<>();
+
+        // TripReport 이미지 목록 조회
+        imageUrls.addAll(tripReportQueryService.getTripReportImageUrlsByMemberId(member.getId()));
+
+        // StudyLog 이미지 목록 조회
+        imageUrls.addAll(studyLogQueryService.getStudyLogImageUrlsByMemberId(member.getId()));
+
+        if (member.getProfileImage() != null && !member.getProfileImage().isBlank()) {
+            imageUrls.add(member.getProfileImage());
+        }
+        return imageUrls;
+    }
+
+    private void cascadeHardDeleteByMemberId(Long memberId) {
+        // 자식 -> 부모 순으로 삭제 진행
+        tripReportStudyLogCommandService.hardDeleteTripReportStudyLogsByMember(memberId);
+        tripReportCommandService.hardDeleteTripReportsByMember(memberId);
+
+        studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsByMember(memberId);
+        pomodoroCommandService.hardDeletePomodorosByMember(memberId);
+        studyLogCommandService.hardDeleteStudyLogsByMember(memberId);
+        dailyMissionCommandService.hardDeleteDailyMissionsByMember(memberId);
+        dailyGoalCommandService.hardDeleteDailyGoalsByMember(memberId);
+
+        missionCommandService.hardDeleteMissionsByMember(memberId);
+        stampCommandService.hardDeleteStampsByMember(memberId);
+        tripCommandService.hardDeleteTripsByMember(memberId);
+        memberCommandService.hardDeleteMemberById(memberId);
     }
 }

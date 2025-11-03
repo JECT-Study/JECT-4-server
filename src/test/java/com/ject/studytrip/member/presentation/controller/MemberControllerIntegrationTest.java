@@ -459,4 +459,69 @@ class MemberControllerIntegrationTest extends BaseIntegrationTest {
             resultActions.andExpect(status().isBadRequest());
         }
     }
+
+    @Nested
+    @DisplayName("멤버 즉시 삭제 API")
+    class DeleteMemberHardDelete {
+        private ResultActions getResultActions(String accessToken) throws Exception {
+            return mockMvc.perform(
+                    delete(BASE_MEMBER_URL + "/me/hard-delete")
+                            .header(
+                                    HttpHeaders.AUTHORIZATION,
+                                    TokenFixture.TOKEN_PREFIX + accessToken)
+                            .contentType(MediaType.APPLICATION_JSON));
+        }
+
+        @Test
+        @DisplayName("Access Token이 없으면 401 Unauthorized를 반환한다.")
+        void shouldReturnUnauthorizedWhenAccessTokenIsMissing() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions("");
+
+            // then
+            resultActions
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(AuthErrorCode.UNAUTHENTICATED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("삭제된 멤버일 경우 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenMemberAlreadyDeleted() throws Exception {
+            // given
+            member.updateDeletedAt();
+
+            // when
+            ResultActions resultActions = getResultActions(accessToken);
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(MemberErrorCode.MEMBER_NOT_FOUND.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효한 멤버 ID가 들어오면 멤버와 관련된 모든 데이터를 즉시 삭제한다.")
+        void shouldHardDeleteMemberAndAllRelatedDataWhenMemberIdIsValid() throws Exception {
+            // when
+            ResultActions resultActions = getResultActions(accessToken);
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
+        }
+    }
 }

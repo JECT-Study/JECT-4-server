@@ -76,4 +76,9 @@ public class TripQueryRepositoryAdapter implements TripQueryRepository {
                                         .where(member.deletedAt.isNotNull())))
                 .execute();
     }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        return queryFactory.delete(trip).where(trip.member.id.eq(memberId)).execute();
+    }
 }
