@@ -140,6 +140,20 @@ public class StudyLogQueryRepositoryAdapter implements StudyLogQueryRepository {
                 .fetch();
     }
 
+    @Override
+    public List<String> findImageUrlsByMemberId(Long memberId) {
+        return queryFactory
+                .select(studyLog.imageUrl)
+                .from(studyLog)
+                .where(studyLog.member.id.eq(memberId))
+                .fetch();
+    }
+
+    @Override
+    public long deleteByMemberId(Long memberId) {
+        return queryFactory.delete(studyLog).where(studyLog.member.id.eq(memberId)).execute();
+    }
+
     private OrderSpecifier<?>[] orderSpecifiers(String order) {
         return (order.equalsIgnoreCase("OLDEST"))
                 ? new OrderSpecifier<?>[] {studyLog.createdAt.asc(), studyLog.id.asc()}

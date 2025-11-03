@@ -575,4 +575,37 @@ class StampCommandServiceTest extends BaseUnitTest {
                     .isEqualTo(initialCompletedMissions + increaseCount);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteStampsByMember 메서드는")
+    class HardDeleteStampsByMember {
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 스탬프가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenStampsOwnedByMemberDoNotExist() {
+            // given
+            Long memberId = 1L;
+            given(stampQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+
+            // when
+            long result = stampCommandService.hardDeleteStampsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 스탬프가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenStampsOwnedByMemberExist() {
+            // given
+            Long memberId = 1L;
+            given(stampQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+
+            // when
+            long result = stampCommandService.hardDeleteStampsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

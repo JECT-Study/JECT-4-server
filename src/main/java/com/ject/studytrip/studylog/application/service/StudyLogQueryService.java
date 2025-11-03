@@ -60,4 +60,8 @@ public class StudyLogQueryService {
     public List<Long> getStudyLogIdsByTripId(Long tripId) {
         return studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId);
     }
+
+    public List<String> getStudyLogImageUrlsByMemberId(Long memberId) {
+        return studyLogQueryRepository.findImageUrlsByMemberId(memberId);
+    }
 }

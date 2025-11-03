@@ -39,4 +39,8 @@ public class StudyLogCommandService {
 
         studyLog.updateImageUrl(imageUrl);
     }
+
+    public long hardDeleteStudyLogsByMember(Long memberId) {
+        return studyLogQueryRepository.deleteByMemberId(memberId);
+    }
 }

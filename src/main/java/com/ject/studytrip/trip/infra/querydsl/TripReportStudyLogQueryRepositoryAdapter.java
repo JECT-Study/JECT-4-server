@@ -7,6 +7,7 @@ import com.ject.studytrip.trip.domain.model.QTripReportStudyLog;
 import com.ject.studytrip.trip.domain.repository.TripReportStudyLogQueryRepository;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +39,24 @@ public class TripReportStudyLogQueryRepositoryAdapter implements TripReportStudy
                                                         .from(studyLog)
                                                         .join(studyLog.member, member)
                                                         .where(member.deletedAt.isNotNull()))))
+                .execute();
+    }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(tripReportStudyLog.id)
+                        .from(tripReportStudyLog)
+                        .join(tripReportStudyLog.tripReport, tripReport)
+                        .where(tripReport.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory
+                .delete(tripReportStudyLog)
+                .where(tripReportStudyLog.id.in(ids))
                 .execute();
     }
 }

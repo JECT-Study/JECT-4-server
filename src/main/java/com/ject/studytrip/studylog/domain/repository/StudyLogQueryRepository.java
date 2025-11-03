@@ -22,4 +22,8 @@ public interface StudyLogQueryRepository {
             Long tripReportId, Pageable pageable);
 
     List<Long> findAllIdsByTripIdOrderByCreatedDesc(Long tripId);
+
+    List<String> findImageUrlsByMemberId(Long memberId);
+
+    long deleteByMemberId(Long memberId);
 }

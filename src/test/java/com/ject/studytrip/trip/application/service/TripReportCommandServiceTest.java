@@ -151,4 +151,37 @@ class TripReportCommandServiceTest extends BaseUnitTest {
             assertThat(result).isEqualTo(5L);
         }
     }
+
+    @Nested
+    @DisplayName("hardDeleteTripReportsByMember 메서드는")
+    class HardDeleteTripReportsByMember {
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 여행 리포트가 없으면 0을 반환한다.")
+        void shouldReturnZeroWhenTripReportsOwnedByMemberDoNotExist() {
+            // given
+            Long memberId = 1L;
+            given(tripReportQueryRepository.deleteAllByMemberId(memberId)).willReturn(0L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReportsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(0L);
+        }
+
+        @Test
+        @DisplayName("특정 멤버가 소유한 여행 리포트가 있으면 해당 개수를 반환한다.")
+        void shouldReturnCountWhenTripReportsOwnedByMemberExist() {
+            // given
+            Long memberId = 1L;
+            given(tripReportQueryRepository.deleteAllByMemberId(memberId)).willReturn(5L);
+
+            // when
+            long result = tripReportCommandService.hardDeleteTripReportsByMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(5L);
+        }
+    }
 }

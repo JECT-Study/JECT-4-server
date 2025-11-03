@@ -39,4 +39,8 @@ public class StudyLogDailyMissionCommandService {
     public long hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog() {
         return studyLogDailyMissionQueryRepository.deleteAllByDeletedStudyLogOwner();
     }
+
+    public long hardDeleteStudyLogDailyMissionsByMember(Long memberId) {
+        return studyLogDailyMissionQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

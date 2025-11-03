@@ -6,4 +6,6 @@ public interface PomodoroQueryRepository {
     long deleteAllByDeletedDailyGoalOwner();
 
     long sumFocusHoursByTripId(Long tripId);
+
+    long deleteAllByMemberId(Long memberId);
 }

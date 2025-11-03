@@ -43,4 +43,8 @@ public class PomodoroCommandService {
     public long hardDeletePomodorosOwnedByDeletedDailyGoal() {
         return pomodoroQueryRepository.deleteAllByDeletedDailyGoalOwner();
     }
+
+    public long hardDeletePomodorosByMember(Long memberId) {
+        return pomodoroQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

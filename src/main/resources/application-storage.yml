@@ -8,3 +8,8 @@ aws:
     bucket: ${S3_BUCKET_NAME:}
     region: ${AWS_REGION:}
     presign-expires-in-minutes: ${PRESIGN_EXPIRES_IN_MINUTES:10}
+    retry:
+      max-attempts: ${AWS_S3_MAX_ATTEMPTS:5}
+    timeout:
+      api-call-in-seconds: ${AWS_S3_API_CALL_TIMEOUT:10}
+      api-call-attempt-in-seconds: ${AWS_S3_API_CALL_ATTEMPT_TIMEOUT:5}

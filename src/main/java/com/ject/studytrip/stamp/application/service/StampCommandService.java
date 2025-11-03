@@ -175,4 +175,8 @@ public class StampCommandService {
         Integer lastOrder = stampQueryRepository.findMaxStampOrderByTripId(tripId);
         return lastOrder == null ? 1 : lastOrder + 1;
     }
+
+    public long hardDeleteStampsByMember(Long memberId) {
+        return stampQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

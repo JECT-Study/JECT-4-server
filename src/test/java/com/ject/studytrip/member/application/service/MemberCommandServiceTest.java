@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import com.ject.studytrip.BaseUnitTest;
 import com.ject.studytrip.global.exception.CustomException;
@@ -275,6 +276,24 @@ class MemberCommandServiceTest extends BaseUnitTest {
 
             // then
             assertThat(result).isEqualTo(5L);
+        }
+    }
+
+    @Nested
+    @DisplayName("hardDeleteMemberById 메서드는")
+    class HardDeleteMemberById {
+
+        @Test
+        @DisplayName("전달된 멤버 ID로 삭제를 수행한다")
+        void shouldDeleteById() {
+            // given
+            Long memberId = 123L;
+
+            // when
+            memberCommandService.hardDeleteMemberById(memberId);
+
+            // then
+            verify(memberRepository).deleteById(memberId);
         }
     }
 }

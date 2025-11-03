@@ -56,13 +56,11 @@ public class S3ImageStorageClient {
                 () -> client.deleteObject(builder -> builder.bucket(props.bucket()).key(key)));
     }
 
-    public void deleteObjects(List<ObjectIdentifier> objects) {
-        S3ExceptionTranslator.executeWithExceptionTranslation(
-                () ->
-                        client.deleteObjects(
-                                builder ->
-                                        builder.bucket(props.bucket())
-                                                .delete(d -> d.quiet(true).objects(objects))));
+    public DeleteObjectsResponse deleteObjects(List<ObjectIdentifier> objects) {
+        return client.deleteObjects(
+                builder ->
+                        builder.bucket(props.bucket())
+                                .delete(d -> d.quiet(false).objects(objects)));
     }
 
     public void copyObject(String tmpKey, String finalKey) {

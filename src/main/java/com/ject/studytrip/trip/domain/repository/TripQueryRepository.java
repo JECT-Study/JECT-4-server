@@ -14,4 +14,6 @@ public interface TripQueryRepository {
     long deleteAllByDeletedAtIsNotNull();
 
     long deleteAllByDeletedMemberOwner();
+
+    long deleteAllByMemberId(Long memberId);
 }

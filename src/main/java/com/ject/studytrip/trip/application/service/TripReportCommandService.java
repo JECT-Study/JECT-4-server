@@ -46,4 +46,8 @@ public class TripReportCommandService {
     public long hardDeleteTripReportsOwnedByDeletedMember() {
         return tripReportQueryRepository.deleteAllByDeletedMemberOwner();
     }
+
+    public long hardDeleteTripReportsByMember(Long memberId) {
+        return tripReportQueryRepository.deleteAllByMemberId(memberId);
+    }
 }

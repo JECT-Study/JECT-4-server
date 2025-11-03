@@ -135,4 +135,13 @@ public class MemberController {
         memberFacade.confirmImage(Long.valueOf(memberId), request);
         return ResponseEntity.ok().body(StandardResponse.success(HttpStatus.OK.value(), null));
     }
+
+    @Operation(summary = "멤버 즉시 삭제", description = "멤버를 즉시 삭제하고 관련된 모든 데이터를 삭제합니다. (CASCADE)")
+    @DeleteMapping("/me/hard-delete")
+    public ResponseEntity<StandardResponse> deleteMemberHardDelete(
+            @AuthenticationPrincipal String memberId) {
+        memberFacade.hardDeleteMemberCascade(Long.valueOf(memberId));
+
+        return ResponseEntity.ok().body(StandardResponse.success(HttpStatus.OK.value(), null));
+    }
 }

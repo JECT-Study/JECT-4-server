@@ -84,4 +84,19 @@ public class StampQueryRepositoryAdapter implements StampQueryRepository {
                 .where(stamp.trip.id.eq(tripId), stamp.deletedAt.isNull())
                 .fetchOne();
     }
+
+    @Override
+    public long deleteAllByMemberId(Long memberId) {
+        List<Long> ids =
+                queryFactory
+                        .select(stamp.id)
+                        .from(stamp)
+                        .join(stamp.trip, trip)
+                        .where(trip.member.id.eq(memberId))
+                        .fetch();
+
+        if (ids.isEmpty()) return 0;
+
+        return queryFactory.delete(stamp).where(stamp.id.in(ids)).execute();
+    }
 }
