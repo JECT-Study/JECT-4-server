@@ -33,6 +33,7 @@ public class TripQueryService {
 
         TripPolicy.validateOwner(memberId, trip);
         TripPolicy.validateNotDeleted(trip);
+        TripPolicy.validateCompleted(trip);
 
         return trip;
     }

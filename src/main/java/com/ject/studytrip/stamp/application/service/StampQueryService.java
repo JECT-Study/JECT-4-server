@@ -30,6 +30,7 @@ public class StampQueryService {
 
         StampPolicy.validateStampBelongsToTrip(tripId, stamp);
         StampPolicy.validateNotDeleted(stamp);
+        StampPolicy.validateCompleted(stamp);
 
         return stamp;
     }

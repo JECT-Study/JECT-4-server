@@ -119,6 +119,7 @@ public class StudyLogFacade {
         return PresignedStudyLogImageInfo.of(studyLog.getId(), info.tmpKey(), info.presignedUrl());
     }
 
+    @CacheEvict(cacheNames = STUDY_LOGS, allEntries = true)
     @Transactional
     public void confirmImage(Long studyLogId, ConfirmStudyLogImageRequest request) {
         StudyLog studyLog = studyLogQueryService.getValidStudyLog(studyLogId);

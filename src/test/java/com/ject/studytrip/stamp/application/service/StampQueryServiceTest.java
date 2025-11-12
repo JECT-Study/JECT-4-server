@@ -85,15 +85,29 @@ class StampQueryServiceTest extends BaseUnitTest {
         void shouldThrowExceptionWhenStampAlreadyDeleted() {
             // given
             courseStamp1.updateDeletedAt();
-            given(stampRepository.findById(any())).willReturn(Optional.ofNullable(courseStamp1));
+            Long tripId = courseTrip.getId();
+            Long stampId = courseStamp1.getId();
+            given(stampRepository.findById(stampId)).willReturn(Optional.ofNullable(courseStamp1));
 
             // when & then
-            assertThatThrownBy(
-                            () ->
-                                    stampQueryService.getValidStamp(
-                                            courseStamp1.getId(), courseStamp1.getId()))
+            assertThatThrownBy(() -> stampQueryService.getValidStamp(tripId, stampId))
                     .isInstanceOf(CustomException.class)
                     .hasMessage(StampErrorCode.STAMP_ALREADY_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("완료된 스탬프일 경우 예외가 발생한다.")
+        void shouldThrowExceptionWhenStampAlreadyCompleted() {
+            // given
+            courseStamp1.updateCompleted();
+            Long tripId = courseTrip.getId();
+            Long stampId = courseStamp1.getId();
+            given(stampRepository.findById(stampId)).willReturn(Optional.ofNullable(courseStamp1));
+
+            // when & then
+            assertThatThrownBy(() -> stampQueryService.getValidStamp(tripId, stampId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(StampErrorCode.STAMP_ALREADY_COMPLETED.getMessage());
         }
 
         @Test

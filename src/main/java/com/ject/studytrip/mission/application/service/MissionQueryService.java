@@ -24,6 +24,7 @@ public class MissionQueryService {
 
         MissionPolicy.validateMissionBelongsToStamp(stampId, mission);
         MissionPolicy.validateNotDeleted(mission);
+        MissionPolicy.validateCompleted(mission);
 
         return mission;
     }

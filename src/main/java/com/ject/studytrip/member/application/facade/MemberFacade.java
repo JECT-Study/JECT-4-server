@@ -102,6 +102,9 @@ public class MemberFacade {
         return PresignedProfileImageInfo.of(member.getId(), info.tmpKey(), info.presignedUrl());
     }
 
+    @CacheEvict(
+            cacheNames = MEMBER,
+            key = "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).member(#memberId)")
     @Transactional
     public void confirmImage(Long memberId, ConfirmProfileImageRequest request) {
         Member member = memberQueryService.getValidMember(memberId);
