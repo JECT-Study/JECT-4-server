@@ -100,6 +100,21 @@ class MissionQueryServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("미션이 이미 완료된 경우 예외가 발생한다.")
+        void shouldThrowExceptionWhenMissionIsCompleted() {
+            // given
+            exploreMission1.updateCompleted();
+            Long stampId = exploreStamp.getId();
+            Long missionId = exploreMission1.getId();
+            given(missionRepository.findById(missionId)).willReturn(Optional.of(exploreMission1));
+
+            // when & then
+            assertThatThrownBy(() -> missionQueryService.getValidMission(stampId, missionId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MissionErrorCode.MISSION_ALREADY_COMPLETED.getMessage());
+        }
+
+        @Test
         @DisplayName("특정 스탬프에 속하고 삭제되지 않은 미션이 존재하면, 해당 미션을 반환한다.")
         void shouldReturnValidMission() {
             // given

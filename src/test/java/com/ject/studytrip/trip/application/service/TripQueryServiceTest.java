@@ -113,6 +113,20 @@ class TripQueryServiceTest extends BaseUnitTest {
         }
 
         @Test
+        @DisplayName("이미 완료된 여행일 경우 예외가 발생한다")
+        void shouldThrowExceptionWhenTripAlreadyCompleted() {
+            // given
+            trip.updateCompleted();
+            Long tripId = trip.getId();
+            given(tripRepository.findById(tripId)).willReturn(Optional.of(trip));
+
+            // when & then
+            assertThatThrownBy(() -> tripQueryService.getValidTrip(member.getId(), tripId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(TripErrorCode.TRIP_ALREADY_COMPLETED.getMessage());
+        }
+
+        @Test
         @DisplayName("특정 여행 ID로 DB에서 조회한 후 유효한 여행을 반환한다")
         void shouldGetTripByTripIdReturnValidTrip() {
             // given
