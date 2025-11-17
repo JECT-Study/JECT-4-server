@@ -1,5 +1,8 @@
 package com.ject.studytrip.trip.application.facade;
 
+import static com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP_REPORT;
+import static com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP_REPORTS;
+
 import com.ject.studytrip.image.application.dto.PresignedImageInfo;
 import com.ject.studytrip.image.application.service.ImageService;
 import com.ject.studytrip.member.application.service.MemberQueryService;
@@ -25,6 +28,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +77,10 @@ public class TripReportFacade {
         return TripRetrospectDetail.from(summary, tripInfo, studyLogDetailSlice);
     }
 
+    @Cacheable(
+            cacheNames = TRIP_REPORTS,
+            key =
+                    "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).tripReports(#memberId)")
     @Transactional(readOnly = true)
     public TripReportsInfo getTripReportsByMember(Long memberId) {
         Member member = memberQueryService.getValidMember(memberId);
@@ -80,6 +90,10 @@ public class TripReportFacade {
         return TripReportsInfo.of(tripReports.stream().map(TripReportInfo::from).toList());
     }
 
+    @Cacheable(
+            cacheNames = TRIP_REPORT,
+            key =
+                    "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).tripReport(#memberId, #tripReportId, #page, #size)")
     @Transactional(readOnly = true)
     public TripReportDetail getTripReport(Long memberId, Long tripReportId, int page, int size) {
         Member member = memberQueryService.getValidMember(memberId);
@@ -95,6 +109,10 @@ public class TripReportFacade {
         return TripReportDetail.from(tripReportInfo, studyLogDetailSlice);
     }
 
+    @CacheEvict(
+            cacheNames = TRIP_REPORTS,
+            key =
+                    "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).tripReports(#memberId)")
     @Transactional
     public TripReportInfo createTripReport(Long memberId, CreateTripReportRequest request) {
         Member member = memberQueryService.getValidMember(memberId);
@@ -105,6 +123,14 @@ public class TripReportFacade {
         return TripReportInfo.from(tripReport);
     }
 
+    @Caching(
+            evict = {
+                @CacheEvict(
+                        cacheNames = TRIP_REPORTS,
+                        key =
+                                "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).tripReports(#memberId)"),
+                @CacheEvict(cacheNames = TRIP_REPORT, allEntries = true)
+            })
     @Transactional
     public void deleteTripReport(Long memberId, Long tripReportId) {
         Member member = memberQueryService.getValidMember(memberId);
@@ -129,6 +155,11 @@ public class TripReportFacade {
                 tripReport.getId(), info.tmpKey(), info.presignedUrl());
     }
 
+    @Caching(
+            evict = {
+                @CacheEvict(cacheNames = TRIP_REPORTS, allEntries = true),
+                @CacheEvict(cacheNames = TRIP_REPORT, allEntries = true)
+            })
     @Transactional
     public void confirmImage(Long tripReportId, ConfirmTripReportImageRequest request) {
         TripReport tripReport = tripReportQueryService.getTripReport(tripReportId);

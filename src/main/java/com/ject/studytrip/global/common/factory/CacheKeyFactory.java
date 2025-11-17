@@ -10,7 +10,7 @@ public class CacheKeyFactory {
     }
 
     public static String trips(Long memberId, int page, int size) {
-        return "member:" + memberId + ":page:" + page + ":size:" + size;
+        return "member:" + memberId + ":trips" + ":page:" + page + ":size:" + size;
     }
 
     public static String trip(Long memberId, Long tripId) {
@@ -18,7 +18,7 @@ public class CacheKeyFactory {
     }
 
     public static String stamps(Long memberId, Long tripId) {
-        return "member:" + memberId + ":trip:" + tripId;
+        return "member:" + memberId + ":trip:" + tripId + ":stamps";
     }
 
     public static String stamp(Long memberId, Long tripId, Long stampId) {
@@ -26,7 +26,7 @@ public class CacheKeyFactory {
     }
 
     public static String missions(Long memberId, Long tripId, Long stampId) {
-        return "member:" + memberId + ":trip:" + tripId + ":stamp:" + stampId;
+        return "member:" + memberId + ":trip:" + tripId + ":stamp:" + stampId + ":missions";
     }
 
     public static String dailyGoal(Long memberId, Long tripId, Long dailyGoalId) {
@@ -38,11 +38,27 @@ public class CacheKeyFactory {
                 + memberId
                 + ":trip:"
                 + tripId
+                + ":studyLogs"
                 + ":page:"
                 + page
                 + ":size:"
                 + size
                 + ":order:"
                 + order.toLowerCase();
+    }
+
+    public static String tripReports(Long memberId) {
+        return "member:" + memberId + ":tripReports";
+    }
+
+    public static String tripReport(Long memberId, Long tripReportId, int page, int size) {
+        return "member:"
+                + memberId
+                + ":tripReport:"
+                + tripReportId
+                + ":page:"
+                + page
+                + ":size:"
+                + size;
     }
 }
