@@ -50,9 +50,11 @@ public class RedisCacheConfig {
         configs.put(MEMBER, common.entryTtl(Duration.ofMinutes(10))); // 멤버 상세 조회
         configs.put(DAILY_GOAL, common.entryTtl(Duration.ofMinutes(10))); // 데일리 목표 상세 조회
         configs.put(STUDY_LOGS, common.entryTtl(Duration.ofMinutes(10))); // 학습 로그 목록 조회
+        configs.put(TRIP_REPORTS, common.entryTtl(Duration.ofMinutes(10))); // 여행 리포트 목록 조회
 
         configs.put(TRIP, common.entryTtl(Duration.ofMinutes(5))); // 여행 상세 조회
         configs.put(STAMP, common.entryTtl(Duration.ofMinutes(5))); // 스탬프 상세 조회
+        configs.put(TRIP_REPORT, common.entryTtl(Duration.ofMinutes(5))); // 여행 리포트 상세 조회
 
         configs.put(TRIPS, common.entryTtl(Duration.ofMinutes(3))); // 여행 목록 조회(페이지)
         configs.put(STAMPS, common.entryTtl(Duration.ofMinutes(3))); // 스탬프 목록 조회

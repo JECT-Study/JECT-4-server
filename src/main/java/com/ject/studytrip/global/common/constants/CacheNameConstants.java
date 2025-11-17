@@ -12,4 +12,6 @@ public final class CacheNameConstants {
     public static final String MISSIONS = "missions";
     public static final String DAILY_GOAL = "dailyGoal";
     public static final String STUDY_LOGS = "studyLogs";
+    public static final String TRIP_REPORT = "tripReport";
+    public static final String TRIP_REPORTS = "tripReports";
 }
