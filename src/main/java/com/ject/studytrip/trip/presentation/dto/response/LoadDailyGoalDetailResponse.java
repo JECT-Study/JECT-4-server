@@ -31,7 +31,9 @@ public record LoadDailyGoalDetailResponse(
             @Schema(name = "뽀모도로 집중 세션 개수") int focusSessionCount) {
         public static DailyGoalPomodoroResponse of(PomodoroInfo info) {
             return new DailyGoalPomodoroResponse(
-                    info.pomodoroId(), info.focusDurationInMinute(), info.focusSessionCount());
+                    info.getPomodoroId(),
+                    info.getFocusDurationInMinute(),
+                    info.getFocusSessionCount());
         }
     }
 

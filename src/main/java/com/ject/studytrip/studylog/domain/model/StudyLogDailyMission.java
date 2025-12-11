@@ -8,7 +8,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class StudyLogDailyMission extends BaseTimeEntity {
 
@@ -26,5 +25,17 @@ public class StudyLogDailyMission extends BaseTimeEntity {
 
     public static StudyLogDailyMission of(StudyLog studyLog, DailyMission dailyMission) {
         return StudyLogDailyMission.builder().studyLog(studyLog).dailyMission(dailyMission).build();
+    }
+
+    public StudyLog getStudyLog() {
+        return studyLog;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public DailyMission getDailyMission() {
+        return dailyMission;
     }
 }

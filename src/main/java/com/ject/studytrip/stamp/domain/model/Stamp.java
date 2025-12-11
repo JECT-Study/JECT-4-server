@@ -12,7 +12,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class Stamp extends BaseTimeEntity {
 
@@ -79,5 +78,37 @@ public class Stamp extends BaseTimeEntity {
 
     public void increaseCompletedMissions(int count) {
         this.completedMissions += count;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public int getCompletedMissions() {
+        return completedMissions;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getStampOrder() {
+        return stampOrder;
+    }
+
+    public int getTotalMissions() {
+        return totalMissions;
+    }
+
+    public Trip getTrip() {
+        return trip;
     }
 }

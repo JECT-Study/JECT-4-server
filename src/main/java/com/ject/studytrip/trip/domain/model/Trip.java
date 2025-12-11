@@ -13,9 +13,47 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class Trip extends BaseTimeEntity {
+    public TripCategory getCategory() {
+        return category;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public int getCompletedStamps() {
+        return completedStamps;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public int getTotalStamps() {
+        return totalStamps;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -60,7 +60,7 @@ class StudyLogDailyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("학습 로그와 데일리 미션 목록으로 학습 로그 데일리 미션을 생성하여 저장하고 반환한다")
         void shouldReturnCreateStudyLogDailyMissions() {
             // given
-            StudyLog studyLog = StudyLogFixture.createStudyLogWithId(1L, member, dailyGoal);
+            StudyLog studyLog = new StudyLogFixture(member, dailyGoal).createWithId(1L);
             DailyMission dailyMission1 =
                     DailyMissionFixture.createDailyMissionWithId(1L, mission1, dailyGoal);
             DailyMission dailyMission2 =

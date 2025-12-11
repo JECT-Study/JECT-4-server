@@ -10,7 +10,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class TripReportStudyLog extends BaseTimeEntity {
 
@@ -28,5 +27,17 @@ public class TripReportStudyLog extends BaseTimeEntity {
 
     public static TripReportStudyLog of(TripReport tripReport, StudyLog studyLog) {
         return TripReportStudyLog.builder().tripReport(tripReport).studyLog(studyLog).build();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public StudyLog getStudyLog() {
+        return studyLog;
+    }
+
+    public TripReport getTripReport() {
+        return tripReport;
     }
 }

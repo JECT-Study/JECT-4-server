@@ -9,7 +9,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class Pomodoro extends BaseTimeEntity {
 
@@ -48,5 +47,29 @@ public class Pomodoro extends BaseTimeEntity {
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public DailyGoal getDailyGoal() {
+        return dailyGoal;
+    }
+
+    public int getFocusDurationInSeconds() {
+        return focusDurationInSeconds;
+    }
+
+    public int getFocusSessionCount() {
+        return focusSessionCount;
+    }
+
+    public int getBreakDurationInSeconds() {
+        return breakDurationInSeconds;
+    }
+
+    public int getTotalFocusTimeInSeconds() {
+        return totalFocusTimeInSeconds;
     }
 }

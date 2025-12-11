@@ -29,6 +29,7 @@ public record LoadTripRetrospectDetailResponse(
                 tripRetrospectSummary.studyDays(),
                 tripRetrospectSummary.studyLogIds(),
                 LoadStudyLogsSliceResponse.of(
-                        studyLogDetailSlice.studyLogDetails(), studyLogDetailSlice.hasNext()));
+                        studyLogDetailSlice.getStudyLogDetails(),
+                        studyLogDetailSlice.getHasNext()));
     }
 }

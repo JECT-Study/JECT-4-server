@@ -9,7 +9,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class DailyMission extends BaseTimeEntity {
 
@@ -31,5 +30,17 @@ public class DailyMission extends BaseTimeEntity {
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public DailyGoal getDailyGoal() {
+        return dailyGoal;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Mission getMission() {
+        return mission;
     }
 }

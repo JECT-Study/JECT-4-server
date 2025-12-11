@@ -29,4 +29,8 @@ public class StampTestHelper {
 
         return stampRepository.save(stamp);
     }
+
+    public Stamp getStamp(Long stampId) {
+        return stampRepository.findById(stampId).orElseThrow();
+    }
 }

@@ -11,7 +11,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class TripReport extends BaseTimeEntity {
 
@@ -76,5 +75,49 @@ public class TripReport extends BaseTimeEntity {
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public long getTotalFocusHours() {
+        return totalFocusHours;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public long getStudyLogCount() {
+        return studyLogCount;
+    }
+
+    public long getStudyDays() {
+        return studyDays;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public Member getMember() {
+        return member;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public String getImageTitle() {
+        return imageTitle;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public String getContent() {
+        return content;
     }
 }
