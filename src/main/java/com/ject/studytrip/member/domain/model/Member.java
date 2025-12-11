@@ -10,7 +10,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class Member extends BaseTimeEntity {
 
@@ -73,5 +72,37 @@ public class Member extends BaseTimeEntity {
 
     public void updateDeletedAt() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public MemberCategory getCategory() {
+        return category;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public MemberRole getRole() {
+        return role;
+    }
+
+    public String getSocialId() {
+        return socialId;
+    }
+
+    public SocialProvider getSocialProvider() {
+        return socialProvider;
     }
 }

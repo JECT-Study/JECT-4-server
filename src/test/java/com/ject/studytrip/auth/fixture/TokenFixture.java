@@ -12,4 +12,8 @@ public class TokenFixture {
     public static TokenProperties createTokenProperties() {
         return new TokenProperties(TEST_SECRET, ACCESS_EXPIRATION_TIME, REFRESH_EXPIRATION_TIME);
     }
+
+    public static String authorization(String token) {
+        return TOKEN_PREFIX + token;
+    }
 }

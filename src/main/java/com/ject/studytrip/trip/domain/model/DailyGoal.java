@@ -8,7 +8,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class DailyGoal extends BaseTimeEntity {
 
@@ -35,5 +34,21 @@ public class DailyGoal extends BaseTimeEntity {
 
     public void updateCompleted() {
         this.completed = true;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Trip getTrip() {
+        return trip;
     }
 }

@@ -31,6 +31,6 @@ public record LoadTripReportDetailResponse(
                 tripReportInfo.imageTitle(),
                 tripReportInfo.imageUrl(),
                 LoadStudyLogsSliceResponse.of(
-                        studyLogSliceInfo.studyLogDetails(), studyLogSliceInfo.hasNext()));
+                        studyLogSliceInfo.getStudyLogDetails(), studyLogSliceInfo.getHasNext()));
     }
 }

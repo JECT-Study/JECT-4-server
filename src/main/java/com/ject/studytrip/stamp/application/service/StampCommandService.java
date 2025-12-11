@@ -35,17 +35,18 @@ public class StampCommandService {
 
         final List<Stamp> stamps =
                 switch (trip.getCategory()) {
-                        // 탐험형 여행일 경우
-                        // order 0 으로 전부 고정
-                    case EXPLORE -> requests.stream()
-                            .map(
-                                    stamp ->
-                                            StampFactory.create(
-                                                    trip, stamp.name(), 0, stamp.endDate()))
-                            .toList();
+                    // 탐험형 여행일 경우
+                    // order 0 으로 전부 고정
+                    case EXPLORE ->
+                            requests.stream()
+                                    .map(
+                                            stamp ->
+                                                    StampFactory.create(
+                                                            trip, stamp.name(), 0, stamp.endDate()))
+                                    .toList();
 
-                        // 코스형 여행일 경우
-                        // nextOrder 부터 1씩 증가하며 order 저장
+                    // 코스형 여행일 경우
+                    // nextOrder 부터 1씩 증가하며 order 저장
                     case COURSE -> {
                         int order = nextOrder;
 

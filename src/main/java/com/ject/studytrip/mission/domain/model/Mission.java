@@ -11,7 +11,6 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class Mission extends BaseTimeEntity {
 
@@ -42,5 +41,21 @@ public class Mission extends BaseTimeEntity {
 
     public void updateCompleted() {
         this.completed = true;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Stamp getStamp() {
+        return stamp;
     }
 }
