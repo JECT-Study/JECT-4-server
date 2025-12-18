@@ -115,7 +115,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
     @DisplayName("hardDeleteStudyLogs 메서드는")
     inner class HardDeleteStudyLogs {
         @Test
-        @DisplayName("삭제된 학습 로그가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("삭제된 학습 로그가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenDeletedStudyLogsDoNotExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L)
@@ -128,7 +128,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("삭제된 학습 로그가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("삭제된 학습 로그가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenDeletedStudyLogsExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L)
@@ -145,7 +145,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
     @DisplayName("hardDeleteStudyLogsOwnedByDeletedMember 메서드는")
     inner class HardDeleteStudyLogsOwnedByDeletedMember {
         @Test
-        @DisplayName("삭제된 멤버가 소유한 학습 로그가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("삭제된 멤버가 소유한 학습 로그가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenStudyLogsOwnedByDeletedMemberDoNotExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(0L)
@@ -158,7 +158,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("삭제된 멤버가 소유한 학습 로그가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("삭제된 멤버가 소유한 학습 로그가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenStudyLogsOwnedByDeletedMemberExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedMemberOwner()).willReturn(5L)
@@ -175,7 +175,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
     @DisplayName("hardDeleteStudyLogsOwnedByDeletedDailyGoal 메서드는")
     inner class HardDeleteStudyLogsOwnedByDeletedDailyGoal {
         @Test
-        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenStudyLogsOwnedByDeletedDailyGoalDoNotExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L)
@@ -188,7 +188,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("삭제된 데일리 목표가 소유한 학습 로그가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenStudyLogsOwnedByDeletedDailyGoalExist() {
             // given
             given(studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L)
@@ -202,31 +202,31 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
     }
 
     @Nested
-    @DisplayName("hardDeleteStudyLogsByMember 메서드는")
-    inner class HardDeleteStudyLogsByMember {
+    @DisplayName("hardDeleteStudyLogsOwnedByMember 메서드는")
+    inner class HardDeleteStudyLogsOwnedByMember {
         @Test
-        @DisplayName("특정 멤버가 소유한 학습 로그가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("특정 멤버가 소유한 학습 로그가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenStudyLogsOwnedByMemberDoNotExist() {
             // given
             val memberId = member.id
             given(studyLogCommandRepository.deleteByMemberId(memberId)).willReturn(0L)
 
             // when
-            val result = studyLogCommandService.hardDeleteStudyLogsByMember(memberId)
+            val result = studyLogCommandService.hardDeleteStudyLogsOwnedByMember(memberId)
 
             // then
             assertThat(result).isEqualTo(0L)
         }
 
         @Test
-        @DisplayName("특정 멤버가 소유한 학습 로그가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("특정 멤버가 소유한 학습 로그가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenStudyLogsOwnedByMemberExist() {
             // given
             val memberId = member.id
             given(studyLogCommandRepository.deleteByMemberId(memberId)).willReturn(5L)
 
             // when
-            val result = studyLogCommandService.hardDeleteStudyLogsByMember(memberId)
+            val result = studyLogCommandService.hardDeleteStudyLogsOwnedByMember(memberId)
 
             // then
             assertThat(result).isEqualTo(5L)

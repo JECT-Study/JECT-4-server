@@ -102,14 +102,14 @@ public class DailyGoalFacade {
     public void deleteDailyGoal(Long memberId, Long tripId, Long dailyGoalId) {
         Trip trip = getValidTripOwnedByMember(memberId, tripId);
         DailyGoal dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.getId(), dailyGoalId);
-        Pomodoro pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoal.getId());
+        Pomodoro pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.getId());
 
         // 뽀모도로 삭제
         pomodoroCommandService.deletePomodoro(pomodoro);
 
         // 데일리 미션 삭제
         List<DailyMission> dailyMissions =
-                dailyMissionQueryService.getDailyMissionsByDailyGoal(dailyGoal.getId());
+                dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoal.getId());
         for (DailyMission dailyMission : dailyMissions) {
             dailyMissionCommandService.deleteDailyMission(dailyMission);
         }
@@ -126,9 +126,9 @@ public class DailyGoalFacade {
     public DailyGoalDetail getDailyGoal(Long memberId, Long tripId, Long dailyGoalId) {
         Trip trip = getValidTripOwnedByMember(memberId, tripId);
         DailyGoal dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.getId(), dailyGoalId);
-        Pomodoro pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoal.getId());
+        Pomodoro pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.getId());
         List<DailyMission> dailyMissions =
-                dailyMissionQueryService.getDailyMissionsByDailyGoal(dailyGoal.getId());
+                dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoal.getId());
 
         return DailyGoalDetail.from(
                 DailyGoalInfo.from(dailyGoal),
@@ -143,7 +143,7 @@ public class DailyGoalFacade {
     }
 
     private List<Mission> getValidMissionsByTripCategory(Trip trip, List<Long> missionIds) {
-        List<Mission> missions = missionQueryService.getValidMissionsWithStamp(missionIds);
+        List<Mission> missions = missionQueryService.getValidMissionsByIds(missionIds);
 
         for (Mission mission : missions) {
             stampCommandService.validateStampBelongsToTrip(trip.getId(), mission.getStamp());

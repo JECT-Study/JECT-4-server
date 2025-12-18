@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 class StudyLogController(
     private val studyLogFacade: StudyLogFacade,
 ) {
-    @Operation(summary = "학습 로그 생성", description = "학습을 완료한 데일리 미션을 선택해 학습 로그를 생성하는 API 입니다.")
+    @Operation(summary = "학습 로그 생성", description = "학습을 완료한 데일리 미션을 선택해 학습 로그를 생성합니다.")
     @PostMapping("/api/trips/{tripId}/daily-goals/{dailyGoalId}/study-logs")
     fun createStudyLog(
         @AuthenticationPrincipal memberId: String,
@@ -47,10 +47,7 @@ class StudyLogController(
             .body(StandardResponse.success(HttpStatus.CREATED.value(), CreateStudyLogResponse.of(result)))
     }
 
-    @Operation(
-        summary = "여행의 학습 로그 목록 조회",
-        description = "특정 여행의 학습 로그 목록을 조회하는 API 입니다. 슬라이스를 적용하고 정렬 옵션 LATEST(최신순)/OLDEST(과거순)을 적용합니다.",
-    )
+    @Operation(summary = "여행의 학습 로그 목록 조회", description = "특정 여행의 학습 로그 목록을 조회합니다. 슬라이스를 적용하고 정렬 옵션 LATEST(최신순)/OLDEST(과거순)을 적용합니다.")
     @GetMapping("/api/trips/{tripId}/study-logs")
     fun loadStudyLogsByTrip(
         @AuthenticationPrincipal memberId: String,

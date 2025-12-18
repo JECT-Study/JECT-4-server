@@ -12,7 +12,7 @@ enum class PomodoroErrorCode(
     POMODORO_NEGATIVE_FOCUS_TIME(HttpStatus.BAD_REQUEST, "뽀모도로 총 집중시간(분)은 음수일 수 없습니다."),
 
     // 404
-    POMODORO_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 뽀모도로 정보를 찾을 수 없습니다."),
+    POMODORO_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 뽀모도로를 찾을 수 없습니다."),
     ;
 
     override fun getName(): String = name

@@ -48,12 +48,12 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
     private lateinit var studyLog2: StudyLog
     private lateinit var tripReport: TripReport
 
+    private val pageable: Pageable = PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE)
+
     companion object {
         private const val DEFAULT_PAGE = 0
         private const val DEFAULT_SIZE = 5
     }
-
-    private val pageable: Pageable = PageRequest.of(DEFAULT_PAGE, DEFAULT_SIZE)
 
     @BeforeEach
     fun setUp() {
@@ -115,8 +115,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
 
             // then
             assertThat(result.content).hasSize(studyLogs.size)
-            assertThat(result.content[0]).isEqualTo(studyLog1)
-            assertThat(result.content[1]).isEqualTo(studyLog2)
+            assertThat(result).containsExactly(studyLog1, studyLog2)
         }
 
         @Test
@@ -134,8 +133,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
 
             // then
             assertThat(result.content).hasSize(studyLogs.size)
-            assertThat(result.content[0]).isEqualTo(studyLog2)
-            assertThat(result.content[1]).isEqualTo(studyLog1)
+            assertThat(result).containsExactly(studyLog2, studyLog1)
         }
     }
 
@@ -250,8 +248,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
 
             // then
             assertThat(result.content).hasSize(studyLogs.size)
-            assertThat(result.content[0]).isEqualTo(studyLog1)
-            assertThat(result.content[1]).isEqualTo(studyLog2)
+            assertThat(result).containsExactly(studyLog1, studyLog2)
         }
     }
 
@@ -277,7 +274,9 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         fun shouldReturnStudyLogIdsWhenStudyLogExists() {
             // given
             val tripId = courseTrip.id
-            val studyLogIds = listOf(studyLog1.id, studyLog2.id)
+            val studyLogId1 = studyLog1.id
+            val studyLogId2 = studyLog2.id
+            val studyLogIds = listOf(studyLogId1, studyLogId2)
             given(studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId)).willReturn(studyLogIds)
 
             // when
@@ -285,8 +284,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
 
             // then
             assertThat(result).hasSize(studyLogIds.size)
-            assertThat(result[0]).isEqualTo(studyLog1.id)
-            assertThat(result[1]).isEqualTo(studyLog2.id)
+            assertThat(result).containsExactly(studyLogId1, studyLogId2)
         }
     }
 

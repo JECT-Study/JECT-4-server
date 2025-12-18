@@ -12,13 +12,7 @@ class PomodoroFixture(
     var focusSessionCount: Int = 1
     var breakDurationSeconds: Int = 0
 
-    fun create(): Pomodoro =
-        PomodoroFactory.create(
-            dailyGoal,
-            focusDurationSeconds,
-            focusSessionCount,
-            breakDurationSeconds,
-        )
+    fun create(): Pomodoro = PomodoroFactory.create(dailyGoal, focusDurationSeconds, focusSessionCount, breakDurationSeconds)
 
     fun createWithId(id: Long): Pomodoro =
         create().also {

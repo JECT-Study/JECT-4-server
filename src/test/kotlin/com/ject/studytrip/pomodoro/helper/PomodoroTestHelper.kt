@@ -10,16 +10,8 @@ import org.springframework.stereotype.Component
 class PomodoroTestHelper(
     private val pomodoroRepository: PomodoroRepository,
 ) {
-    fun savePomodoro(dailyGoal: DailyGoal): Pomodoro {
-        val pomodoro = PomodoroFixture(dailyGoal).create()
-        return pomodoroRepository.save(pomodoro)
-    }
+    fun savePomodoro(dailyGoal: DailyGoal): Pomodoro = pomodoroRepository.save(PomodoroFixture(dailyGoal).create())
 
-    fun saveDeletedPomodoro(dailyGoal: DailyGoal): Pomodoro {
-        val pomodoro =
-            PomodoroFixture(dailyGoal).create().also {
-                it.updateDeletedAt()
-            }
-        return pomodoroRepository.save(pomodoro)
-    }
+    fun saveDeletedPomodoro(dailyGoal: DailyGoal): Pomodoro =
+        pomodoroRepository.save(PomodoroFixture(dailyGoal).create().also { it.updateDeletedAt() })
 }

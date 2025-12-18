@@ -159,13 +159,13 @@ public class MemberFacade {
         tripReportStudyLogCommandService.hardDeleteTripReportStudyLogsByMember(memberId);
         tripReportCommandService.hardDeleteTripReportsByMember(memberId);
 
-        studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsByMember(memberId);
-        pomodoroCommandService.hardDeletePomodorosByMember(memberId);
-        studyLogCommandService.hardDeleteStudyLogsByMember(memberId);
-        dailyMissionCommandService.hardDeleteDailyMissionsByMember(memberId);
+        studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsOwnedByMember(memberId);
+        pomodoroCommandService.hardDeletePomodorosOwnedByMember(memberId);
+        studyLogCommandService.hardDeleteStudyLogsOwnedByMember(memberId);
+        dailyMissionCommandService.hardDeleteDailyMissionsOwnedByMember(memberId);
         dailyGoalCommandService.hardDeleteDailyGoalsByMember(memberId);
 
-        missionCommandService.hardDeleteMissionsByMember(memberId);
+        missionCommandService.hardDeleteMissionsOwnedByMember(memberId);
         stampCommandService.hardDeleteStampsByMember(memberId);
         tripCommandService.hardDeleteTripsByMember(memberId);
         memberCommandService.hardDeleteMemberById(memberId);

@@ -51,5 +51,5 @@ class PomodoroCommandService(
 
     fun hardDeletePomodorosOwnedByDeletedDailyGoal(): Long = pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner()
 
-    fun hardDeletePomodorosByMember(memberId: Long): Long = pomodoroCommandRepository.deleteAllByMemberId(memberId)
+    fun hardDeletePomodorosOwnedByMember(memberId: Long): Long = pomodoroCommandRepository.deleteAllByMemberId(memberId)
 }

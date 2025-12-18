@@ -270,7 +270,7 @@ class StampCommandServiceTest extends BaseUnitTest {
             // when & then
             assertThatThrownBy(() -> stampCommandService.updateStampOrders(newTrip, request))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP.getMessage());
+                    .hasMessage(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP.getMessage());
         }
 
         @Test

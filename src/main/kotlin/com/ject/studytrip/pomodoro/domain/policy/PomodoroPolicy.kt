@@ -6,7 +6,7 @@ import com.ject.studytrip.pomodoro.domain.model.Pomodoro
 
 object PomodoroPolicy {
     fun validateNotDeleted(pomodoro: Pomodoro) {
-        if (pomodoro.isDeleted()) {
+        if (pomodoro.isDeleted) {
             throw CustomException(PomodoroErrorCode.POMODORO_ALREADY_DELETED)
         }
     }

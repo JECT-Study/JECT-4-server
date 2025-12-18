@@ -77,7 +77,7 @@ class StampQueryServiceTest extends BaseUnitTest {
                                     stampQueryService.getValidStamp(
                                             exploreTrip.getId(), courseStamp1.getId()))
                     .isInstanceOf(CustomException.class)
-                    .hasMessage(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP.getMessage());
+                    .hasMessage(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP.getMessage());
         }
 
         @Test

@@ -23,7 +23,7 @@ public enum StampErrorCode implements ErrorCode {
             HttpStatus.BAD_REQUEST, "스탬프의 종료일은 여행 종료일보다 이후일 수 없습니다."),
 
     // 403
-    STAMP_NOT_BELONG_TO_TRIP(HttpStatus.FORBIDDEN, "해당 스탬프는 요청한 여행에 속하지 않습니다."),
+    STAMP_NOT_BELONGS_TO_TRIP(HttpStatus.FORBIDDEN, "해당 스탬프는 요청한 여행에 속하지 않습니다."),
 
     // 404
     STAMP_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 스탬프가 존재하지 않습니다."),

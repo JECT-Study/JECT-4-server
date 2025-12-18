@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class StampPolicy {
     public static void validateStampBelongsToTrip(Long tripId, Stamp stamp) {
         if (!stamp.getTrip().getId().equals(tripId))
-            throw new CustomException(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP);
+            throw new CustomException(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP);
     }
 
     public static void validateNotDeleted(Stamp stamp) {

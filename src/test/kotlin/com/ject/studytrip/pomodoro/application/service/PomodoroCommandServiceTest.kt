@@ -53,7 +53,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
     inner class CreatePomodoro {
         @Test
         @DisplayName("유효한 요청이 들어오면 뽀모도로를 생성하고 반환한다.")
-        fun shouldReturnPomodoroWhenRequestIsValid() {
+        fun shouldCreateAndReturnPomodoroWhenRequestIsValid() {
             // given
             val request =
                 CreatePomodoroRequestFixture()
@@ -157,7 +157,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
     @DisplayName("hardDeletePomodoros 메서드는")
     inner class HardDeletePomodoros {
         @Test
-        @DisplayName("삭제된 뽀모도로가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("삭제된 뽀모도로가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenDeletedPomodorosDoNotExist() {
             // given
             given(pomodoroCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(0L)
@@ -170,7 +170,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("삭제된 뽀모도로가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("삭제된 뽀모도로가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenDeletedPomodorosExist() {
             // given
             given(pomodoroCommandRepository.deleteAllByDeletedAtIsNotNull()).willReturn(5L)
@@ -187,7 +187,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
     @DisplayName("hardDeletePomodorosOwnedByDeletedDailyGoal 메서드는")
     inner class HardDeletePomodorosOwnedByDeletedDailyGoal {
         @Test
-        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenPomodorosOwnedByDeletedDailyGoalDoNotExist() {
             // given
             given(pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(0L)
@@ -200,7 +200,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("삭제된 데일리 목표가 소유한 뽀모도로가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenPomodorosOwnedByDeletedDailyGoalExist() {
             // given
             given(pomodoroCommandRepository.deleteAllByDeletedDailyGoalOwner()).willReturn(5L)
@@ -214,31 +214,31 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
     }
 
     @Nested
-    @DisplayName("hardDeletePomodorosByMember 메서드는")
-    inner class HardDeletePomodorosByMember {
+    @DisplayName("hardDeletePomodorosOwnedByMember 메서드는")
+    inner class HardDeletePomodorosOwnedByMember {
         @Test
-        @DisplayName("특정 멤버가 소유한 뽀모도로가 존재하지 않으면 0을 반환한다.")
+        @DisplayName("특정 멤버가 소유한 뽀모도로가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenPomodorosOwnedByMemberDoNotExist() {
             // given
-            val memberId = -1L
+            val memberId = member.id
             given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
-            val result = pomodoroCommandService.hardDeletePomodorosByMember(memberId)
+            val result = pomodoroCommandService.hardDeletePomodorosOwnedByMember(memberId)
 
             // then
             assertThat(result).isEqualTo(0L)
         }
 
         @Test
-        @DisplayName("특정 멤버가 소유한 뽀모도로가 존재하면 해당 개수를 반환한다.")
+        @DisplayName("특정 멤버가 소유한 뽀모도로가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenPomodorosOwnedByMemberExist() {
             // given
             val memberId = member.id
             given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when
-            val result = pomodoroCommandService.hardDeletePomodorosByMember(memberId)
+            val result = pomodoroCommandService.hardDeletePomodorosOwnedByMember(memberId)
 
             // then
             assertThat(result).isEqualTo(5L)

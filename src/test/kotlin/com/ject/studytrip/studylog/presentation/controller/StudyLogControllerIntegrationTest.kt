@@ -359,8 +359,8 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             resultActions
                 .andExpect(status().isForbidden)
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.status").value(DailyMissionErrorCode.DAILY_MISSION_NOT_BELONG_TO_DAILY_GOAL.status.value()))
-                .andExpect(jsonPath("$.data.message").value(DailyMissionErrorCode.DAILY_MISSION_NOT_BELONG_TO_DAILY_GOAL.message))
+                .andExpect(jsonPath("$.status").value(DailyMissionErrorCode.DAILY_MISSION_NOT_BELONGS_TO_DAILY_GOAL.status.value()))
+                .andExpect(jsonPath("$.data.message").value(DailyMissionErrorCode.DAILY_MISSION_NOT_BELONGS_TO_DAILY_GOAL.message))
         }
 
         @Test
@@ -460,7 +460,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
 
         @Test
         @DisplayName("유효한 요청이 들어오면 학습 로그를 생성하고 반환한다.")
-        fun shouldReturnStudyLogWhenRequestIsValid() {
+        fun shouldCreateAndReturnStudyLogWhenRequestIsValid() {
             // given
             val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
             val initialCompletedMissions = stamp.completedMissions
@@ -722,7 +722,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
 
         private fun getResultActions(
             token: String,
-            studyLogId: Long,
+            studyLogId: Any,
             request: PresignStudyLogImageRequest,
         ): ResultActions =
             mockMvc.perform(
@@ -747,6 +747,24 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(AuthErrorCode.UNAUTHENTICATED.status.value()))
                 .andExpect(jsonPath("$.data.message").value(AuthErrorCode.UNAUTHENTICATED.message))
+        }
+
+        @Test
+        @DisplayName("PathVariable 학습 로그 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        fun shouldReturnBadRequestWhenStudyLogIdTypeMismatch() {
+            // given
+            val studyLogId = "abc"
+            val request = fixture.build()
+
+            // when
+            val resultActions = getResultActions(token, studyLogId, request)
+
+            // then
+            resultActions
+                .andExpect(status().isBadRequest)
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.status").value(CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.status.value()))
+                .andExpect(jsonPath("$.data.message").value(CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.message))
         }
 
         @Test
@@ -814,7 +832,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
 
         private fun getResultActions(
             token: String,
-            studyLogId: Long,
+            studyLogId: Any,
             request: ConfirmStudyLogImageRequest,
         ): ResultActions =
             mockMvc.perform(
@@ -839,6 +857,24 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.status").value(AuthErrorCode.UNAUTHENTICATED.status.value()))
                 .andExpect(jsonPath("$.data.message").value(AuthErrorCode.UNAUTHENTICATED.message))
+        }
+
+        @Test
+        @DisplayName("PathVariable 학습 로그 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        fun shouldReturnBadRequestWhenStudyLogIdTypeMismatch() {
+            // given
+            val studyLogId = "abc"
+            val request = fixture.build()
+
+            // when
+            val resultActions = getResultActions(token, studyLogId, request)
+
+            // then
+            resultActions
+                .andExpect(status().isBadRequest)
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.status").value(CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.status.value()))
+                .andExpect(jsonPath("$.data.message").value(CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.message))
         }
 
         @Test

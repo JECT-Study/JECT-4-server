@@ -75,13 +75,13 @@ class StudyLogFacade(
     ): StudyLogInfo {
         // 1. 유효성 검증 및 엔티티 조회
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.getId(), dailyGoalId)
+        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
         val selectedDailyMissions =
             dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
-                dailyGoal.getId(),
+                dailyGoal.id,
                 request.selectedDailyMissionIds,
             )
-        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoal.getId())
+        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.id)
 
         // 2. 학습 로그 생성
         val studyLog = studyLogCommandService.createStudyLog(trip.member, dailyGoal, request.content)
@@ -146,7 +146,7 @@ class StudyLogFacade(
     ) {
         // 학습 로그 데일리 미션 저장
         studyLogDailyMissionCommandService.createStudyLogDailyMissions(studyLog, selectedDailyMissions)
-        val missions = selectedDailyMissions.map { it.getMission() }
+        val missions = selectedDailyMissions.map { it.mission }
 
         // 스탬프 ID를 기준으로 Stamp 집계
         val stampById = mutableMapOf<Long, Stamp>()
@@ -155,10 +155,10 @@ class StudyLogFacade(
         val completeMissionCountByStampId = mutableMapOf<Long, Int>()
 
         missions.forEach { mission ->
-            val stamp = mission.getStamp()
-            stampById.putIfAbsent(stamp.getId(), stamp)
+            val stamp = mission.stamp
+            stampById.putIfAbsent(stamp.id, stamp)
             missionCommandService.completeMission(mission) // 미션 완료 처리
-            completeMissionCountByStampId.merge(stamp.getId(), 1) { a, b -> a + b } // 스탬프별 완료한 미션 개수 누적(없으면 1, 있으면 +1)
+            completeMissionCountByStampId.merge(stamp.id, 1) { a, b -> a + b } // 스탬프별 완료한 미션 개수 누적(없으면 1, 있으면 +1)
         }
 
         // 스탬프별 완료된 미션 수 증가
