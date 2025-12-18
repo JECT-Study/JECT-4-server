@@ -432,7 +432,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                         .andExpect(
                                 jsonPath("$.status")
                                         .value(
-                                                StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                                StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                         .getStatus()
                                                         .value()));
             }
@@ -669,7 +669,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                         .andExpect(
                                 jsonPath("$.status")
                                         .value(
-                                                StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                                StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                         .getStatus()
                                                         .value()));
             }
@@ -876,7 +876,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                            StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                     .getStatus()
                                                     .value()));
         }
@@ -1170,7 +1170,7 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                            StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                     .getStatus()
                                                     .value()));
         }
@@ -1336,12 +1336,12 @@ public class StampControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                            StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                     .getStatus()
                                                     .value()))
                     .andExpect(
                             jsonPath("$.data.message")
-                                    .value(StampErrorCode.STAMP_NOT_BELONG_TO_TRIP.getMessage()));
+                                    .value(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP.getMessage()));
         }
 
         @Test

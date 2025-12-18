@@ -9,6 +9,6 @@ data class CreateStudyLogResponse(
 ) {
     companion object {
         @JvmStatic
-        fun of(info: StudyLogInfo): CreateStudyLogResponse = CreateStudyLogResponse(info.studyLogId)
+        fun of(studyLogInfo: StudyLogInfo): CreateStudyLogResponse = CreateStudyLogResponse(studyLogInfo.studyLogId)
     }
 }

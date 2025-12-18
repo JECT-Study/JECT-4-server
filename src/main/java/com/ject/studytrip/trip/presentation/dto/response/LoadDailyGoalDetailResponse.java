@@ -42,7 +42,7 @@ public record LoadDailyGoalDetailResponse(
             @Schema(name = "미션 이름") String missionName) {
         public static DailyGoalMissionResponse of(DailyMissionInfo info) {
             return new DailyGoalMissionResponse(
-                    info.dailyMissionId(), info.missionInfo().missionName());
+                    info.getDailyMissionId(), info.getMissionInfo().getMissionName());
         }
     }
 }

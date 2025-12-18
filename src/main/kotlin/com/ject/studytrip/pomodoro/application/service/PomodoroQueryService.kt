@@ -13,7 +13,7 @@ class PomodoroQueryService(
     private val pomodoroRepository: PomodoroRepository,
     private val pomodoroQueryRepository: PomodoroQueryRepository,
 ) {
-    fun getValidPomodoroByDailyGoal(dailyGoalId: Long): Pomodoro {
+    fun getValidPomodoroByDailyGoalId(dailyGoalId: Long): Pomodoro {
         val pomodoro =
             pomodoroRepository
                 .findByDailyGoalId(dailyGoalId)

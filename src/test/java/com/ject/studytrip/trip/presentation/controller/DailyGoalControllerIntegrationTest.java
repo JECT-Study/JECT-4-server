@@ -332,7 +332,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                            StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                     .getStatus()
                                                     .value()));
         }
@@ -683,7 +683,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
                             jsonPath("$.status")
                                     .value(
                                             DailyMissionErrorCode
-                                                    .DAILY_MISSION_NOT_BELONG_TO_DAILY_GOAL
+                                                    .DAILY_MISSION_NOT_BELONGS_TO_DAILY_GOAL
                                                     .getStatus()
                                                     .value()));
         }
@@ -775,7 +775,7 @@ public class DailyGoalControllerIntegrationTest extends BaseIntegrationTest {
                     .andExpect(
                             jsonPath("$.status")
                                     .value(
-                                            StampErrorCode.STAMP_NOT_BELONG_TO_TRIP
+                                            StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP
                                                     .getStatus()
                                                     .value()));
         }

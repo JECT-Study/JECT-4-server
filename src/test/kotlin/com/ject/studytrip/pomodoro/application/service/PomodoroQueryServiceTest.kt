@@ -48,8 +48,8 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
     }
 
     @Nested
-    @DisplayName("getValidPomodoroByDailyGoal 메서드는")
-    inner class GetValidPomodoroByDailyGoal {
+    @DisplayName("getValidPomodoroByDailyGoalId 메서드는")
+    inner class GetValidPomodoroByDailyGoalId {
         @Test
         @DisplayName("뽀모도로가 존재하지 않으면 예외가 발생한다.")
         fun shouldThrowExceptionWhenPomodoroDoesNotExist() {
@@ -60,7 +60,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
             // when
             val exception =
                 assertThrows<CustomException> {
-                    pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoalId)
+                    pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
                 }
 
             // then
@@ -78,7 +78,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
             // when
             val exception =
                 assertThrows<CustomException> {
-                    pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoalId)
+                    pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
                 }
 
             // then
@@ -93,7 +93,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
             given(pomodoroRepository.findByDailyGoalId(dailyGoalId)).willReturn(Optional.of(pomodoro))
 
             // when
-            val result = pomodoroQueryService.getValidPomodoroByDailyGoal(dailyGoalId)
+            val result = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
 
             // then
             assertThat(result).isEqualTo(pomodoro)

@@ -39,5 +39,5 @@ class StudyLogCommandService(
 
     fun hardDeleteStudyLogsOwnedByDeletedDailyGoal(): Long = studyLogCommandRepository.deleteAllByDeletedDailyGoalOwner()
 
-    fun hardDeleteStudyLogsByMember(memberId: Long): Long = studyLogCommandRepository.deleteByMemberId(memberId)
+    fun hardDeleteStudyLogsOwnedByMember(memberId: Long): Long = studyLogCommandRepository.deleteByMemberId(memberId)
 }
