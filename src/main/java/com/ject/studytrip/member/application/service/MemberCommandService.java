@@ -51,6 +51,10 @@ public class MemberCommandService {
         member.updateDeletedAt();
     }
 
+    public void restoreMember(Member member) {
+        member.restoreDeletedAt();
+    }
+
     public long hardDeleteMembers() {
         return memberCommandRepository.deleteAllByDeletedAtIsNotNull();
     }

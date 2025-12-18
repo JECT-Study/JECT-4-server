@@ -12,6 +12,7 @@ import com.ject.studytrip.member.presentation.dto.response.PresignProfileImageRe
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -141,6 +142,15 @@ public class MemberController {
     public ResponseEntity<StandardResponse> deleteMemberHardDelete(
             @AuthenticationPrincipal String memberId) {
         memberFacade.hardDeleteMemberCascade(Long.valueOf(memberId));
+
+        return ResponseEntity.ok().body(StandardResponse.success(HttpStatus.OK.value(), null));
+    }
+
+    @Operation(summary = "멤버 복구", description = "삭제된 멤버를 복구합니다.")
+    @PatchMapping("/me/restore/{memberId}")
+    public ResponseEntity<StandardResponse> restoreMember(
+            @PathVariable @NotNull(message = "멤버 ID는 필수 요청 파라미터입니다.") Long memberId) {
+        memberFacade.restoreMember(memberId);
 
         return ResponseEntity.ok().body(StandardResponse.success(HttpStatus.OK.value(), null));
     }

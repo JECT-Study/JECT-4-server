@@ -19,4 +19,10 @@ public class MemberPolicy {
             throw new CustomException(MemberErrorCode.MEMBER_ALREADY_DELETED);
         }
     }
+
+    public static void validateDeleted(Member member) {
+        if (member.getDeletedAt() == null) {
+            throw new CustomException(MemberErrorCode.MEMBER_NOT_DELETED);
+        }
+    }
 }

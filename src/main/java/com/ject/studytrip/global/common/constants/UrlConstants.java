@@ -30,5 +30,7 @@ public final class UrlConstants {
     public static final String[] ORIGIN_EXTRACT_PATHS = {"/api/auth/login/kakao"};
 
     // 인증이 필요없는 API 경로
-    public static final String[] PERMIT_ALL_API_PATHS = {"/api/auth/**", "/api/trips/categories"};
+    public static final String[] PERMIT_ALL_API_PATHS = {
+        "/api/auth/**", "/api/trips/categories", "/api/members/me/restore/**"
+    };
 }
