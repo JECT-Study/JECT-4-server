@@ -132,6 +132,13 @@ public class MemberFacade {
         imageService.publishCleanupBatchEvent(imageUrls);
     }
 
+    @Transactional
+    public void restoreMember(Long memberId) {
+        Member member = memberQueryService.getDeletedMember(memberId);
+
+        memberCommandService.restoreMember(member);
+    }
+
     private List<String> collectImageUrlsForMember(Member member) {
         List<String> imageUrls = new ArrayList<>();
 

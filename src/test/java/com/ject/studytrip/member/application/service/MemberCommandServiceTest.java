@@ -249,6 +249,24 @@ class MemberCommandServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("restoreMember 메서드는")
+    class RestoreMember {
+
+        @Test
+        @DisplayName("삭제된 멤버가 복구될 때 deletedAt 필드를 null로 업데이트한다.")
+        void shouldRestoreDeletedAtWhenDeletedMemberIsRestored() {
+            // given
+            member.updateDeletedAt();
+
+            // when
+            memberCommandService.restoreMember(member);
+
+            // then
+            assertThat(member.getDeletedAt()).isNull();
+        }
+    }
+
+    @Nested
     @DisplayName("hardDeleteMembers 메서드는")
     class HardDeleteMembers {
 

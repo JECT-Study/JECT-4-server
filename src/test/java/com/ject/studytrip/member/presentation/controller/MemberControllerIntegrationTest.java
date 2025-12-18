@@ -14,6 +14,7 @@ import com.ject.studytrip.BaseIntegrationTest;
 import com.ject.studytrip.auth.domain.error.AuthErrorCode;
 import com.ject.studytrip.auth.fixture.TokenFixture;
 import com.ject.studytrip.auth.helper.TokenTestHelper;
+import com.ject.studytrip.global.exception.error.CommonErrorCode;
 import com.ject.studytrip.image.domain.error.ImageErrorCode;
 import com.ject.studytrip.image.infra.s3.provider.S3ImageStorageProvider;
 import com.ject.studytrip.member.domain.error.MemberErrorCode;
@@ -516,6 +517,101 @@ class MemberControllerIntegrationTest extends BaseIntegrationTest {
         void shouldHardDeleteMemberAndAllRelatedDataWhenMemberIdIsValid() throws Exception {
             // when
             ResultActions resultActions = getResultActions(accessToken);
+
+            // then
+            resultActions
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(true))
+                    .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
+        }
+    }
+
+    @Nested
+    @DisplayName("멤버 복구 API")
+    class RestoreMember {
+        private ResultActions getResultActions(Object memberId) throws Exception {
+            return mockMvc.perform(
+                    patch(BASE_MEMBER_URL + "/me/restore/{memberId}", memberId)
+                            .contentType(MediaType.APPLICATION_JSON));
+        }
+
+        @Test
+        @DisplayName("PathVariable 멤버 ID 타입이 올바르지 않으면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenMemberIdTypeMismatch() throws Exception {
+            // given
+            String memberId = "abc";
+
+            // when
+            ResultActions resultActions = getResultActions(memberId);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getStatus()
+                                                    .value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(
+                                            CommonErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH
+                                                    .getMessage()));
+        }
+
+        @Test
+        @DisplayName("멤버가 존재하지 않으면 404 Not Found를 반환한다.")
+        void shouldReturnNotFoundWhenMemberDoesNotExist() throws Exception {
+            // given
+            Long memberId = -1L;
+
+            // when
+            ResultActions resultActions = getResultActions(memberId);
+
+            // then
+            resultActions
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(MemberErrorCode.MEMBER_NOT_FOUND.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(MemberErrorCode.MEMBER_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        @DisplayName("멤버가 삭제되지 않았다면 400 Bad Request를 반환한다.")
+        void shouldReturnBadRequestWhenMemberIsNotDeleted() throws Exception {
+            // given
+            Long memberId = member.getId();
+
+            // when
+            ResultActions resultActions = getResultActions(memberId);
+
+            // then
+            resultActions
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(
+                            jsonPath("$.status")
+                                    .value(MemberErrorCode.MEMBER_NOT_DELETED.getStatus().value()))
+                    .andExpect(
+                            jsonPath("$.data.message")
+                                    .value(MemberErrorCode.MEMBER_NOT_DELETED.getMessage()));
+        }
+
+        @Test
+        @DisplayName("유효한 멤버 ID가 들어오면 삭제된 멤버를 복구한다.")
+        void shouldRestoreMemberWhenMemberIdIsValid() throws Exception {
+            // given
+            Long memberId = member.getId();
+            member.updateDeletedAt();
+
+            // when
+            ResultActions resultActions = getResultActions(memberId);
 
             // then
             resultActions

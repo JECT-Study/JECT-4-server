@@ -157,6 +157,52 @@ class MemberQueryServiceTest extends BaseUnitTest {
     }
 
     @Nested
+    @DisplayName("getDeletedMember 메서드는")
+    class GetDeletedMember {
+
+        @Test
+        @DisplayName("멤버가 존재하지 않으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenMemberDoesNotExist() {
+            // given
+            Long memberId = -1L;
+            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> memberQueryService.getDeletedMember(memberId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("멤버가 삭제되지 않았다면 예외가 발생한다.")
+        void shouldThrowExceptionWhenMemberIsNotDeleted() {
+            // given
+            Long memberId = member.getId();
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+            // when & then
+            assertThatThrownBy(() -> memberQueryService.getDeletedMember(memberId))
+                    .isInstanceOf(CustomException.class)
+                    .hasMessage(MemberErrorCode.MEMBER_NOT_DELETED.getMessage());
+        }
+
+        @Test
+        @DisplayName("멤버가 이미 삭제되었다면 삭제된 멤버를 반환한다.")
+        void shouldReturnMemberWhenMemberAlreadyDeleted() {
+            // given
+            Long memberId = member.getId();
+            member.updateDeletedAt();
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+            // when
+            Member result = memberQueryService.getDeletedMember(memberId);
+
+            // then
+            assertThat(result).isEqualTo(member);
+        }
+    }
+
+    @Nested
     @DisplayName("getRoleByMemberId 메서드는")
     class GetRoleByMemberId {
 

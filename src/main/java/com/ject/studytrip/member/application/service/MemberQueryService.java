@@ -41,6 +41,17 @@ public class MemberQueryService {
                 .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
+    public Member getDeletedMember(Long memberId) {
+        Member member =
+                memberRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        MemberPolicy.validateDeleted(member);
+
+        return member;
+    }
+
     public String getRoleByMemberId(String memberId) {
         MemberRole memberRole =
                 memberQueryRepository

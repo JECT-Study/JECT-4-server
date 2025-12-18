@@ -74,6 +74,10 @@ public class Member extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
+    public void restoreDeletedAt() {
+        this.deletedAt = null;
+    }
+
     public MemberCategory getCategory() {
         return category;
     }

@@ -10,6 +10,7 @@ public enum MemberErrorCode implements ErrorCode {
     INVALID_MEMBER_CATEGORY(HttpStatus.BAD_REQUEST, "유효하지 않은 멤버 카테고리입니다."),
     MEMBER_NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임입니다."),
     MEMBER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "해당 멤버는 이미 삭제되었습니다."),
+    MEMBER_NOT_DELETED(HttpStatus.BAD_REQUEST, "해당 멤버는 삭제되지 않았습니다."),
 
     // 404
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "멤버를 찾을 수 없습니다."),
