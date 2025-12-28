@@ -47,7 +47,7 @@ class StudyLogController(
             .body(StandardResponse.success(HttpStatus.CREATED.value(), CreateStudyLogResponse.of(result)))
     }
 
-    @Operation(summary = "여행의 학습 로그 목록 조회", description = "특정 여행의 학습 로그 목록을 조회합니다. 슬라이스를 적용하고 정렬 옵션 LATEST(최신순)/OLDEST(과거순)을 적용합니다.")
+    @Operation(summary = "학습 로그 목록 조회", description = "특정 여행의 학습 로그 목록을 조회합니다. 슬라이스를 적용하고 정렬 옵션 LATEST(최신순)/OLDEST(과거순)을 적용합니다.")
     @GetMapping("/api/trips/{tripId}/study-logs")
     fun loadStudyLogsByTrip(
         @AuthenticationPrincipal memberId: String,

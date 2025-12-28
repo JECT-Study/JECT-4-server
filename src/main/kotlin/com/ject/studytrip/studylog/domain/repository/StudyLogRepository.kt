@@ -8,5 +8,5 @@ interface StudyLogRepository {
 
     fun findById(studyLogId: Long): Optional<StudyLog>
 
-    fun findAllByIdIn(studyLogIds: Collection<Long>): List<StudyLog>
+    fun findAllByIdIn(studyLogIds: List<Long>): List<StudyLog>
 }

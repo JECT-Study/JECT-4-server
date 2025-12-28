@@ -4,5 +4,5 @@ import com.ject.studytrip.studylog.domain.model.StudyLog
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface StudyLogJpaRepository : JpaRepository<StudyLog, Long> {
-    fun findAllByIdIn(studyLogIds: Collection<Long>): List<StudyLog>
+    fun findAllByIdIn(studyLogIds: List<Long>): List<StudyLog>
 }

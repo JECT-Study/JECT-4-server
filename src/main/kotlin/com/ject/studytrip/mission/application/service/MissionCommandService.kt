@@ -38,7 +38,7 @@ class MissionCommandService(
         mission.updateCompleted()
     }
 
-    fun validateMissionsBelongsToStamp(
+    fun validateMissionsBelongToStamp(
         stampId: Long,
         missions: List<Mission>,
     ) = missions.forEach {
@@ -47,7 +47,7 @@ class MissionCommandService(
 
     fun validateAllMissionsCompletedByStampId(stampId: Long) {
         val exists = missionCommandRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId)
-        MissionPolicy.validateAllCompleted(exists)
+        MissionPolicy.validateNotAllCompleted(exists)
     }
 
     fun hardDeleteMissions(): Long = missionCommandRepository.deleteAllByDeletedAtIsNotNull()

@@ -36,7 +36,7 @@ class DummyStampCommandServiceTest extends BaseUnitTest {
         @DisplayName("코스형 여행이 들어오면 코스형 더미 스탬프를 생성하고 반환한다.")
         void shouldReturnDummyCourseStampForCourseTrip() {
             // given
-            Trip courseTrip = TripFixture.createTrip(member, TripCategory.COURSE);
+            Trip courseTrip = new TripFixture(member, TripCategory.COURSE).create();
 
             // when
             Stamp result = dummyStampCommandService.createDummyStamp(courseTrip, COUNT);
@@ -52,7 +52,7 @@ class DummyStampCommandServiceTest extends BaseUnitTest {
         @DisplayName("탐험형 여행이 들어오면 탐험형 더미 스탬프를 생성하고 반환한다.")
         void shouldReturnDummyExploreStampForExploreTrip() {
             // given
-            Trip exploreTrip = TripFixture.createTrip(member, TripCategory.EXPLORE);
+            Trip exploreTrip = new TripFixture(member, TripCategory.EXPLORE).create();
 
             // when
             Stamp result = dummyStampCommandService.createDummyStamp(exploreTrip, COUNT);

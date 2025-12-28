@@ -21,9 +21,9 @@ public record LoadTripRetrospectDetailResponse(
             TripInfo tripInfo,
             StudyLogSliceInfo studyLogDetailSlice) {
         return new LoadTripRetrospectDetailResponse(
-                tripInfo.tripName(),
-                tripInfo.startDate(),
-                tripInfo.endDate(),
+                tripInfo.getTripName(),
+                tripInfo.getStartDate(),
+                tripInfo.getEndDate(),
                 tripRetrospectSummary.totalFocusHours(),
                 tripRetrospectSummary.studyLogCount(),
                 tripRetrospectSummary.studyDays(),

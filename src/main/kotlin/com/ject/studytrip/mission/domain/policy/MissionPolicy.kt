@@ -17,7 +17,7 @@ object MissionPolicy {
         }
     }
 
-    fun validateAllCompleted(exists: Boolean) {
+    fun validateNotAllCompleted(exists: Boolean) {
         if (exists) {
             throw CustomException(MissionErrorCode.ALL_MISSIONS_NOT_COMPLETED)
         }

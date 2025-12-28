@@ -13,5 +13,5 @@ class StudyLogRepositoryAdapter(
 
     override fun findById(studyLogId: Long): Optional<StudyLog> = studyLogJpaRepository.findById(studyLogId)
 
-    override fun findAllByIdIn(studyLogIds: Collection<Long>): List<StudyLog> = studyLogJpaRepository.findAllByIdIn(studyLogIds)
+    override fun findAllByIdIn(studyLogIds: List<Long>): List<StudyLog> = studyLogJpaRepository.findAllByIdIn(studyLogIds)
 }
