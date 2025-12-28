@@ -22,8 +22,8 @@ public record LoadMemberDetailResponse(
                 memberInfo.nickname(),
                 memberInfo.profileImage(),
                 memberInfo.category(),
-                tripCount.course(),
-                tripCount.explore(),
+                tripCount.getCourse(),
+                tripCount.getExplore(),
                 studyLogCount);
     }
 }

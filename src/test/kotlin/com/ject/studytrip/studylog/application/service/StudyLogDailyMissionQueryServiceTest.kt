@@ -39,10 +39,10 @@ class StudyLogDailyMissionQueryServiceTest : BaseUnitTest() {
     @BeforeEach
     fun setUp() {
         val member = MemberFixture.createMemberFromKakaoWithId(1L)
-        val trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE)
-        val stamp = StampFixture.createStampWithId(1L, trip, 1)
+        val trip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
+        val stamp = StampFixture(trip, 1).createWithId(1L)
         val mission = MissionFixture(stamp).createWithId(1L)
-        val dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, trip)
+        val dailyGoal = DailyGoalFixture(trip).createWithId(1L)
         val dailyMission1 = DailyMissionFixture(mission, dailyGoal).createWithId(1L)
         val dailyMission2 = DailyMissionFixture(mission, dailyGoal).createWithId(2L)
         studyLog1 = StudyLogFixture(member, dailyGoal).createWithId(1L)

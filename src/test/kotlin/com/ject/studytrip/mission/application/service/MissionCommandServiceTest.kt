@@ -2,6 +2,7 @@ package com.ject.studytrip.mission.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.mission.domain.error.MissionErrorCode
 import com.ject.studytrip.mission.domain.model.Mission
@@ -37,6 +38,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
     @Mock
     private lateinit var missionCommandRepository: MissionCommandRepository
 
+    private lateinit var member: Member
     private lateinit var courseStamp: Stamp
     private lateinit var exploreStamp: Stamp
     private lateinit var courseMission: Mission
@@ -49,11 +51,11 @@ class MissionCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        val member = MemberFixture.createMemberFromKakaoWithId(1L)
-        val courseTrip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE)
-        val exploreTrip = TripFixture.createTripWithId(2L, member, TripCategory.EXPLORE)
-        courseStamp = StampFixture.createStampWithId(1L, courseTrip, 1)
-        exploreStamp = StampFixture.createStampWithId(2L, exploreTrip, 0)
+        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        val courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
+        val exploreTrip = TripFixture(member, TripCategory.EXPLORE).createWithId(2L)
+        courseStamp = StampFixture(courseTrip, 1).createWithId(1L)
+        exploreStamp = StampFixture(exploreTrip, 0).createWithId(2L)
         courseMission = MissionFixture(courseStamp).createWithId(1L)
         exploreMission1 = MissionFixture(exploreStamp).createWithId(2L)
         exploreMission2 = MissionFixture(exploreStamp).createWithId(3L)
@@ -104,8 +106,8 @@ class MissionCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 미션의 이름을 수정한다.")
         fun shouldUpdateMissionWhenNameIsPresent() {
             // given
-            val existingName = courseMission.name
             val request = fixture.withName(NEW_MISSION_NAME).build()
+            val existingName = courseMission.name
 
             // when
             missionCommandService.updateMissionNameIfPresent(courseMission, request)
@@ -166,13 +168,13 @@ class MissionCommandServiceTest : BaseUnitTest() {
             missionCommandService.completeMission(exploreMission1)
 
             // then
-            assertThat(exploreMission1.isCompleted).isTrue()
+            assertThat(exploreMission1.isCompleted).isTrue
         }
     }
 
     @Nested
-    @DisplayName("validateMissionsBelongsToStamp 메서드는")
-    inner class ValidateMissionsBelongsToStamp {
+    @DisplayName("validateMissionsBelongToStamp 메서드는")
+    inner class ValidateMissionsBelongToStamp {
         @Test
         @DisplayName("특정 스탬프에 속하지 않은 미션이 하나라도 존재하면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionsNotBelongToStamp() {
@@ -181,7 +183,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
 
             // when
             val exception =
-                assertThrows<CustomException> { missionCommandService.validateMissionsBelongsToStamp(exploreStamp.id, missions) }
+                assertThrows<CustomException> { missionCommandService.validateMissionsBelongToStamp(exploreStamp.id, missions) }
 
             // then
             assertThat(exception.message).isEqualTo(MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP.message)
@@ -194,7 +196,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
             val missions = listOf(exploreMission1, exploreMission2)
 
             // when & then
-            assertDoesNotThrow { missionCommandService.validateMissionsBelongsToStamp(exploreStamp.id, missions) }
+            assertDoesNotThrow { missionCommandService.validateMissionsBelongToStamp(exploreStamp.id, missions) }
         }
     }
 
@@ -294,7 +296,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 미션이 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenMissionsOwnedByMemberDoNotExist() {
             // given
-            val memberId = -1L
+            val memberId = member.id
             given(missionCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -308,7 +310,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 미션이 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenMissionsOwnedByMemberExist() {
             // given
-            val memberId = -1L
+            val memberId = member.id
             given(missionCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

@@ -28,7 +28,7 @@ class DummyMissionCommandServiceTest extends BaseUnitTest {
     @BeforeEach
     void setUp() {
         Member member = MemberFixture.createMemberFromKakao();
-        courseTrip = TripFixture.createTrip(member, TripCategory.COURSE);
+        courseTrip = new TripFixture(member, TripCategory.COURSE).create();
     }
 
     @Nested
@@ -39,7 +39,7 @@ class DummyMissionCommandServiceTest extends BaseUnitTest {
         @DisplayName("특정 스탬프가 들어오면 더미 미션을 생성하고 리턴한다.")
         void shouldReturnDummyMissionForStamp() {
             // given
-            Stamp stamp = StampFixture.createStamp(courseTrip, COUNT);
+            Stamp stamp = new StampFixture(courseTrip, COUNT).create();
 
             // when
             Mission result = dummyMissionCommandService.createDummyMission(stamp);

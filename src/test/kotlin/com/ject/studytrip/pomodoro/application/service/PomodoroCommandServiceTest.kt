@@ -43,8 +43,8 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
     @BeforeEach
     fun setUp() {
         member = MemberFixture.createMemberFromKakaoWithId(1L)
-        val trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE)
-        dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, trip)
+        val trip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
+        dailyGoal = DailyGoalFixture(trip).createWithId(1L)
         pomodoro = PomodoroFixture(dailyGoal).createWithId(1L)
     }
 

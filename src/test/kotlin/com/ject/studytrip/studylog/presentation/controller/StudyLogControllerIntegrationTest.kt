@@ -293,7 +293,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
 
         @Test
         @DisplayName("데일리 목표가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
-        fun shouldReturnForbiddenWhenDailyGoalDoesNotBelongToTrip() {
+        fun shouldReturnForbiddenWhenDailyGoalNotBelongToTrip() {
             // given
             val newTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(newTrip)
@@ -306,8 +306,8 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             resultActions
                 .andExpect(status().isForbidden)
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.status").value(DailyGoalErrorCode.DAILY_GOAL_NOT_BELONG_TO_TRIP.status.value()))
-                .andExpect(jsonPath("$.data.message").value(DailyGoalErrorCode.DAILY_GOAL_NOT_BELONG_TO_TRIP.message))
+                .andExpect(jsonPath("$.status").value(DailyGoalErrorCode.DAILY_GOAL_NOT_BELONGS_TO_TRIP.status.value()))
+                .andExpect(jsonPath("$.data.message").value(DailyGoalErrorCode.DAILY_GOAL_NOT_BELONGS_TO_TRIP.message))
         }
 
         @Test
@@ -347,7 +347,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
 
         @Test
         @DisplayName("데일리 미션이 요청한 데일리 목표에 속하지 않으면 403 Forbidden을 반환한다.")
-        fun shouldReturnForbiddenWhenDailyMissionDoesNotBelongToDailyGoal() {
+        fun shouldReturnForbiddenWhenDailyMissionNotBelongToDailyGoal() {
             // given
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(trip)
             val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()

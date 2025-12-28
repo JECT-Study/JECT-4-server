@@ -38,8 +38,8 @@ class TripReportStudyLogCommandServiceTest extends BaseUnitTest {
     @BeforeEach
     void setUp() {
         Member member = MemberFixture.createMemberFromKakaoWithId(1L);
-        Trip trip = TripFixture.createTrip(member, TripCategory.COURSE);
-        DailyGoal dailyGoal = DailyGoalFixture.createDailyGoal(trip);
+        Trip trip = new TripFixture(member, TripCategory.COURSE).create();
+        DailyGoal dailyGoal = new DailyGoalFixture(trip).create();
         StudyLog studyLog1 = new StudyLogFixture(member, dailyGoal).createWithId(1L);
         StudyLog studyLog2 = new StudyLogFixture(member, dailyGoal).createWithId(2L);
         tripReport = TripReportFixture.createTripReportWithId(1L, member);

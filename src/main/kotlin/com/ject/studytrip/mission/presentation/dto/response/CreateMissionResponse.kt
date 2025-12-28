@@ -9,6 +9,6 @@ data class CreateMissionResponse(
 ) {
     companion object {
         @JvmStatic
-        fun of(info: MissionInfo): CreateMissionResponse = CreateMissionResponse(info.missionId)
+        fun of(missionInfo: MissionInfo): CreateMissionResponse = CreateMissionResponse(missionInfo.missionId)
     }
 }

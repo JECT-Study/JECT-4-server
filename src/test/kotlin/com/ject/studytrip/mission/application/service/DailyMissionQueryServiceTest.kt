@@ -43,10 +43,10 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
     @BeforeEach
     fun setUp() {
         val member = MemberFixture.createMemberFromKakaoWithId(1L)
-        trip = TripFixture.createTripWithId(1L, member, TripCategory.COURSE)
-        val stamp = StampFixture.createStampWithId(1L, trip, 1)
+        trip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
+        val stamp = StampFixture(trip, 1).createWithId(1L)
         val mission = MissionFixture(stamp).createWithId(1L)
-        dailyGoal = DailyGoalFixture.createDailyGoalWithId(1L, trip)
+        dailyGoal = DailyGoalFixture(trip).createWithId(1L)
         dailyMission = DailyMissionFixture(mission, dailyGoal).createWithId(1L)
     }
 
@@ -72,7 +72,7 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 데일리 목표에 속하지 않은 데일리 미션이 하나라도 존재하면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyMissionsNotBelongToDailyGoal() {
             // given
-            val newDailyGoal = DailyGoalFixture.createDailyGoalWithId(2L, trip)
+            val newDailyGoal = DailyGoalFixture(trip).createWithId(2L)
             val dailyMissionIds = listOf(dailyMission.id)
             given(dailyMissionRepository.findAllByIdIn(dailyMissionIds)).willReturn(listOf(dailyMission))
 
@@ -143,7 +143,7 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 데일리 목표에 속하지 않은 데일리 미션이 하나라도 존재하면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyMissionsNotBelongToDailyGoal() {
             // given
-            val newDailyGoal = DailyGoalFixture.createDailyGoalWithId(2L, trip)
+            val newDailyGoal = DailyGoalFixture(trip).createWithId(2L)
             val dailyMissionIds = listOf(dailyMission.id)
             given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)).willReturn(listOf(dailyMission))
 

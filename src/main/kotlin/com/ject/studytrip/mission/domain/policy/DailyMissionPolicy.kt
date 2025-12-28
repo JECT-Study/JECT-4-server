@@ -11,7 +11,7 @@ object DailyMissionPolicy {
         }
     }
 
-    fun validateBelongsToDailyGoal(
+    fun validateDailyMissionBelongsToDailyGoal(
         dailyMission: DailyMission,
         dailyGoalId: Long,
     ) {

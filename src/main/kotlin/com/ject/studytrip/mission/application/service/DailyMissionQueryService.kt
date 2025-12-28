@@ -41,7 +41,7 @@ class DailyMissionQueryService(
     ) {
         DailyMissionPolicy.validateExistAll(dailyMissions, dailyMissionIds)
         dailyMissions.forEach { dailyMission ->
-            DailyMissionPolicy.validateBelongsToDailyGoal(dailyMission, dailyGoalId)
+            DailyMissionPolicy.validateDailyMissionBelongsToDailyGoal(dailyMission, dailyGoalId)
             DailyMissionPolicy.validateNotDeleted(dailyMission)
         }
     }

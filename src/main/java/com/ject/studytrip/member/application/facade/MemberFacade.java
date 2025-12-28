@@ -81,7 +81,7 @@ public class MemberFacade {
     @Transactional(readOnly = true)
     public MemberDetail getMemberDetail(Long memberId) {
         Member member = memberQueryService.getValidMember(memberId);
-        TripCount tripCount = tripQueryService.getActiveTripCountsByMemberId(memberId);
+        TripCount tripCount = tripQueryService.getActiveTripCountByMemberId(memberId);
         long studyLogCount = studyLogQueryService.getActiveStudyLogCountByMemberId(memberId);
 
         MemberInfo memberInfo = MemberInfo.from(member);
@@ -163,11 +163,11 @@ public class MemberFacade {
         pomodoroCommandService.hardDeletePomodorosOwnedByMember(memberId);
         studyLogCommandService.hardDeleteStudyLogsOwnedByMember(memberId);
         dailyMissionCommandService.hardDeleteDailyMissionsOwnedByMember(memberId);
-        dailyGoalCommandService.hardDeleteDailyGoalsByMember(memberId);
+        dailyGoalCommandService.hardDeleteDailyGoalsOwnedByMember(memberId);
 
         missionCommandService.hardDeleteMissionsOwnedByMember(memberId);
-        stampCommandService.hardDeleteStampsByMember(memberId);
-        tripCommandService.hardDeleteTripsByMember(memberId);
+        stampCommandService.hardDeleteStampsOwnedByMember(memberId);
+        tripCommandService.hardDeleteTripsOwnedByMember(memberId);
         memberCommandService.hardDeleteMemberById(memberId);
     }
 }

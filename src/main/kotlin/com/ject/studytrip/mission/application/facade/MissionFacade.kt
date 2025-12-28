@@ -16,6 +16,7 @@ import com.ject.studytrip.stamp.application.service.StampQueryService
 import com.ject.studytrip.stamp.domain.model.Stamp
 import com.ject.studytrip.trip.application.service.TripQueryService
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -128,13 +129,9 @@ class MissionFacade(
         stampCommandService.decreaseTotalMissions(stamp)
     }
 
-    @Caching(
-        evict = [
-            CacheEvict(
-                cacheNames = [MISSIONS],
-                key = "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).missions(#memberId, #tripId, #stampId)",
-            ),
-        ],
+    @Cacheable(
+        cacheNames = [MISSIONS],
+        key = "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).missions(#memberId, #tripId, #stampId)",
     )
     @Transactional(readOnly = true)
     fun getMissionsByStamp(
