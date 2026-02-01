@@ -99,7 +99,7 @@ class TripController(
             .body(StandardResponse.success(HttpStatus.OK.value(), responses))
     }
 
-    @Operation(summary = "특정 멤버의 여행 목록을 조회합니다. 슬라이스를 적용하고 D-DAY 정보가 이른 순으로 정렬합니다")
+    @Operation(summary = "여행 목록 조회", description = "특정 멤버의 여행 목록을 조회합니다. 슬라이스를 적용하고 D-DAY 정보가 이른 순으로 정렬합니다")
     @GetMapping
     fun loadTrips(
         @AuthenticationPrincipal memberId: String,

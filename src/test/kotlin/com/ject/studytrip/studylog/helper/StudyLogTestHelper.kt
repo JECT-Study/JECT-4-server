@@ -15,4 +15,9 @@ class StudyLogTestHelper(
         member: Member,
         dailyGoal: DailyGoal,
     ): StudyLog = studyLogRepository.save(StudyLogFixture(member, dailyGoal).create())
+
+    fun saveDeletedStudyLog(
+        member: Member,
+        dailyGoal: DailyGoal,
+    ): StudyLog = studyLogRepository.save(StudyLogFixture(member, dailyGoal).create().also { it.updateDeletedAt() })
 }
