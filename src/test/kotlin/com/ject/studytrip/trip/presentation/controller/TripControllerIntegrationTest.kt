@@ -181,6 +181,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             resultActions
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.status").value(HttpStatus.CREATED.value()))
                 .andExpect(jsonPath("$.data.tripId").isNumber)
         }
     }
@@ -468,7 +469,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         }
 
         @Test
-        @DisplayName("특정 여행을 수정한다.")
+        @DisplayName("특정 여행을 삭제한다.")
         fun shouldDeleteTrip() {
             // when
             val resultActions = getResultActions(token, courseTrip.id)

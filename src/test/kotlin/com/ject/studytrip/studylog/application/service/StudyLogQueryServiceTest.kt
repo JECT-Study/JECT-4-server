@@ -62,7 +62,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         dailyGoal = DailyGoalFixture(courseTrip).createWithId(1L)
         studyLog1 = StudyLogFixture(member, dailyGoal).createWithId(1L)
         studyLog2 = StudyLogFixture(member, dailyGoal).createWithId(2L)
-        tripReport = TripReportFixture.createTripReportWithId(1L, member)
+        tripReport = TripReportFixture(member).createWithId(1L)
     }
 
     @Nested

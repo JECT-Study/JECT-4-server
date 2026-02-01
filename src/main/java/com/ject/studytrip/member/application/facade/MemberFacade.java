@@ -156,8 +156,8 @@ public class MemberFacade {
 
     private void cascadeHardDeleteByMemberId(Long memberId) {
         // 자식 -> 부모 순으로 삭제 진행
-        tripReportStudyLogCommandService.hardDeleteTripReportStudyLogsByMember(memberId);
-        tripReportCommandService.hardDeleteTripReportsByMember(memberId);
+        tripReportStudyLogCommandService.hardDeleteTripReportStudyLogsOwnedByMember(memberId);
+        tripReportCommandService.hardDeleteTripReportsOwnedByMember(memberId);
 
         studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsOwnedByMember(memberId);
         pomodoroCommandService.hardDeletePomodorosOwnedByMember(memberId);
