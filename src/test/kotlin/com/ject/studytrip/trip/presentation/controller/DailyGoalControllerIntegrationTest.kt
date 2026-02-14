@@ -88,7 +88,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         dailyGoal = dailyGoalTestHelper.saveDailyGoal(trip)
         dailyMission = dailyMissionTestHelper.saveDailyMission(mission1, dailyGoal)
 
-        val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+        val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
         newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
     }
 
@@ -108,7 +108,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post(BASE_DAILY_GOAL_URL, tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -396,7 +396,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_DAILY_GOAL_URL/{dailyGoalId}", tripId, dailyGoalId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -773,7 +773,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 delete("$BASE_DAILY_GOAL_URL/{dailyGoalId}", tripId, dailyGoalId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -999,7 +999,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get("$BASE_DAILY_GOAL_URL/{dailyGoalId}", tripId, dailyGoalId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test

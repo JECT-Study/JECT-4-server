@@ -19,7 +19,7 @@ class DummyTripCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakao()
+        member = MemberFixture().createFromKakao()
     }
 
     companion object {

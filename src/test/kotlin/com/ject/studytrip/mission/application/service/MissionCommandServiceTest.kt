@@ -51,7 +51,7 @@ class MissionCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         val courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         val exploreTrip = TripFixture(member, TripCategory.EXPLORE).createWithId(2L)
         courseStamp = StampFixture(courseTrip, 1).createWithId(1L)

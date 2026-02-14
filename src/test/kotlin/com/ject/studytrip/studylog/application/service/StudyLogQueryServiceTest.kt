@@ -57,7 +57,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         dailyGoal = DailyGoalFixture(courseTrip).createWithId(1L)
         studyLog1 = StudyLogFixture(member, dailyGoal).createWithId(1L)
