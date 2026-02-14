@@ -52,7 +52,7 @@ class DummyMissionControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get(BASE_DUMMY_MISSION_URL)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .param("category", category)
                     .param("count", count.toString())
                     .contentType(MediaType.APPLICATION_JSON),

@@ -44,7 +44,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         dailyGoal = DailyGoalFixture(courseTrip).createWithId(1L)
         studyLog = StudyLogFixture(member, dailyGoal).createWithId(1L)
@@ -87,10 +87,7 @@ class StudyLogCommandServiceTest : BaseUnitTest() {
             studyLog.updateDeletedAt()
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    studyLogCommandService.updateImageUrl(studyLog, newImageUrl)
-                }
+            val exception = assertThrows<CustomException> { studyLogCommandService.updateImageUrl(studyLog, newImageUrl) }
 
             // then
             assertThat(exception.message).isEqualTo(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED.message)

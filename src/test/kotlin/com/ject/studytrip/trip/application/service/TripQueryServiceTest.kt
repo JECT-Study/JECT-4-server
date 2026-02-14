@@ -47,7 +47,7 @@ class TripQueryServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         trip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
     }
 

@@ -100,7 +100,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         studyLogDailyMissionTestHelper.saveStudyLogDailyMissions(studyLog2, dailyMission)
         tripReport = tripReportTestHelper.saveTripReport(member)
 
-        newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+        newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
     }
 
     companion object {
@@ -120,7 +120,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post(BASE_TRIP_REPORT_URL)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -204,7 +204,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 delete("$BASE_TRIP_REPORT_URL/{tripReportId}", tripReportId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -315,7 +315,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post("$BASE_TRIP_REPORT_URL/{tripReportId}/images/presigned", tripReportId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -407,7 +407,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post("$BASE_TRIP_REPORT_URL/{tripReportId}/images/confirm", tripReportId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -478,7 +478,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
                 get("/api/trips/{tripId}/retrospect", tripId)
                     .param("page", page)
                     .param("size", size)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -637,7 +637,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
         private fun getResultActions(token: String): ResultActions =
             mockMvc.perform(
                 get(BASE_TRIP_REPORT_URL)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -682,7 +682,7 @@ class TripReportControllerIntegrationTest : BaseIntegrationTest() {
                 get("$BASE_TRIP_REPORT_URL/{tripReportId}", tripReportId)
                     .param("page", page)
                     .param("size", size)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test

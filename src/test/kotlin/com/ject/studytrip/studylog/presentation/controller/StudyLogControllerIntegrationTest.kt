@@ -121,7 +121,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post("/api/trips/{tripId}/daily-goals/{dailyGoalId}/study-logs", tripId, dailyGoalId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -222,7 +222,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // given
-            val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+            val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
             val newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
             val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
 
@@ -521,7 +521,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
                     .param("page", page)
                     .param("size", size)
                     .param("order", order)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -612,7 +612,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // given
-            val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+            val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
             val newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
             // when
             val resultActions = getResultActions(token, newTrip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
@@ -727,7 +727,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post("/api/study-logs/{studyLogId}/images/presigned", studyLogId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -837,7 +837,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post("/api/study-logs/{studyLogId}/images/confirm", studyLogId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )

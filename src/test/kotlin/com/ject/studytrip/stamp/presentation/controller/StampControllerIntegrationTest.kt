@@ -81,7 +81,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         exploreStamp1 = stampTestHelper.saveStamp(exploreTrip, 0)
         exploreStamp2 = stampTestHelper.saveStamp(exploreTrip, 0)
 
-        val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+        val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
         newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
     }
 
@@ -101,7 +101,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post(BASE_STAMP_URL, tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -259,7 +259,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_STAMP_URL/{stampId}", tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -488,7 +488,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 put("$BASE_STAMP_URL/orders", tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -713,7 +713,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 delete("$BASE_STAMP_URL/{stampId}", tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -917,7 +917,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_STAMP_URL/{stampId}/complete", tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -1142,7 +1142,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get(BASE_STAMP_URL, tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -1265,7 +1265,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get("$BASE_STAMP_URL/{stampId}", tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test

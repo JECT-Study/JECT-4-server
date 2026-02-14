@@ -40,7 +40,7 @@ class TripReportStudyLogCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         val trip = TripFixture(member, TripCategory.COURSE).create()
         val dailyGoal = DailyGoalFixture(trip).create()
         val studyLog1 = StudyLogFixture(member, dailyGoal).createWithId(1L)

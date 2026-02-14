@@ -21,7 +21,7 @@ class DummyStampCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        val member = MemberFixture.createMemberFromKakao()
+        val member = MemberFixture().createFromKakao()
         courseTrip = TripFixture(member, TripCategory.COURSE).create()
         exploreTrip = TripFixture(member, TripCategory.EXPLORE).create()
     }

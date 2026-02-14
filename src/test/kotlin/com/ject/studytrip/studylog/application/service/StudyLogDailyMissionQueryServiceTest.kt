@@ -38,7 +38,7 @@ class StudyLogDailyMissionQueryServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        val member = MemberFixture.createMemberFromKakaoWithId(1L)
+        val member = MemberFixture().createFromKakaoWithId(1L)
         val trip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         val stamp = StampFixture(trip, 1).createWithId(1L)
         val mission = MissionFixture(stamp).createWithId(1L)

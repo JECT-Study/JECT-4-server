@@ -38,7 +38,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         tripReport1 = TripReportFixture(member).createWithId(1L)
         tripReport2 = TripReportFixture(member).createWithId(2L)
         tripReports = listOf(tripReport1, tripReport2)

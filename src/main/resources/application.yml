@@ -12,6 +12,13 @@ spring:
     init:
       mode: never
 
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: Asia/Seoul
+
 server:
   forward-headers-strategy: framework
 

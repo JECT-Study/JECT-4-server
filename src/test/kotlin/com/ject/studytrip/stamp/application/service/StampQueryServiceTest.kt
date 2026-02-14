@@ -44,7 +44,7 @@ class StampQueryServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        val member = MemberFixture.createMemberFromKakaoWithId(1L)
+        val member = MemberFixture().createFromKakaoWithId(1L)
         courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         exploreTrip = TripFixture(member, TripCategory.EXPLORE).createWithId(2L)
         courseStamp1 = StampFixture(courseTrip, 1).createWithId(1L)

@@ -79,7 +79,7 @@ class MissionControllerIntegrationTest : BaseIntegrationTest() {
         exploreStamp = stampTestHelper.saveStamp(exploreTrip, 0)
         exploreMission = missionTestHelper.saveMission(exploreStamp)
 
-        val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+        val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
         newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
     }
 
@@ -100,7 +100,7 @@ class MissionControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post(BASE_MISSION_URL, tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -349,7 +349,7 @@ class MissionControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_MISSION_URL/{missionId}", tripId, stampId, missionId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -683,7 +683,7 @@ class MissionControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 delete("$BASE_MISSION_URL/{missionId}", tripId, stampId, missionId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -969,7 +969,7 @@ class MissionControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get(BASE_MISSION_URL, tripId, stampId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test

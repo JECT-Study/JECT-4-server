@@ -48,7 +48,7 @@ class TripCommandServiceTest : BaseUnitTest() {
 
     @BeforeEach
     fun setUp() {
-        member = MemberFixture.createMemberFromKakaoWithId(1L)
+        member = MemberFixture().createFromKakaoWithId(1L)
         courseTrip = TripFixture(member, TripCategory.COURSE).createWithId(1L)
         exploreTrip = TripFixture(member, TripCategory.EXPLORE).createWithId(2L)
     }
@@ -107,7 +107,7 @@ class TripCommandServiceTest : BaseUnitTest() {
     @Nested
     @DisplayName("updateTrip 메서드는")
     inner class UpdateTrip {
-        val fixture = UpdateTripRequestFixture()
+        private val fixture = UpdateTripRequestFixture()
 
         @Test
         @DisplayName("특정 여행의 이름을 수정한다.")

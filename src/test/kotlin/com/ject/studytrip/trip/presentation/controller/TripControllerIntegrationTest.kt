@@ -58,7 +58,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         token = tokenTestHelper.createAccessToken(member.id.toString(), MemberRole.ROLE_USER.name)
         courseTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
 
-        val newMember = memberTestHelper.saveMember("test@gmail.com", "test")
+        val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
         newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
     }
 
@@ -79,7 +79,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 post(BASE_TRIP_URL)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -198,7 +198,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_TRIP_URL/{tripId}", tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token))
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)),
             )
@@ -369,7 +369,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 delete("$BASE_TRIP_URL/{tripId}", tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -491,7 +491,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 patch("$BASE_TRIP_URL/{tripId}/complete", tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -657,7 +657,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
                 get(BASE_TRIP_URL)
                     .param("page", page)
                     .param("size", size)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test
@@ -735,7 +735,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         ): ResultActions =
             mockMvc.perform(
                 get("$BASE_TRIP_URL/{tripId}", tripId)
-                    .header(HttpHeaders.AUTHORIZATION, TokenFixture.authorization(token)),
+                    .header(HttpHeaders.AUTHORIZATION, TokenFixture().authorization(token)),
             )
 
         @Test

@@ -148,6 +148,7 @@ class TripReportFacade(
         return PresignedTripReportImageResponse.of(tripReport.id, info.tmpKey, info.presignedUrl)
     }
 
+    @Transactional
     fun confirmImage(
         tripReportId: Long,
         request: ConfirmTripReportImageRequest,
