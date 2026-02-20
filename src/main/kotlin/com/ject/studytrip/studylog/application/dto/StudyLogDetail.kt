@@ -8,7 +8,6 @@ data class StudyLogDetail(
     val studyLogDailyMissionInfos: List<StudyLogDailyMissionInfo>,
 ) {
     companion object {
-        @JvmStatic
         fun from(
             studyLog: StudyLog,
             studyLogDailyMissions: List<StudyLogDailyMission>?,

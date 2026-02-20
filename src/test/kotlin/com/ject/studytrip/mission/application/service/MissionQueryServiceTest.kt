@@ -2,6 +2,7 @@ package com.ject.studytrip.mission.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.mission.domain.error.MissionErrorCode
 import com.ject.studytrip.mission.domain.model.Mission
@@ -63,7 +64,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
             given(missionRepository.findById(missionId)).willReturn(Optional.empty())
 
             // when
-            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(courseStamp.id, missionId) }
+            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(courseStamp.id.requireId(), missionId) }
 
             // then
             assertThat(exception.message).isEqualTo(MissionErrorCode.MISSION_NOT_FOUND.message)
@@ -73,11 +74,11 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 미션이 다른 스템프에 속한다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionNotBelongToStamp() {
             // given
-            val missionId = exploreMission1.id
+            val missionId = exploreMission1.id.requireId()
             given(missionRepository.findById(missionId)).willReturn(Optional.of(exploreMission1))
 
             // when
-            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(courseStamp.id, missionId) }
+            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(courseStamp.id.requireId(), missionId) }
 
             // then
             assertThat(exception.message).isEqualTo(MissionErrorCode.MISSION_NOT_BELONGS_TO_STAMP.message)
@@ -87,12 +88,12 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("미션이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionAlreadyDeleted() {
             // given
-            val missionId = exploreMission1.id
+            val missionId = exploreMission1.id.requireId()
             exploreMission1.updateDeletedAt()
             given(missionRepository.findById(missionId)).willReturn(Optional.of(exploreMission1))
 
             // when
-            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(exploreStamp.id, missionId) }
+            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(exploreStamp.id.requireId(), missionId) }
 
             // then
             assertThat(exception.message).isEqualTo(MissionErrorCode.MISSION_ALREADY_DELETED.message)
@@ -102,12 +103,12 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("미션이 이미 완료되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionAlreadyCompleted() {
             // given
-            val missionId = exploreMission1.id
+            val missionId = exploreMission1.id.requireId()
             exploreMission1.updateCompleted()
             given(missionRepository.findById(missionId)).willReturn(Optional.of(exploreMission1))
 
             // when
-            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(exploreStamp.id, missionId) }
+            val exception = assertThrows<CustomException> { missionQueryService.getValidMission(exploreStamp.id.requireId(), missionId) }
 
             // then
             assertThat(exception.message).isEqualTo(MissionErrorCode.MISSION_ALREADY_COMPLETED.message)
@@ -117,11 +118,11 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 스탬프에 속한 미션이 존재하면 미션을 조회하고 반환한다.")
         fun shouldReturnMissionWhenMissionBelongsToStamp() {
             // given
-            val missionId = exploreMission1.id
+            val missionId = exploreMission1.id.requireId()
             given(missionRepository.findById(missionId)).willReturn(Optional.of(exploreMission1))
 
             // when
-            val result = missionQueryService.getValidMission(exploreStamp.id, missionId)
+            val result = missionQueryService.getValidMission(exploreStamp.id.requireId(), missionId)
 
             // then
             assertThat(result).isEqualTo(exploreMission1)
@@ -135,7 +136,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 스탬프에 속한 미션 목록을 최신순으로 정렬하여 반환한다.")
         fun shouldReturnMissionsByStampIdSortedByLatest() {
             // given
-            val stampId = exploreStamp.id
+            val stampId = exploreStamp.id.requireId()
             given(
                 missionRepository.findAllByStampIdAndDeletedAtIsNullOrderByCreatedAt(stampId),
             ).willReturn(listOf(exploreMission2, exploreMission1))
@@ -156,7 +157,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("요청한 미션 ID 개수와 조회된 미션 개수가 일치하지 않으면 예외가 발생한다.")
         fun shouldThrowExceptionWhenSomeMissionsDoNotExist() {
             // given
-            val missionIds = listOf(exploreMission1.id, exploreMission2.id, 1000L)
+            val missionIds = listOf(exploreMission1.id.requireId(), exploreMission2.id.requireId(), 1000L)
             given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds)).willReturn(listOf(exploreMission1, exploreMission2))
 
             // when
@@ -170,7 +171,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("미션이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionAlreadyDeleted() {
             // given
-            val missionIds = listOf(exploreMission1.id, exploreMission2.id)
+            val missionIds = listOf(exploreMission1.id.requireId(), exploreMission2.id.requireId())
             exploreMission1.updateDeletedAt()
             given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds)).willReturn(listOf(exploreMission1, exploreMission2))
 
@@ -185,7 +186,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("미션이 이미 완료되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMissionAlreadyCompleted() {
             // given
-            val missionIds = listOf(exploreMission1.id, exploreMission2.id)
+            val missionIds = listOf(exploreMission1.id.requireId(), exploreMission2.id.requireId())
             exploreMission1.updateCompleted()
             given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds)).willReturn(listOf(exploreMission1, exploreMission2))
 
@@ -200,7 +201,7 @@ class MissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("미션 ID 목록과 일치하는 미션 목록을 조회하고 반환한다.")
         fun shouldReturnMissionsByIds() {
             // given
-            val missionIds = listOf(exploreMission1.id, exploreMission2.id)
+            val missionIds = listOf(exploreMission1.id.requireId(), exploreMission2.id.requireId())
             given(missionQueryRepository.findAllByIdsInFetchJoinStamp(missionIds)).willReturn(listOf(exploreMission1, exploreMission2))
 
             // when

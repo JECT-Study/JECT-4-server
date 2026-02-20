@@ -4,8 +4,8 @@ import com.ject.studytrip.global.exception.error.ErrorCode
 import org.springframework.http.HttpStatus
 
 enum class StampErrorCode(
-    private val status: HttpStatus,
-    private val message: String,
+    override val status: HttpStatus,
+    override val message: String,
 ) : ErrorCode {
     // 400
     STAMP_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 스탬프입니다."),
@@ -21,11 +21,4 @@ enum class StampErrorCode(
 
     // 404
     STAMP_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 스탬프를 찾을 수 없습니다."),
-    ;
-
-    override fun getName(): String = name
-
-    override fun getStatus(): HttpStatus = status
-
-    override fun getMessage(): String = message
 }

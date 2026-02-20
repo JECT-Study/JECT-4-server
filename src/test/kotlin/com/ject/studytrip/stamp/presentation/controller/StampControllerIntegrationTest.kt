@@ -5,6 +5,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode
 import com.ject.studytrip.auth.fixture.TokenFixture
 import com.ject.studytrip.auth.helper.TokenTestHelper
 import com.ject.studytrip.global.exception.error.CommonErrorCode
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.MemberRole
 import com.ject.studytrip.member.helper.MemberTestHelper
@@ -113,7 +114,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", courseTrip.id, request)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -148,7 +149,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withName(" ").build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -183,7 +184,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -201,7 +202,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -219,7 +220,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -236,7 +237,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -271,7 +272,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", courseTrip.id, courseStamp1.id, request)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -289,7 +290,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id, request)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -307,7 +308,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId, request)
 
             // then
             resultActions
@@ -325,7 +326,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id, request)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -342,7 +343,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, courseStamp1.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -360,7 +361,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, courseStamp1.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -378,7 +379,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, courseStamp1.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -396,7 +397,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId, request)
 
             // then
             resultActions
@@ -413,7 +414,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, exploreStamp1.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), exploreStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -431,7 +432,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, deletedStamp.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), deletedStamp.id.requireId(), request)
 
             // then
             resultActions
@@ -449,7 +450,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, completedStamp.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), completedStamp.id.requireId(), request)
 
             // then
             resultActions
@@ -466,7 +467,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, courseStamp1.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), courseStamp1.id.requireId(), request)
 
             // then
             resultActions
@@ -500,7 +501,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", courseTrip.id, request)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -553,7 +554,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -571,7 +572,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -589,7 +590,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -606,7 +607,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, exploreTrip.id, request)
+            val resultActions = getResultActions(token, exploreTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -623,7 +624,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withOrderedStampIds(listOf(1000L, 2000L)).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -637,10 +638,14 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenStampNotBelongToTrip() {
             // given
-            val request = fixture.withOrderedStampIds(listOf(courseStamp1.id, courseStamp2.id, exploreStamp1.id)).build()
+            val request =
+                fixture
+                    .withOrderedStampIds(
+                        listOf(courseStamp1.id.requireId(), courseStamp2.id.requireId(), exploreStamp1.id.requireId()),
+                    ).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -655,10 +660,14 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenStampAlreadyDeleted() {
             // given
             val deletedStamp = stampTestHelper.saveDeletedStamp(courseTrip, 3)
-            val request = fixture.withOrderedStampIds(listOf(courseStamp1.id, courseStamp2.id, deletedStamp.id)).build()
+            val request =
+                fixture
+                    .withOrderedStampIds(
+                        listOf(courseStamp1.id.requireId(), courseStamp2.id.requireId(), deletedStamp.id.requireId()),
+                    ).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -673,10 +682,14 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenStampAlreadyCompleted() {
             // given
             val completedStamp = stampTestHelper.saveCompletedStamp(courseTrip, 3)
-            val request = fixture.withOrderedStampIds(listOf(courseStamp1.id, courseStamp2.id, completedStamp.id)).build()
+            val request =
+                fixture
+                    .withOrderedStampIds(
+                        listOf(courseStamp1.id.requireId(), courseStamp2.id.requireId(), completedStamp.id.requireId()),
+                    ).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -690,10 +703,10 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("유효한 요청이 들어오면 스탬프 순서를 변경한다.")
         fun shouldUpdateStampOrdersWhenRequestIsValid() {
             // given
-            val request = fixture.withOrderedStampIds(listOf(courseStamp2.id, courseStamp1.id)).build()
+            val request = fixture.withOrderedStampIds(listOf(courseStamp2.id.requireId(), courseStamp1.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -720,7 +733,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -736,7 +749,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val tripId = "abc"
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -753,7 +766,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = "abc"
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -770,7 +783,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = -1L
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -784,7 +797,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -801,7 +814,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -818,7 +831,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -835,7 +848,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = -1L
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -849,7 +862,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenStampNotBelongToTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id, exploreStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), exploreStamp1.id.requireId())
 
             // then
             resultActions
@@ -866,7 +879,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedStamp = stampTestHelper.saveDeletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, deletedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), deletedStamp.id.requireId())
 
             // then
             resultActions
@@ -883,7 +896,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedStamp = stampTestHelper.saveCompletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, completedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), completedStamp.id.requireId())
 
             // then
             resultActions
@@ -897,7 +910,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("특정 스탬프를 삭제한다.")
         fun shouldDeleteStamp() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -924,7 +937,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -940,7 +953,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val tripId = "abc"
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -957,7 +970,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = "abc"
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -974,7 +987,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = -1L
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -988,7 +1001,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1005,7 +1018,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1022,7 +1035,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1039,7 +1052,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = -1L
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -1053,7 +1066,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenStampNotBelongToTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id, exploreStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), exploreStamp1.id.requireId())
 
             // then
             resultActions
@@ -1070,7 +1083,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedStamp = stampTestHelper.saveDeletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, deletedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), deletedStamp.id.requireId())
 
             // then
             resultActions
@@ -1087,7 +1100,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedStamp = stampTestHelper.saveCompletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, completedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), completedStamp.id.requireId())
 
             // then
             resultActions
@@ -1105,7 +1118,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             missionTestHelper.saveCompletedMission(courseStamp1)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1123,7 +1136,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             missionTestHelper.saveCompletedMission(courseStamp1)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1149,7 +1162,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId())
 
             // then
             resultActions
@@ -1196,7 +1209,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId())
 
             // then
             resultActions
@@ -1213,7 +1226,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId())
 
             // then
             resultActions
@@ -1230,7 +1243,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId())
 
             // then
             resultActions
@@ -1244,7 +1257,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("특정 스탬프의 미션 목록을 조회하고 반환한다.")
         fun shouldReturnStampsByTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId())
 
             // then
             resultActions
@@ -1272,7 +1285,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1289,7 +1302,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = "abc"
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1306,7 +1319,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = "abc"
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -1323,7 +1336,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = -1L
 
             // when
-            val resultActions = getResultActions(token, tripId, courseStamp1.id)
+            val resultActions = getResultActions(token, tripId, courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1337,7 +1350,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1354,7 +1367,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1371,7 +1384,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions
@@ -1388,7 +1401,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val stampId = -1L
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, stampId)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), stampId)
 
             // then
             resultActions
@@ -1402,7 +1415,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("스탬프가 요청한 여행에 속하지 않으면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenStampNotBelongToTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id, exploreStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), exploreStamp1.id.requireId())
 
             // then
             resultActions
@@ -1419,7 +1432,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val deletedStamp = stampTestHelper.saveDeletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, deletedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), deletedStamp.id.requireId())
 
             // then
             resultActions
@@ -1436,7 +1449,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
             val completedStamp = stampTestHelper.saveCompletedStamp(courseTrip, 3)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, completedStamp.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), completedStamp.id.requireId())
 
             // then
             resultActions
@@ -1450,7 +1463,7 @@ class StampControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("특정 스탬프를 상세 조회하고 반환한다.")
         fun shouldReturnStamp() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id, courseStamp1.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), courseStamp1.id.requireId())
 
             // then
             resultActions

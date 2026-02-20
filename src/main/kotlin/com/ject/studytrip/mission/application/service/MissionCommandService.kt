@@ -47,6 +47,7 @@ class MissionCommandService(
 
     fun validateAllMissionsCompletedByStampId(stampId: Long) {
         val exists = missionCommandRepository.existsByStampIdAndCompletedIsFalseAndDeletedAtIsNull(stampId)
+
         MissionPolicy.validateNotAllCompleted(exists)
     }
 

@@ -9,10 +9,9 @@ import java.time.LocalDate
 class StampFixture(
     private val trip: Trip,
     private val order: Int,
+    private val name: String = "TEST 스탬프 이름",
+    private val endTime: LocalDate = LocalDate.now().plusDays(7),
 ) {
-    var name: String = "TEST 스탬프 이름"
-    var endTime: LocalDate = LocalDate.now().plusDays(7)
-
     fun create(): Stamp = StampFactory.create(trip, name, order, endTime)
 
     fun createWithId(id: Long): Stamp =

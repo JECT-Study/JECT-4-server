@@ -43,7 +43,7 @@ class TripQueryService(
         val courseCount = tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.COURSE)
         val exploreCount = tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.EXPLORE)
 
-        return TripCount.of(courseCount, exploreCount)
+        return TripCount(courseCount, exploreCount)
     }
 
     fun getValidCompletedTrip(

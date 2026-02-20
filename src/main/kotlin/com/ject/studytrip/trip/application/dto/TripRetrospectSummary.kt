@@ -5,20 +5,4 @@ data class TripRetrospectSummary(
     val totalFocusHours: Long, // 총 집중 시간 (시간 단위)
     val studyDays: Long, // 학습한 일수 (중복 날짜 제거)
     val studyLogIds: List<Long>, // 학습 로그 ID 목록
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            studyLogCount: Long,
-            totalFocusHours: Long,
-            studyDays: Long,
-            studyLogIds: List<Long>,
-        ): TripRetrospectSummary =
-            TripRetrospectSummary(
-                studyLogCount,
-                totalFocusHours,
-                studyDays,
-                studyLogIds,
-            )
-    }
-}
+)

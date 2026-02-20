@@ -5,6 +5,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode
 import com.ject.studytrip.auth.fixture.TokenFixture
 import com.ject.studytrip.auth.helper.TokenTestHelper
 import com.ject.studytrip.global.exception.error.CommonErrorCode
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.MemberRole
 import com.ject.studytrip.member.helper.MemberTestHelper
@@ -117,10 +118,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // given
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions("", trip.id, request)
+            val resultActions = getResultActions("", trip.id.requireId(), request)
 
             // then
             resultActions
@@ -135,7 +136,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripIdTypeMismatch() {
             // given
             val tripId = "abc"
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
             val resultActions = getResultActions(token, tripId, request)
@@ -153,10 +154,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenDailyGoalPomodoroFocusTimeInMinuteIsLessThanOneMinute() {
             // given
             val pomodoro = CreatePomodoroRequestFixture().withFocusDurationInMinute(0).build()
-            val request = fixture.withPomodoro(pomodoro).withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withPomodoro(pomodoro).withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -171,10 +172,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenDailyGoalPomodoroFocusSessionCountIsLessThanOne() {
             // given
             val pomodoro = CreatePomodoroRequestFixture().withFocusSessionCount(0).build()
-            val request = fixture.withPomodoro(pomodoro).withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withPomodoro(pomodoro).withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -189,7 +190,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnNotFoundWhenTripDoesNotExist() {
             // given
             val tripId = -1L
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
             val resultActions = getResultActions(token, tripId, request)
@@ -206,10 +207,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // given
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -224,10 +225,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripAlreadyDeleted() {
             // given
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -242,10 +243,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripAlreadyCompleted() {
             // given
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -259,10 +260,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("어떤 미션이 존재하지 않으면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenAnyMissionDoesNotExist() {
             // given
-            val request = fixture.withMissionIds(listOf(mission1.id, -1L)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), -1L)).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -277,10 +278,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenAnyMissionAlreadyDeleted() {
             // given
             val deletedMission = missionTestHelper.saveDeletedMission(stamp)
-            val request = fixture.withMissionIds(listOf(mission1.id, deletedMission.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), deletedMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -295,10 +296,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenAnyMissionAlreadyCompleted() {
             // given
             val completedMission = missionTestHelper.saveCompletedMission(stamp)
-            val request = fixture.withMissionIds(listOf(mission1.id, completedMission.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), completedMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -314,10 +315,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val otherTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
             stampTestHelper.saveStamp(otherTrip, 2)
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, otherTrip.id, request)
+            val resultActions = getResultActions(token, otherTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -334,10 +335,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val otherTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
             val completedStamp = stampTestHelper.saveCompletedStamp(otherTrip, 2)
             val otherMission = missionTestHelper.saveMission(completedStamp)
-            val request = fixture.withMissionIds(listOf(otherMission.id)).build()
+            val request = fixture.withMissionIds(listOf(otherMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, otherTrip.id, request)
+            val resultActions = getResultActions(token, otherTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -353,10 +354,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newStamp = stampTestHelper.saveStamp(trip, 2)
             val newMission = missionTestHelper.saveMission(newStamp)
-            val request = fixture.withMissionIds(listOf(newMission.id)).build()
+            val request = fixture.withMissionIds(listOf(newMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -370,10 +371,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("유효한 요청이 들어오면 데일리 목표, 뽀모도로, 데일리 미션들을 생성하고, 데일리 목표를 반환한다.")
         fun shouldCreateAndReturnDailyGoalWhenRequestIsValid() {
             // given
-            val request = fixture.withMissionIds(listOf(mission1.id, mission2.id)).build()
+            val request = fixture.withMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), request)
 
             // then
             resultActions
@@ -408,7 +409,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions("", trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -426,7 +427,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id, request)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -444,7 +445,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId, request)
 
             // then
             resultActions
@@ -462,7 +463,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id, request)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -479,7 +480,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -497,7 +498,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -515,7 +516,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -533,7 +534,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId, request)
 
             // then
             resultActions
@@ -551,7 +552,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, otherTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, otherTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -569,7 +570,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, deletedDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), deletedDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -583,10 +584,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("어떤 데일리 미션이 존재하지 않으면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenAnyDailyMissionDoesNotExist() {
             // given
-            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id, -1L)).build()
+            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id.requireId(), -1L)).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -602,10 +603,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val otherDailyGoal = dailyGoalTestHelper.saveDeletedDailyGoal(trip)
             val otherDailyMission = dailyMissionTestHelper.saveDailyMission(mission1, otherDailyGoal)
-            val request = fixture.withDeleteDailyMissionIds(listOf(otherDailyMission.id)).build()
+            val request = fixture.withDeleteDailyMissionIds(listOf(otherDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -620,10 +621,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenAnyDailyMissionAlreadyDeleted() {
             // given
             val deletedDailyMission = dailyMissionTestHelper.saveDeletedDailyMission(mission1, dailyGoal)
-            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id, deletedDailyMission.id)).build()
+            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id.requireId(), deletedDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -637,10 +638,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("어떤 미션이 존재하지 않으면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenAnyMissionDoesNotExist() {
             // given
-            val request = fixture.withAddMissionIds(listOf(mission1.id, mission2.id, -1L)).build()
+            val request = fixture.withAddMissionIds(listOf(mission1.id.requireId(), mission2.id.requireId(), -1L)).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -655,10 +656,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenAnyMissionAlreadyDeleted() {
             // given
             val deletedMission = missionTestHelper.saveDeletedMission(stamp)
-            val request = fixture.withAddMissionIds(listOf(mission1.id, deletedMission.id)).build()
+            val request = fixture.withAddMissionIds(listOf(mission1.id.requireId(), deletedMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -673,10 +674,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenAnyMissionAlreadyCompleted() {
             // given
             val completedMission = missionTestHelper.saveCompletedMission(stamp)
-            val request = fixture.withAddMissionIds(listOf(mission1.id, completedMission.id)).build()
+            val request = fixture.withAddMissionIds(listOf(mission1.id.requireId(), completedMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -693,10 +694,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val otherTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
             val otherStamp = stampTestHelper.saveStamp(otherTrip, 2)
             val otherMission = missionTestHelper.saveMission(otherStamp)
-            val request = fixture.withAddMissionIds(listOf(otherMission.id)).build()
+            val request = fixture.withAddMissionIds(listOf(otherMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -714,10 +715,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val completedStamp = stampTestHelper.saveCompletedStamp(otherTrip, 2)
             val otherDailyGoal = dailyGoalTestHelper.saveDailyGoal(otherTrip)
             val otherMission = missionTestHelper.saveMission(completedStamp)
-            val request = fixture.withAddMissionIds(listOf(otherMission.id)).build()
+            val request = fixture.withAddMissionIds(listOf(otherMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, otherTrip.id, otherDailyGoal.id, request)
+            val resultActions = getResultActions(token, otherTrip.id.requireId(), otherDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -733,10 +734,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newStamp = stampTestHelper.saveStamp(trip, 2)
             val newMission = missionTestHelper.saveMission(newStamp)
-            val request = fixture.withAddMissionIds(listOf(newMission.id)).build()
+            val request = fixture.withAddMissionIds(listOf(newMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -750,10 +751,10 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("유효한 요청이 들어오면 데일리 목표를 수정한다.")
         fun shouldUpdateDailyGoalWhenRequestIsValid() {
             // given
-            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withDeleteDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -780,7 +781,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", trip.id, dailyGoal.id)
+            val resultActions = getResultActions("", trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -797,7 +798,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = "abc"
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -814,7 +815,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val dailyGoalId = "abc"
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId)
 
             // then
             resultActions
@@ -831,7 +832,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = -1L
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -845,7 +846,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -862,7 +863,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -879,7 +880,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -896,7 +897,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val dailyGoalId = -1L
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId)
 
             // then
             resultActions
@@ -914,7 +915,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.savePomodoro(newDailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId())
 
             // then
             resultActions
@@ -931,7 +932,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val deletedDailyGoal = dailyGoalTestHelper.saveDeletedDailyGoal(trip)
 
             // when
-            val resultActions = getResultActions(token, trip.id, deletedDailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), deletedDailyGoal.id.requireId())
 
             // then
             resultActions
@@ -945,7 +946,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("뽀모도로가 존재하지 않으면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenPomodoroDoesNotExist() {
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -962,7 +963,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.saveDeletedPomodoro(dailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -979,7 +980,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.savePomodoro(dailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1006,7 +1007,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", trip.id, dailyGoal.id)
+            val resultActions = getResultActions("", trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1023,7 +1024,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = "abc"
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1040,7 +1041,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val dailyGoalId = "abc"
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId)
 
             // then
             resultActions
@@ -1057,7 +1058,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val tripId = -1L
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1071,7 +1072,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1088,7 +1089,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1105,7 +1106,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1122,7 +1123,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val dailyGoalId = -1L
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId)
 
             // then
             resultActions
@@ -1140,7 +1141,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.savePomodoro(newDailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1157,7 +1158,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             val deletedDailyGoal = dailyGoalTestHelper.saveDeletedDailyGoal(trip)
 
             // when
-            val resultActions = getResultActions(token, trip.id, deletedDailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), deletedDailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1171,7 +1172,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("뽀모도로가 존재하지 않으면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenPomodoroDoesNotExist() {
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1188,7 +1189,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.saveDeletedPomodoro(dailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions
@@ -1205,7 +1206,7 @@ class DailyGoalControllerIntegrationTest : BaseIntegrationTest() {
             pomodoroTestHelper.savePomodoro(dailyGoal)
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId())
 
             // then
             resultActions

@@ -2,6 +2,7 @@ package com.ject.studytrip.stamp.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.stamp.domain.error.StampErrorCode
 import com.ject.studytrip.stamp.domain.model.Stamp
@@ -63,7 +64,7 @@ class StampQueryServiceTest : BaseUnitTest() {
             val stampId = -1L
 
             // when
-            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id, stampId) }
+            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id.requireId(), stampId) }
 
             // then
             assertThat(exception.message).isEqualTo(StampErrorCode.STAMP_NOT_FOUND.message)
@@ -73,11 +74,11 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 스탬프가 다른 여행에 속한다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenStampNotBelongToTrip() {
             // given
-            val stampId = courseStamp1.id
+            val stampId = courseStamp1.id.requireId()
             given(stampRepository.findById(stampId)).willReturn(Optional.of(courseStamp1))
 
             // when
-            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(exploreTrip.id, stampId) }
+            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(exploreTrip.id.requireId(), stampId) }
 
             // then
             assertThat(exception.message).isEqualTo(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP.message)
@@ -87,12 +88,12 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("스탬프가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenStampAlreadyDeleted() {
             // given
-            val stampId = courseStamp1.id
+            val stampId = courseStamp1.id.requireId()
             courseStamp1.updateDeletedAt()
             given(stampRepository.findById(stampId)).willReturn(Optional.of(courseStamp1))
 
             // when
-            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id, stampId) }
+            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id.requireId(), stampId) }
 
             // then
             assertThat(exception.message).isEqualTo(StampErrorCode.STAMP_ALREADY_DELETED.message)
@@ -102,12 +103,12 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("스탬프가 이미 완료되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenStampAlreadyCompleted() {
             // given
-            val stampId = courseStamp1.id
+            val stampId = courseStamp1.id.requireId()
             courseStamp1.updateCompleted()
             given(stampRepository.findById(stampId)).willReturn(Optional.of(courseStamp1))
 
             // when
-            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id, stampId) }
+            val exception = assertThrows<CustomException> { stampQueryService.getValidStamp(courseTrip.id.requireId(), stampId) }
 
             // then
             assertThat(exception.message).isEqualTo(StampErrorCode.STAMP_ALREADY_COMPLETED.message)
@@ -117,11 +118,11 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 속한 스탬프가 존재하면 스탬프를 조회하고 반환한다.")
         fun shouldReturnStampWhenStampBelongsToTrip() {
             // given
-            val stampId = courseStamp1.id
+            val stampId = courseStamp1.id.requireId()
             given(stampRepository.findById(stampId)).willReturn(Optional.of(courseStamp1))
 
             // when
-            val result = stampQueryService.getValidStamp(courseTrip.id, stampId)
+            val result = stampQueryService.getValidStamp(courseTrip.id.requireId(), stampId)
 
             // then
             assertThat(result).isEqualTo(courseStamp1)
@@ -135,7 +136,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 속한 삭제되지 않은 스탬프 목록을 조회하고 반환한다.")
         fun shouldReturnStampsByTripIdAndDeletedAtIsNull() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             given(stampRepository.findAllByTripIdAndDeletedAtIsNull(tripId)).willReturn(listOf(courseStamp1, courseStamp2))
 
             // when
@@ -154,7 +155,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 코스형 여행에서 진행 중인 스탬프가 존재하지 않으면 예외가 발생한다.")
         fun shouldThrowExceptionWhenProgressStampDoesNotExistForCourseTrip() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             courseStamp1.updateCompleted()
             courseStamp2.updateCompleted()
             given(stampQueryRepository.findFirstIncompleteStampByTripId(tripId)).willReturn(Optional.empty())
@@ -170,7 +171,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 코스형 여행에서 진행 중인 첫번째 스탬프를 조회하고 반환한다.")
         fun shouldReturnFirstProcessingStampForCourseTrip() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             given(stampQueryRepository.findFirstIncompleteStampByTripId(tripId)).willReturn(Optional.of(courseStamp1))
 
             // when
@@ -178,8 +179,8 @@ class StampQueryServiceTest : BaseUnitTest() {
 
             // then
             assertThat(result).isEqualTo(courseStamp1)
-            assertThat(result.isDeleted).isFalse
-            assertThat(result.isCompleted).isFalse
+            assertThat(result.isDeleted()).isFalse
+            assertThat(result.isCompleted()).isFalse
         }
     }
 
@@ -271,7 +272,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("코스형 여행이라면 다음 스탬프 순서를 반환한다.")
         fun shouldReturnNextStampOrderForCourseTrip() {
             // given
-            given(stampQueryRepository.findNextStampOrderByTripId(courseTrip.id)).willReturn(3)
+            given(stampQueryRepository.findNextStampOrderByTripId(courseTrip.id.requireId())).willReturn(3)
 
             // when
             val result = stampQueryService.getNextStampOrderByTrip(courseTrip)
@@ -288,7 +289,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("시프트할 스탬프가 존재하지 않으면 빈 리스트를 반환한다.")
         fun shouldReturnEmptyListWhenStampsToShiftDoNotExist() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             val deletedOrder = courseStamp2.stampOrder
             courseStamp2.updateDeletedAt()
             given(stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedOrder)).willReturn(emptyList())
@@ -304,7 +305,7 @@ class StampQueryServiceTest : BaseUnitTest() {
         @DisplayName("시프트할 스탬프 목록을 조회하고 반환한다.")
         fun shouldReturnStampsToShiftAfterDeleted() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             val deletedOrder = courseStamp1.stampOrder
             given(stampQueryRepository.findStampsToShiftAfterOrder(tripId, deletedOrder)).willReturn(listOf(courseStamp2))
 

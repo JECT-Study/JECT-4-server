@@ -1,6 +1,7 @@
 package com.ject.studytrip.mission.application.service
 
 import com.ject.studytrip.BaseUnitTest
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.mission.domain.model.DailyMission
@@ -180,7 +181,7 @@ class DailyMissionCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 데일리 미션이 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenDailyMissionsOwnedByMemberDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(dailyMissionCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -194,7 +195,7 @@ class DailyMissionCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 데일리 미션이 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenDailyMissionsOwnedByMemberExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(dailyMissionCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

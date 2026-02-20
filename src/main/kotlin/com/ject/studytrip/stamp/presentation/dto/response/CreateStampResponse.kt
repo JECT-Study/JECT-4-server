@@ -8,7 +8,6 @@ data class CreateStampResponse(
     val stampId: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(stampInfo: StampInfo): CreateStampResponse = CreateStampResponse(stampInfo.stampId)
     }
 }

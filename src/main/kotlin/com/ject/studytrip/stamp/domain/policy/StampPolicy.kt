@@ -8,13 +8,13 @@ import java.time.LocalDate
 
 object StampPolicy {
     fun validateNotDeleted(stamp: Stamp) {
-        if (stamp.isDeleted) {
+        if (stamp.isDeleted()) {
             throw CustomException(StampErrorCode.STAMP_ALREADY_DELETED)
         }
     }
 
     fun validateNotCompleted(stamp: Stamp) {
-        if (stamp.isCompleted) {
+        if (stamp.isCompleted()) {
             throw CustomException(StampErrorCode.STAMP_ALREADY_COMPLETED)
         }
     }

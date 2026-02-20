@@ -5,6 +5,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode
 import com.ject.studytrip.auth.fixture.TokenFixture
 import com.ject.studytrip.auth.helper.TokenTestHelper
 import com.ject.studytrip.global.exception.error.CommonErrorCode
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.MemberRole
 import com.ject.studytrip.member.helper.MemberTestHelper
@@ -210,7 +211,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", courseTrip.id, request)
+            val resultActions = getResultActions("", courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -245,7 +246,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withCategory("TEST").build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -262,7 +263,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withEndDate(LocalDate.now().minusDays(10)).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -297,7 +298,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -315,7 +316,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -333,7 +334,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -350,7 +351,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withEndDate(LocalDate.now().plusDays(3)).build()
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id, request)
+            val resultActions = getResultActions(token, courseTrip.id.requireId(), request)
 
             // then
             resultActions
@@ -376,7 +377,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId())
 
             // then
             resultActions
@@ -424,7 +425,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId())
 
             // then
             resultActions
@@ -441,7 +442,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId())
 
             // then
             resultActions
@@ -458,7 +459,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId())
 
             // then
             resultActions
@@ -472,7 +473,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("특정 여행을 삭제한다.")
         fun shouldDeleteTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId())
 
             // then
             resultActions
@@ -498,7 +499,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId())
 
             // then
             resultActions
@@ -546,7 +547,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId())
 
             // then
             resultActions
@@ -563,7 +564,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId())
 
             // then
             resultActions
@@ -580,7 +581,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId())
 
             // then
             resultActions
@@ -597,7 +598,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             stampTestHelper.saveStamp(courseTrip, 1)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId())
 
             // then
             resultActions
@@ -615,7 +616,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             stampTestHelper.saveCompletedStamp(courseTrip, 2)
 
             // when
-            val resultActions = getResultActions(token, courseTrip.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId())
 
             // then
             resultActions
@@ -742,7 +743,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", courseTrip.id)
+            val resultActions = getResultActions("", courseTrip.id.requireId())
 
             // then
             resultActions
@@ -790,7 +791,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("여행의 소유자가 아니라면 403 Forbidden을 반환한다.")
         fun shouldReturnForbiddenWhenMemberIsNotTripOwner() {
             // when
-            val resultActions = getResultActions(token, newTrip.id)
+            val resultActions = getResultActions(token, newTrip.id.requireId())
 
             // then
             resultActions
@@ -807,7 +808,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId())
 
             // then
             resultActions
@@ -824,7 +825,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id)
+            val resultActions = getResultActions(token, completedTrip.id.requireId())
 
             // then
             resultActions
@@ -838,7 +839,7 @@ class TripControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("특정 여행을 상세 조회합니다.")
         fun shouldReturnTrip() {
             // when
-            val resultActions = getResultActions(token, courseTrip.id)
+            val resultActions = getResultActions(token, courseTrip.id.requireId())
 
             // then
             resultActions

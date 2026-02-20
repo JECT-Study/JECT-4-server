@@ -24,6 +24,6 @@ class DummyStampFacade(
         val trip = dummyTripCommandService.createDummyTrip(member, category, count)
         val stamps = (1..count).map { order -> dummyStampCommandService.createDummyStamp(trip, order) }
 
-        return DummyStampsInfo.of(stamps.map { DummyStampInfo.from(it) })
+        return DummyStampsInfo(stamps.map { DummyStampInfo.from(it) })
     }
 }

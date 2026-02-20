@@ -1,13 +1,14 @@
 package com.ject.studytrip.stamp.application.dto
 
 import com.ject.studytrip.global.util.DateUtil
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.stamp.domain.model.Stamp
 
 data class StampInfo(
     val stampId: Long,
     val stampName: String,
     val stampOrder: Int,
-    val endDate: String,
+    val endDate: String?,
     val totalMissions: Int,
     val completedMissions: Int,
     val completed: Boolean,
@@ -16,18 +17,17 @@ data class StampInfo(
     val deletedAt: String?,
 ) {
     companion object {
-        @JvmStatic
         fun from(stamp: Stamp): StampInfo =
             StampInfo(
-                stamp.id,
+                stamp.id.requireId(),
                 stamp.name,
                 stamp.stampOrder,
-                DateUtil.formatDate(stamp.endDate),
+                stamp.endDate?.let { DateUtil.formatDate(it) },
                 stamp.totalMissions,
                 stamp.completedMissions,
-                stamp.isCompleted,
-                DateUtil.formatDateTime(stamp.createdAt),
-                DateUtil.formatDateTime(stamp.updatedAt),
+                stamp.isCompleted(),
+                DateUtil.formatDateTime(requireNotNull(stamp.createdAt)),
+                DateUtil.formatDateTime(requireNotNull(stamp.updatedAt)),
                 stamp.deletedAt?.let { DateUtil.formatDateTime(it) },
             )
     }

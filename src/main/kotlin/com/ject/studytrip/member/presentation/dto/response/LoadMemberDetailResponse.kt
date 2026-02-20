@@ -24,7 +24,6 @@ data class LoadMemberDetailResponse(
     val studyLogCount: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             memberInfo: MemberInfo,
             tripCount: TripCount,

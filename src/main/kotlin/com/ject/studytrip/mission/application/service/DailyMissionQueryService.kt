@@ -16,6 +16,7 @@ class DailyMissionQueryService(
         dailyMissionIds: List<Long>,
     ): List<DailyMission> {
         val dailyMissions = dailyMissionRepository.findAllByIdIn(dailyMissionIds)
+
         validateDailyMissions(dailyMissions, dailyMissionIds, dailyGoalId)
 
         return dailyMissions
@@ -26,6 +27,7 @@ class DailyMissionQueryService(
         dailyMissionIds: List<Long>,
     ): List<DailyMission> {
         val dailyMissions = dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)
+
         validateDailyMissions(dailyMissions, dailyMissionIds, dailyGoalId)
 
         return dailyMissions

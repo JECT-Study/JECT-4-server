@@ -6,7 +6,7 @@ import com.ject.studytrip.trip.domain.model.DailyGoal
 
 object DailyGoalPolicy {
     fun validateNotDeleted(dailyGoal: DailyGoal) {
-        if (dailyGoal.isDeleted) {
+        if (dailyGoal.isDeleted()) {
             throw CustomException(DailyGoalErrorCode.DAILY_GOAL_ALREADY_DELETED)
         }
     }

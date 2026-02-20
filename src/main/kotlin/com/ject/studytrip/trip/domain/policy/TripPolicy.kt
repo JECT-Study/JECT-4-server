@@ -8,19 +8,19 @@ import java.time.LocalDate
 
 object TripPolicy {
     fun validateNotDeleted(trip: Trip) {
-        if (trip.isDeleted) {
+        if (trip.isDeleted()) {
             throw CustomException(TripErrorCode.TRIP_ALREADY_DELETED)
         }
     }
 
     fun validateNotCompleted(trip: Trip) {
-        if (trip.isCompleted) {
+        if (trip.isCompleted()) {
             throw CustomException(TripErrorCode.TRIP_ALREADY_COMPLETED)
         }
     }
 
     fun validateCompleted(trip: Trip) {
-        if (!trip.isCompleted) {
+        if (!trip.isCompleted()) {
             throw CustomException(TripErrorCode.TRIP_NOT_COMPLETED)
         }
     }

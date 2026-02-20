@@ -6,7 +6,7 @@ import com.ject.studytrip.trip.domain.model.TripReport
 
 object TripReportPolicy {
     fun validateNotDeleted(tripReport: TripReport) {
-        if (tripReport.isDeleted) {
+        if (tripReport.isDeleted()) {
             throw CustomException(TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED)
         }
     }

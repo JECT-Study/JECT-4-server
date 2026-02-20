@@ -13,20 +13,13 @@ data class LoadStudyLogsSliceResponse(
     val hasNext: Boolean,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             studyLogDetails: List<StudyLogDetail>,
             hasNext: Boolean,
         ): LoadStudyLogsSliceResponse =
             LoadStudyLogsSliceResponse(
-                studyLogs =
-                    studyLogDetails.map { detail ->
-                        StudyLogResponse.of(
-                            studyLogInfo = detail.studyLogInfo,
-                            studyLogDailyMissionInfos = detail.studyLogDailyMissionInfos,
-                        )
-                    },
-                hasNext = hasNext,
+                studyLogDetails.map { StudyLogResponse.of(it.studyLogInfo, it.studyLogDailyMissionInfos) },
+                hasNext,
             )
     }
 
@@ -50,18 +43,12 @@ data class LoadStudyLogsSliceResponse(
                 studyLogDailyMissionInfos: List<StudyLogDailyMissionInfo>,
             ): StudyLogResponse =
                 StudyLogResponse(
-                    studyLogId = studyLogInfo.studyLogId,
-                    dailyMissions =
-                        studyLogDailyMissionInfos.map { info ->
-                            StudyLogDailyMissionResponse.of(
-                                studyLogDailyMissionInfo = info,
-                                missionInfo = info.dailyMissionInfo.missionInfo,
-                            )
-                        },
-                    title = studyLogInfo.title,
-                    content = studyLogInfo.content,
-                    imageUrl = studyLogInfo.imageUrl,
-                    createdAt = studyLogInfo.createdAt,
+                    studyLogInfo.studyLogId,
+                    studyLogDailyMissionInfos.map { StudyLogDailyMissionResponse.of(it, it.dailyMissionInfo.missionInfo) },
+                    studyLogInfo.title,
+                    studyLogInfo.content,
+                    studyLogInfo.imageUrl,
+                    studyLogInfo.createdAt,
                 )
         }
 
@@ -76,10 +63,7 @@ data class LoadStudyLogsSliceResponse(
                     studyLogDailyMissionInfo: StudyLogDailyMissionInfo,
                     missionInfo: MissionInfo,
                 ): StudyLogDailyMissionResponse =
-                    StudyLogDailyMissionResponse(
-                        studyLogDailyMissionId = studyLogDailyMissionInfo.studyLogDailyMissionId,
-                        missionName = missionInfo.missionName,
-                    )
+                    StudyLogDailyMissionResponse(studyLogDailyMissionInfo.studyLogDailyMissionId, missionInfo.missionName)
             }
         }
     }

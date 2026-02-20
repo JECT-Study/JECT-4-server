@@ -1,6 +1,7 @@
 package com.ject.studytrip.stamp.application.service
 
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.stamp.domain.error.StampErrorCode
 import com.ject.studytrip.stamp.domain.model.Stamp
 import com.ject.studytrip.stamp.domain.policy.StampPolicy
@@ -58,7 +59,7 @@ class StampQueryService(
     fun getNextStampOrderByTrip(trip: Trip): Int {
         if (trip.category != TripCategory.COURSE) return 0
 
-        return stampQueryRepository.findNextStampOrderByTripId(trip.id)
+        return stampQueryRepository.findNextStampOrderByTripId(trip.id.requireId())
     }
 
     fun getStampsToShiftAfterDeleted(
@@ -68,17 +69,25 @@ class StampQueryService(
 
     private fun getExploreStampName(stamps: List<Stamp>): String {
         // 스탬프별 개수 집계
-        val stampCountMap = stamps.groupingBy { it }.eachCount().mapValues { it.value.toLong() }
+        val stampCountMap: Map<Stamp, Long> =
+            stamps
+                .groupingBy { it }
+                .eachCount()
+                .mapValues { it.value.toLong() }
 
         // 최대 개수
-        val maxCount = stampCountMap.values.maxOrNull() ?: 0L
+        val maxCount: Long = stampCountMap.values.maxOrNull() ?: 0L
 
         // 최대 개수를 가진 스탬프들 찾기
-        val maxCountStamps: List<Stamp> = stampCountMap.filterValues { it == maxCount }.keys.toList()
+        val maxCountStamps: List<Stamp> =
+            stampCountMap
+                .filterValues { it == maxCount }
+                .keys
+                .toList()
 
         // 가장 빠른 생성 시간을 가진 스탬프 선택
         return maxCountStamps
-            .minByOrNull { it.createdAt }
+            .minByOrNull { it.createdAt!! }
             ?.name
             ?: ""
     }

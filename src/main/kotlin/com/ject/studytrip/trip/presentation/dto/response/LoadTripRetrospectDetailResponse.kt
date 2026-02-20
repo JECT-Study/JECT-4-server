@@ -25,7 +25,6 @@ data class LoadTripRetrospectDetailResponse(
     val history: LoadStudyLogsSliceResponse,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             tripRetrospectSummary: TripRetrospectSummary,
             tripInfo: TripInfo,

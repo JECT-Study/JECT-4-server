@@ -4,6 +4,7 @@ import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMPS
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIPS
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.mission.application.dto.MissionInfo
 import com.ject.studytrip.mission.application.service.MissionCommandService
 import com.ject.studytrip.mission.application.service.MissionQueryService
@@ -89,7 +90,7 @@ class StampFacade(
         request: UpdateStampRequest,
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val stamp = stampQueryService.getValidStamp(trip.id, stampId)
+        val stamp = stampQueryService.getValidStamp(trip.id.requireId(), stampId)
 
         stampCommandService.updateStamp(trip, stamp, request)
     }
@@ -143,7 +144,7 @@ class StampFacade(
         stampId: Long,
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val stamp = stampQueryService.getValidStamp(trip.id, stampId)
+        val stamp = stampQueryService.getValidStamp(tripId, stampId)
 
         stampCommandService.deleteStamp(stamp)
         shiftStampOrdersIfTripCategoryIsCourse(trip, stamp.stampOrder)
@@ -174,9 +175,9 @@ class StampFacade(
         stampId: Long,
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val stamp = stampQueryService.getValidStamp(trip.id, stampId)
+        val stamp = stampQueryService.getValidStamp(tripId, stampId)
 
-        missionCommandService.validateAllMissionsCompletedByStampId(stamp.id)
+        missionCommandService.validateAllMissionsCompletedByStampId(stampId)
 
         stampCommandService.completeStamp(stamp)
         tripCommandService.increaseCompletedStamps(trip)
@@ -192,9 +193,9 @@ class StampFacade(
         tripId: Long,
     ): StampsInfo {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val stamps = stampQueryService.getStampsByTripId(trip.id)
+        val stamps = stampQueryService.getStampsByTripId(trip.id.requireId())
 
-        return StampsInfo.of(stamps.map { StampInfo.from(it) })
+        return StampsInfo(stamps.map { StampInfo.from(it) })
     }
 
     @Cacheable(
@@ -208,10 +209,10 @@ class StampFacade(
         stampId: Long,
     ): StampDetail {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val stamp = stampQueryService.getValidStamp(trip.id, stampId)
-        val missions = missionQueryService.getMissionsByStampId(stamp.id)
+        val stamp = stampQueryService.getValidStamp(trip.id.requireId(), stampId)
+        val missions = missionQueryService.getMissionsByStampId(stampId)
 
-        return StampDetail.from(StampInfo.from(stamp), missions.map { MissionInfo.from(it) })
+        return StampDetail(StampInfo.from(stamp), missions.map { MissionInfo.from(it) })
     }
 
     private fun shiftStampOrdersIfTripCategoryIsCourse(
@@ -220,7 +221,7 @@ class StampFacade(
     ) {
         if (trip.category != TripCategory.COURSE) return
 
-        val affectedStamps = stampQueryService.getStampsToShiftAfterDeleted(trip.id, stampOrder)
+        val affectedStamps = stampQueryService.getStampsToShiftAfterDeleted(trip.id.requireId(), stampOrder)
 
         stampCommandService.shiftStampOrders(affectedStamps)
     }

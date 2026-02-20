@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.trip.domain.error.TripErrorCode
@@ -194,7 +195,7 @@ class TripCommandServiceTest : BaseUnitTest() {
             tripCommandService.completeTrip(courseTrip)
 
             // then
-            assertThat(courseTrip.isCompleted).isTrue
+            assertThat(courseTrip.isCompleted()).isTrue
         }
     }
 
@@ -316,7 +317,7 @@ class TripCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 여행이 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenTripsOwnedByMemberDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -330,7 +331,7 @@ class TripCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 여행이 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenTripsOwnedByMemberExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

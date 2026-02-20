@@ -15,7 +15,7 @@ data class LoadTripReportDetailResponse(
     @field:Schema(description = "여행 시작일 (여행 회고)")
     val startDate: String,
     @field:Schema(description = "여행 종료일 (여행 회고)")
-    val endDate: String,
+    val endDate: String?,
     @field:Schema(description = "총 학습 시간")
     val totalFocusHours: Long,
     @field:Schema(description = "학습 로그 개수 (세션 성공)")
@@ -30,7 +30,6 @@ data class LoadTripReportDetailResponse(
     val history: LoadStudyLogsSliceResponse,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             tripReportInfo: TripReportInfo,
             studyLogSliceInfo: StudyLogSliceInfo,

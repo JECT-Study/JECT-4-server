@@ -147,7 +147,7 @@ class TripReportController(
             .body(
                 StandardResponse.success(
                     HttpStatus.OK.value(),
-                    PresignedTripReportImageResponse.of(result.tripReportId, result.tmpKey, result.presignedUrl),
+                    PresignedTripReportImageResponse(result.tripReportId, result.tmpKey, result.presignedUrl),
                 ),
             )
     }

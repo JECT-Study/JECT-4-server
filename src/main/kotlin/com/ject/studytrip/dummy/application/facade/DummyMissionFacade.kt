@@ -27,6 +27,6 @@ class DummyMissionFacade(
         val stamp = dummyStampCommandService.createDummyStamp(trip, count)
         val missions = List(count) { dummyMissionCommandService.createDummyMission(stamp) }
 
-        return DummyMissionsInfo.of(missions.map { DummyMissionInfo.from(it) })
+        return DummyMissionsInfo(missions.map { DummyMissionInfo.from(it) })
     }
 }

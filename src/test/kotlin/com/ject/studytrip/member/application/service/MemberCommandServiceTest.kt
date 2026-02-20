@@ -2,6 +2,7 @@ package com.ject.studytrip.member.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.error.MemberErrorCode
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.SocialProvider
@@ -67,20 +68,6 @@ class MemberCommandServiceTest : BaseUnitTest() {
         }
 
         @Test
-        @DisplayName("카테고리가 유효하지 않으면 예외가 발생한다.")
-        fun shouldThrowExceptionWhenCategoryIsInvalid() {
-            // given
-            val command = fixture.withCategory("INVALID").build()
-            given(memberRepository.existsBySocialProviderAndSocialId(SocialProvider.KAKAO, member.socialId)).willReturn(false)
-
-            // when
-            val exception = assertThrows<CustomException> { memberCommandService.createMemberFromKakao(command) }
-
-            // then
-            assertThat(exception.message).isEqualTo(MemberErrorCode.INVALID_MEMBER_CATEGORY.message)
-        }
-
-        @Test
         @DisplayName("CreateMemberCommand가 유효하면 멤버를 생성하고 반환한다.")
         fun shouldCreateAndReturnMemberWhenCommandIsValid() {
             // given
@@ -117,19 +104,6 @@ class MemberCommandServiceTest : BaseUnitTest() {
     @DisplayName("updateMember 메서드는")
     inner class UpdateMember {
         private val fixture = UpdateMemberRequestFixture()
-
-        @Test
-        @DisplayName("카테고리가 유효하지 않으면 예외가 발생한다.")
-        fun shouldThrowExceptionWhenCategoryIsInvalid() {
-            // given
-            val request = fixture.withCategory("INVALID").build()
-
-            // when
-            val exception = assertThrows<CustomException> { memberCommandService.updateMember(member, request) }
-
-            // then
-            assertThat(exception.message).isEqualTo(MemberErrorCode.INVALID_MEMBER_CATEGORY.message)
-        }
 
         @Test
         @DisplayName("특정 멤버의 닉네임을 수정한다.")
@@ -273,7 +247,7 @@ class MemberCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버를 완전 삭제합니다.")
         fun shouldHardDeleteMember() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
 
             // when
             memberCommandService.hardDeleteMember(memberId)

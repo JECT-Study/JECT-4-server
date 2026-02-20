@@ -397,7 +397,7 @@ class ImageServiceTest : BaseUnitTest() {
             // given
             val imageUrls = listOf(VALID_IMAGE_URL1, "https://wrong-cdn.com/members/1/image1.jpg")
             val keys = listOf(VALID_KEY1)
-            given(cdnProperties.domain()).willReturn(IMAGE_BASE_URL)
+            given(cdnProperties.domain).willReturn(IMAGE_BASE_URL)
             given(s3Provider.deleteByKeys(keys)).willReturn(CleanupImagesResult(1, emptyList()))
 
             // when

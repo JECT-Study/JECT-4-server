@@ -110,7 +110,7 @@ class TripController(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(StandardResponse.success(HttpStatus.OK.value(), LoadTripsSliceResponse.of(result.tripInfos, result.hasNext)))
+            .body(StandardResponse.success(HttpStatus.OK.value(), LoadTripsSliceResponse(result.tripInfos, result.hasNext)))
     }
 
     @Operation(summary = "여행 상세 조회", description = "특정 여행을 상세 조회합니다.")

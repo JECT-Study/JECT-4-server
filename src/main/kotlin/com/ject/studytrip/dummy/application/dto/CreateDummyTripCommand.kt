@@ -8,14 +8,4 @@ data class CreateDummyTripCommand(
     val memo: String,
     val tripCategory: TripCategory,
     val endDate: LocalDate?,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            name: String,
-            memo: String,
-            tripCategory: TripCategory,
-            endDate: LocalDate?,
-        ): CreateDummyTripCommand = CreateDummyTripCommand(name, memo, tripCategory, endDate)
-    }
-}
+)

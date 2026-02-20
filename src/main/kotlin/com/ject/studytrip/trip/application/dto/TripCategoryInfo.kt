@@ -7,7 +7,6 @@ data class TripCategoryInfo(
     val value: String,
 ) {
     companion object {
-        @JvmStatic
-        fun from(category: TripCategory): TripCategoryInfo = TripCategoryInfo(category.name, category.getValue())
+        fun from(category: TripCategory): TripCategoryInfo = TripCategoryInfo(category.name, category.value)
     }
 }

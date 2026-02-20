@@ -92,12 +92,10 @@ class HardDeleteFacade(
             executor.run(STUDY_LOG_DAILY_MISSIONS_OWNED_BY_DELETED_DAILY_MISSION) {
                 studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsOwnedByDeletedDailyMission()
             }
-
         phases[STUDY_LOG_DAILY_MISSIONS_OWNED_BY_DELETED_STUDY_LOG] =
             executor.run(STUDY_LOG_DAILY_MISSIONS_OWNED_BY_DELETED_STUDY_LOG) {
                 studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissionsOwnedByDeletedStudyLog()
             }
-
         phases[STUDY_LOG_DAILY_MISSIONS] =
             executor.run(STUDY_LOG_DAILY_MISSIONS) {
                 studyLogDailyMissionCommandService.hardDeleteStudyLogDailyMissions()
@@ -109,12 +107,10 @@ class HardDeleteFacade(
             executor.run(DAILY_MISSIONS_OWNED_BY_DELETED_MISSION) {
                 dailyMissionCommandService.hardDeleteDailyMissionsOwnedByDeletedMission()
             }
-
         phases[DAILY_MISSIONS_OWNED_BY_DELETED_DAILY_GOAL] =
             executor.run(DAILY_MISSIONS_OWNED_BY_DELETED_DAILY_GOAL) {
                 dailyMissionCommandService.hardDeleteDailyMissionsOwnedByDeletedDailyGoal()
             }
-
         phases[DAILY_MISSIONS] =
             executor.run(DAILY_MISSIONS) {
                 dailyMissionCommandService.hardDeleteDailyMissions()
@@ -133,7 +129,6 @@ class HardDeleteFacade(
             executor.run(TRIP_REPORTS_OWNED_BY_DELETED_MEMBER) {
                 tripReportCommandService.hardDeleteTripReportsOwnedByDeletedMember()
             }
-
         phases[TRIP_REPORTS] =
             executor.run(TRIP_REPORTS) {
                 tripReportCommandService.hardDeleteTripReports()
@@ -145,12 +140,10 @@ class HardDeleteFacade(
             executor.run(STUDY_LOGS_OWNED_BY_DELETED_MEMBER) {
                 studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedMember()
             }
-
         phases[STUDY_LOGS_OWNED_BY_DELETED_DAILY_GOAL] =
             executor.run(STUDY_LOGS_OWNED_BY_DELETED_DAILY_GOAL) {
                 studyLogCommandService.hardDeleteStudyLogsOwnedByDeletedDailyGoal()
             }
-
         phases[STUDY_LOGS] =
             executor.run(STUDY_LOGS) {
                 studyLogCommandService.hardDeleteStudyLogs()
@@ -162,7 +155,6 @@ class HardDeleteFacade(
             executor.run(DAILY_GOALS_OWNED_BY_DELETED_TRIP) {
                 dailyGoalCommandService.hardDeleteDailyGoalsOwnedByDeletedTrip()
             }
-
         phases[DAILY_GOALS] =
             executor.run(DAILY_GOALS) {
                 dailyGoalCommandService.hardDeleteDailyGoals()
@@ -174,7 +166,6 @@ class HardDeleteFacade(
             executor.run(MISSIONS_OWNED_BY_DELETED_STAMP) {
                 missionCommandService.hardDeleteMissionsOwnedByDeletedStamp()
             }
-
         phases[MISSIONS] =
             executor.run(MISSIONS) {
                 missionCommandService.hardDeleteMissions()
@@ -186,7 +177,6 @@ class HardDeleteFacade(
             executor.run(STAMPS_OWNED_BY_DELETED_TRIP) {
                 stampCommandService.hardDeleteStampsOwnedByDeletedTrip()
             }
-
         phases[STAMPS] =
             executor.run(STAMPS) {
                 stampCommandService.hardDeleteStamps()
@@ -198,7 +188,6 @@ class HardDeleteFacade(
             executor.run(TRIPS_OWNED_BY_DELETED_MEMBER) {
                 tripCommandService.hardDeleteTripsOwnedByDeletedMember()
             }
-
         phases[TRIPS] =
             executor.run(TRIPS) {
                 tripCommandService.hardDeleteTrips()

@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.facade
 
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP_REPORT
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP_REPORTS
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.image.application.service.ImageService
 import com.ject.studytrip.member.application.service.MemberQueryService
 import com.ject.studytrip.pomodoro.application.service.PomodoroQueryService
@@ -10,6 +11,7 @@ import com.ject.studytrip.studylog.application.dto.StudyLogSliceInfo
 import com.ject.studytrip.studylog.application.service.StudyLogDailyMissionQueryService
 import com.ject.studytrip.studylog.application.service.StudyLogQueryService
 import com.ject.studytrip.studylog.domain.model.StudyLog
+import com.ject.studytrip.trip.application.dto.PresignedTripReportImageInfo
 import com.ject.studytrip.trip.application.dto.TripInfo
 import com.ject.studytrip.trip.application.dto.TripReportDetail
 import com.ject.studytrip.trip.application.dto.TripReportInfo
@@ -23,7 +25,6 @@ import com.ject.studytrip.trip.application.service.TripReportStudyLogCommandServ
 import com.ject.studytrip.trip.presentation.dto.request.ConfirmTripReportImageRequest
 import com.ject.studytrip.trip.presentation.dto.request.CreateTripReportRequest
 import com.ject.studytrip.trip.presentation.dto.request.PresignTripReportImageRequest
-import com.ject.studytrip.trip.presentation.dto.response.PresignedTripReportImageResponse
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.cache.annotation.Caching
@@ -96,17 +97,17 @@ class TripReportFacade(
         size: Int,
     ): TripRetrospectDetail {
         val trip = tripQueryService.getValidCompletedTrip(memberId, tripId)
-        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripId(trip.id, page, size, "LATEST")
-        val studyLogCount = studyLogQueryService.getStudyLogCountByTripId(trip.id)
-        val totalFocusHours = pomodoroQueryService.getTotalFocusHoursByTripId(trip.id)
+        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripId(trip.id.requireId(), page, size, "LATEST")
+        val studyLogCount = studyLogQueryService.getStudyLogCountByTripId(trip.id.requireId())
+        val totalFocusHours = pomodoroQueryService.getTotalFocusHoursByTripId(trip.id.requireId())
         val studyDays = trip.endDate?.let { maxOf(0, ChronoUnit.DAYS.between(trip.startDate, it) + 1) } ?: 0L
-        val studyLogIds = studyLogQueryService.getStudyLogIdsByTripId(trip.id)
+        val studyLogIds = studyLogQueryService.getStudyLogIdsByTripId(trip.id.requireId())
 
         val summary = TripRetrospectSummary(studyLogCount, totalFocusHours, studyDays, studyLogIds)
         val tripInfo = TripInfo.from(trip, 0, 100)
         val studyLogSliceInfo = buildStudyLogSliceInfo(studyLogSlice)
 
-        return TripRetrospectDetail.from(summary, tripInfo, studyLogSliceInfo)
+        return TripRetrospectDetail(summary, tripInfo, studyLogSliceInfo)
     }
 
     @Cacheable(cacheNames = [TRIP_REPORTS], key = "T(com.ject.studytrip.global.common.factory.CacheKeyFactory).tripReports(#memberId)")
@@ -114,7 +115,7 @@ class TripReportFacade(
     fun getTripReportsByMember(memberId: Long): TripReportsInfo {
         val tripReports = tripReportQueryService.getTripReportsByMemberId(memberId)
 
-        return TripReportsInfo.of(tripReports.map { TripReportInfo.from(it) })
+        return TripReportsInfo(tripReports.map { TripReportInfo.from(it) })
     }
 
     @Cacheable(
@@ -129,23 +130,23 @@ class TripReportFacade(
         size: Int,
     ): TripReportDetail {
         val tripReport = tripReportQueryService.getValidTripReport(memberId, tripReportId)
-        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripReportId(tripReport.id, page, size)
+        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripReportId(tripReport.id.requireId(), page, size)
 
         val tripReportInfo = TripReportInfo.from(tripReport)
         val studyLogSliceInfo = buildStudyLogSliceInfo(studyLogSlice)
 
-        return TripReportDetail.from(tripReportInfo, studyLogSliceInfo)
+        return TripReportDetail(tripReportInfo, studyLogSliceInfo)
     }
 
     @Transactional(readOnly = true)
     fun issuePresignedUrl(
         tripReportId: Long,
         request: PresignTripReportImageRequest,
-    ): PresignedTripReportImageResponse {
+    ): PresignedTripReportImageInfo {
         val tripReport = tripReportQueryService.getTripReport(tripReportId)
         val info = imageService.presign(TRIP_REPORT_IMAGE_KEY_PREFIX, tripReport.id.toString(), request.originFilename)
 
-        return PresignedTripReportImageResponse.of(tripReport.id, info.tmpKey, info.presignedUrl)
+        return PresignedTripReportImageInfo(tripReport.id.requireId(), info.tmpKey, info.presignedUrl)
     }
 
     @Transactional
@@ -160,12 +161,12 @@ class TripReportFacade(
     }
 
     private fun buildStudyLogSliceInfo(studyLogSlice: Slice<StudyLog>): StudyLogSliceInfo {
-        val studyLogIds = studyLogSlice.content.map { it.id }
+        val studyLogIds = studyLogSlice.content.map { it.id.requireId() }
 
         // 학습 로그별 학습 로그 데일리 미션 목록 그룹화
         val groupedStudyLogDailyMissions = studyLogDailyMissionQueryService.getGroupedStudyLogDailyMissionsByStudyLogIds(studyLogIds)
         val studyLogDetails = studyLogSlice.content.map { StudyLogDetail.from(it, groupedStudyLogDailyMissions[it.id]) }
 
-        return StudyLogSliceInfo.of(studyLogDetails, studyLogSlice.hasNext())
+        return StudyLogSliceInfo(studyLogDetails, studyLogSlice.hasNext())
     }
 }

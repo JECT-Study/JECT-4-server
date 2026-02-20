@@ -5,6 +5,7 @@ import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMPS
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIPS
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.mission.application.dto.MissionInfo
 import com.ject.studytrip.mission.application.dto.MissionsInfo
 import com.ject.studytrip.mission.application.service.MissionCommandService
@@ -93,7 +94,7 @@ class MissionFacade(
         request: UpdateMissionRequest,
     ) {
         val stamp = getValidStampForTripOwnedByMember(memberId, tripId, stampId)
-        val mission = missionQueryService.getValidMission(stamp.id, missionId)
+        val mission = missionQueryService.getValidMission(stamp.id.requireId(), missionId)
 
         missionCommandService.updateMissionNameIfPresent(mission, request)
     }
@@ -123,7 +124,7 @@ class MissionFacade(
         missionId: Long,
     ) {
         val stamp = getValidStampForTripOwnedByMember(memberId, tripId, stampId)
-        val mission = missionQueryService.getValidMission(stamp.id, missionId)
+        val mission = missionQueryService.getValidMission(stamp.id.requireId(), missionId)
 
         missionCommandService.deleteMission(mission)
         stampCommandService.decreaseTotalMissions(stamp)
@@ -140,9 +141,9 @@ class MissionFacade(
         stampId: Long,
     ): MissionsInfo {
         val stamp = getValidStampForTripOwnedByMember(memberId, tripId, stampId)
-        val missions = missionQueryService.getMissionsByStampId(stamp.id)
+        val missions = missionQueryService.getMissionsByStampId(stamp.id.requireId())
 
-        return MissionsInfo.of(missions.map { MissionInfo.from(it) })
+        return MissionsInfo(missions.map { MissionInfo.from(it) })
     }
 
     private fun getValidStampForTripOwnedByMember(
@@ -152,6 +153,6 @@ class MissionFacade(
     ): Stamp {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
 
-        return stampQueryService.getValidStamp(trip.id, stampId)
+        return stampQueryService.getValidStamp(trip.id.requireId(), stampId)
     }
 }

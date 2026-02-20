@@ -6,7 +6,7 @@ import com.ject.studytrip.studylog.domain.model.StudyLog
 
 object StudyLogPolicy {
     fun validateNotDeleted(studyLog: StudyLog) {
-        if (studyLog.isDeleted) {
+        if (studyLog.isDeleted()) {
             throw CustomException(StudyLogErrorCode.STUDY_LOG_ALREADY_DELETED)
         }
     }

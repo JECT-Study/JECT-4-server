@@ -8,7 +8,6 @@ data class CreateMissionResponse(
     val missionId: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(missionInfo: MissionInfo): CreateMissionResponse = CreateMissionResponse(missionInfo.missionId)
     }
 }

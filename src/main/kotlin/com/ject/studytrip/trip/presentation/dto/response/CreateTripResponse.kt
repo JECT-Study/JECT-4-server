@@ -8,7 +8,6 @@ data class CreateTripResponse(
     val tripId: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(tripInfo: TripInfo): CreateTripResponse = CreateTripResponse(tripInfo.tripId)
     }
 }

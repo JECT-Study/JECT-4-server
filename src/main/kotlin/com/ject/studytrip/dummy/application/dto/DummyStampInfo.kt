@@ -12,15 +12,14 @@ data class DummyStampInfo(
     val completed: Boolean,
 ) {
     companion object {
-        @JvmStatic
         fun from(stamp: Stamp): DummyStampInfo =
             DummyStampInfo(
                 stamp.name,
                 stamp.stampOrder,
-                DateUtil.formatDate(stamp.endDate),
+                stamp.endDate?.let { DateUtil.formatDate(it) },
                 stamp.totalMissions,
                 stamp.completedMissions,
-                stamp.isCompleted,
+                stamp.isCompleted(),
             )
     }
 }

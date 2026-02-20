@@ -101,7 +101,7 @@ class StudyLogController(
             .body(
                 StandardResponse.success(
                     HttpStatus.OK.value(),
-                    PresignedStudyLogImageResponse.of(result.studyLogId, result.tmpKey, result.presignedUrl),
+                    PresignedStudyLogImageResponse(result.studyLogId, result.tmpKey, result.presignedUrl),
                 ),
             )
     }

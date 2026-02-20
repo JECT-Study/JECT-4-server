@@ -2,6 +2,7 @@ package com.ject.studytrip.stamp.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.stamp.domain.error.StampErrorCode
@@ -154,7 +155,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("스탬프 종료일을 여행 종료일보다 이후 날짜로 수정하면 예외가 발생한다.")
         fun shouldThrowExceptionWhenEndDateIsAfterTripEndDate() {
             // given
-            val request = fixture.withEndTime(LocalDate.now().plusDays(100)).build()
+            val request = fixture.withEndDate(LocalDate.now().plusDays(100)).build()
 
             // when
             val exception = assertThrows<CustomException> { stampCommandService.updateStamp(courseTrip, courseStamp1, request) }
@@ -167,7 +168,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("유효한 요청이 들어오면 스탬프 이름을 수정한다.")
         fun shouldUpdateStampNameWhenRequestIsValid() {
             // given
-            val request = fixture.withEndTime(null).build()
+            val request = fixture.withEndDate(null).build()
 
             // when
             stampCommandService.updateStamp(courseTrip, courseStamp1, request)
@@ -303,10 +304,11 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("여행 카테고리가 탐험형으로 변경되면 소속되어 있던 모든 스탬프 순서를 0으로 초기화한다.")
         fun shouldResetStampOrdersWhenTripCategoryChangesToExplore() {
             // given
-            given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(courseTrip.id)).willReturn(listOf(courseStamp1, courseStamp2))
+            val tripId = courseTrip.id.requireId()
+            given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(tripId)).willReturn(listOf(courseStamp1, courseStamp2))
 
             // when
-            stampCommandService.updateStampOrdersByTripCategoryChange(courseTrip.id, TripCategory.EXPLORE)
+            stampCommandService.updateStampOrdersByTripCategoryChange(tripId, TripCategory.EXPLORE)
 
             // then
             assertThat(courseStamp1.stampOrder).isEqualTo(0)
@@ -317,10 +319,11 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("여행 카테고리가 코스형으로 변경되면 소속되어 있던 모든 스탬프 순서를 생성일 기준으로 1부터 초기화합니다.")
         fun shouldSetStampOrdersWhenCategoryChangesToCourse() {
             // given
-            given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(exploreTrip.id)).willReturn(listOf(exploreStamp1, exploreStamp2))
+            val tripId = exploreTrip.id.requireId()
+            given(stampRepository.findAllByTripIdOrderByCreatedAtAsc(tripId)).willReturn(listOf(exploreStamp1, exploreStamp2))
 
             // when
-            stampCommandService.updateStampOrdersByTripCategoryChange(exploreTrip.id, TripCategory.COURSE)
+            stampCommandService.updateStampOrdersByTripCategoryChange(tripId, TripCategory.COURSE)
 
             // then
             assertThat(exploreStamp1.stampOrder).isEqualTo(1)
@@ -352,7 +355,7 @@ class StampCommandServiceTest : BaseUnitTest() {
             stampCommandService.completeStamp(courseStamp1)
 
             // then
-            assertThat(courseStamp1.isCompleted).isTrue
+            assertThat(courseStamp1.isCompleted()).isTrue
         }
     }
 
@@ -439,7 +442,8 @@ class StampCommandServiceTest : BaseUnitTest() {
             val newTrip = TripFixture(member, TripCategory.COURSE).createWithId(3L)
 
             // when
-            val exception = assertThrows<CustomException> { stampCommandService.validateStampBelongsToTrip(newTrip.id, courseStamp1) }
+            val exception =
+                assertThrows<CustomException> { stampCommandService.validateStampBelongsToTrip(newTrip.id.requireId(), courseStamp1) }
 
             // then
             assertThat(exception.message).isEqualTo(StampErrorCode.STAMP_NOT_BELONGS_TO_TRIP.message)
@@ -453,7 +457,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행의 어떤 스탬프가 완료되지 않았다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenAnyStampIsNotCompleted() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             given(stampCommandRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId)).willReturn(true)
 
             // when
@@ -467,7 +471,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행의 모든 스탬프가 완료되었다면 예외가 발생하지 않는다.")
         fun shouldPassWhenAllStampsAreCompleted() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             given(stampCommandRepository.existsByTripIdAndCompletedIsFalseAndDeletedAtIsNull(tripId)).willReturn(false)
 
             // when & then
@@ -542,7 +546,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 스탬프가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenStampsOwnedByMemberDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(stampCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -556,7 +560,7 @@ class StampCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 스탬프가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenStampsOwnedByMemberExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(stampCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

@@ -15,11 +15,7 @@ class DailyGoalCommandService(
     fun createDailyGoal(
         trip: Trip,
         title: String,
-    ): DailyGoal {
-        val dailyGoal = DailyGoalFactory.create(trip, title)
-
-        return dailyGoalRepository.save(dailyGoal)
-    }
+    ): DailyGoal = dailyGoalRepository.save(DailyGoalFactory.create(trip, title))
 
     fun deleteDailyGoal(dailyGoal: DailyGoal) = dailyGoal.updateDeletedAt()
 

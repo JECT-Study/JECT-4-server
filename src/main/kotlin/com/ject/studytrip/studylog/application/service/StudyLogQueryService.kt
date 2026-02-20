@@ -50,11 +50,7 @@ class StudyLogQueryService(
         tripReportId: Long,
         page: Int,
         size: Int,
-    ): Slice<StudyLog> =
-        studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(
-            tripReportId,
-            PageRequest.of(page, size),
-        )
+    ): Slice<StudyLog> = studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(tripReportId, PageRequest.of(page, size))
 
     fun getStudyLogIdsByTripId(tripId: Long): List<Long> = studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId)
 
