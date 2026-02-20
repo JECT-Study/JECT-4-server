@@ -12,7 +12,6 @@ data class LoadMissionInfoResponse(
     val completed: Boolean,
 ) {
     companion object {
-        @JvmStatic
         fun of(missionInfo: MissionInfo): LoadMissionInfoResponse =
             LoadMissionInfoResponse(missionInfo.missionId, missionInfo.missionName, missionInfo.completed)
     }

@@ -6,15 +6,4 @@ data class CreateMemberCommand(
     val profileImage: String?,
     val nickname: String,
     val category: String,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            socialId: String,
-            email: String,
-            profileImage: String?,
-            nickname: String,
-            category: String,
-        ): CreateMemberCommand = CreateMemberCommand(socialId, email, profileImage, nickname, category)
-    }
-}
+)

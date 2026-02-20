@@ -7,11 +7,10 @@ import org.springframework.test.util.ReflectionTestUtils
 
 class PomodoroFixture(
     private val dailyGoal: DailyGoal,
+    private val focusDurationSeconds: Int = 30 * 60,
+    private val focusSessionCount: Int = 1,
+    private val breakDurationSeconds: Int = 0,
 ) {
-    var focusDurationSeconds: Int = 30 * 60
-    var focusSessionCount: Int = 1
-    var breakDurationSeconds: Int = 0
-
     fun create(): Pomodoro = PomodoroFactory.create(dailyGoal, focusDurationSeconds, focusSessionCount, breakDurationSeconds)
 
     fun createWithId(id: Long): Pomodoro =

@@ -2,6 +2,7 @@ package com.ject.studytrip.mission.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.mission.domain.error.DailyMissionErrorCode
 import com.ject.studytrip.mission.domain.model.DailyMission
@@ -57,12 +58,17 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("요청한 데일리 미션 ID 개수와 조회된 데일리 미션 개수가 일치하지 않으면 예외가 발생한다.")
         fun shouldThrowExceptionWhenSomeDailyMissionsDoNotExist() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id, 1000L)
+            val dailyMissionIds = listOf(dailyMission.id.requireId(), 1000L)
             given(dailyMissionRepository.findAllByIdIn(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
             val exception =
-                assertThrows<CustomException> { dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoal.id, dailyMissionIds) }
+                assertThrows<CustomException> {
+                    dailyMissionQueryService.getValidDailyMissionsByIds(
+                        dailyGoal.id.requireId(),
+                        dailyMissionIds,
+                    )
+                }
 
             // then
             assertThat(exception.message).isEqualTo(DailyMissionErrorCode.DAILY_MISSION_NOT_FOUND.message)
@@ -73,12 +79,17 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         fun shouldThrowExceptionWhenDailyMissionsNotBelongToDailyGoal() {
             // given
             val newDailyGoal = DailyGoalFixture(trip).createWithId(2L)
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             given(dailyMissionRepository.findAllByIdIn(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
             val exception =
-                assertThrows<CustomException> { dailyMissionQueryService.getValidDailyMissionsByIds(newDailyGoal.id, dailyMissionIds) }
+                assertThrows<CustomException> {
+                    dailyMissionQueryService.getValidDailyMissionsByIds(
+                        newDailyGoal.id.requireId(),
+                        dailyMissionIds,
+                    )
+                }
 
             // then
             assertThat(exception.message).isEqualTo(DailyMissionErrorCode.DAILY_MISSION_NOT_BELONGS_TO_DAILY_GOAL.message)
@@ -88,13 +99,18 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 미션이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyMissionAlreadyDeleted() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             dailyMission.updateDeletedAt()
             given(dailyMissionRepository.findAllByIdIn(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
             val exception =
-                assertThrows<CustomException> { dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoal.id, dailyMissionIds) }
+                assertThrows<CustomException> {
+                    dailyMissionQueryService.getValidDailyMissionsByIds(
+                        dailyGoal.id.requireId(),
+                        dailyMissionIds,
+                    )
+                }
 
             // then
             assertThat(exception.message).isEqualTo(DailyMissionErrorCode.DAILY_MISSION_ALREADY_DELETED.message)
@@ -104,11 +120,11 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 미션 ID 목록과 일치하는 데일리 미션 목록을 조회하고 반환한다.")
         fun shouldReturnDailyMissionsByIds() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             given(dailyMissionRepository.findAllByIdIn(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
-            val result = dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoal.id, dailyMissionIds)
+            val result = dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoal.id.requireId(), dailyMissionIds)
 
             // then
             assertThat(result).hasSize(1)
@@ -123,14 +139,14 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("요청한 데일리 미션 ID 개수와 조회된 데일리 미션 개수가 일치하지 않으면 예외가 발생한다.")
         fun shouldThrowExceptionWhenSomeDailyMissionsDoNotExist() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id, 1000L)
+            val dailyMissionIds = listOf(dailyMission.id.requireId(), 1000L)
             given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
             val exception =
                 assertThrows<CustomException> {
                     dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
-                        dailyGoal.id,
+                        dailyGoal.id.requireId(),
                         dailyMissionIds,
                     )
                 }
@@ -144,14 +160,14 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         fun shouldThrowExceptionWhenDailyMissionsNotBelongToDailyGoal() {
             // given
             val newDailyGoal = DailyGoalFixture(trip).createWithId(2L)
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
             val exception =
                 assertThrows<CustomException> {
                     dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
-                        newDailyGoal.id,
+                        newDailyGoal.id.requireId(),
                         dailyMissionIds,
                     )
                 }
@@ -164,7 +180,7 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 미션이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyMissionAlreadyDeleted() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             dailyMission.updateDeletedAt()
             given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)).willReturn(listOf(dailyMission))
 
@@ -172,7 +188,7 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
             val exception =
                 assertThrows<CustomException> {
                     dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
-                        dailyGoal.id,
+                        dailyGoal.id.requireId(),
                         dailyMissionIds,
                     )
                 }
@@ -185,11 +201,11 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 미션 ID 목록과 일치하는 데일리 미션 목록을 미션과 스탬프와 함께 조회하고 반환한다.")
         fun shouldReturnDailyMissionsWithMissionAndStampByIds() {
             // given
-            val dailyMissionIds = listOf(dailyMission.id)
+            val dailyMissionIds = listOf(dailyMission.id.requireId())
             given(dailyMissionQueryRepository.findAllWithMissionAndStampByIds(dailyMissionIds)).willReturn(listOf(dailyMission))
 
             // when
-            val result = dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(dailyGoal.id, dailyMissionIds)
+            val result = dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(dailyGoal.id.requireId(), dailyMissionIds)
 
             // then
             assertThat(result).hasSize(1)
@@ -204,7 +220,7 @@ class DailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 목표 ID로 데일리 미션 목록을 조회하고 반환한다.")
         fun shouldReturnDailyMissionsByDailyGoalId() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             given(dailyMissionQueryRepository.findAllByDailyGoalIdFetchJoinMission(dailyGoalId)).willReturn(listOf(dailyMission))
 
             // when

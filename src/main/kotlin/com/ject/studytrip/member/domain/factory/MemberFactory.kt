@@ -6,7 +6,6 @@ import com.ject.studytrip.member.domain.model.MemberRole
 import com.ject.studytrip.member.domain.model.SocialProvider
 
 object MemberFactory {
-    @JvmStatic
     fun createFromKakao(
         kakaoId: String,
         email: String,

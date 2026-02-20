@@ -18,7 +18,6 @@ data class LoadDailyGoalDetailResponse(
     val dailyMissions: List<DailyGoalMissionResponse>,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             dailyGoalInfo: DailyGoalInfo,
             pomodoroInfo: PomodoroInfo,

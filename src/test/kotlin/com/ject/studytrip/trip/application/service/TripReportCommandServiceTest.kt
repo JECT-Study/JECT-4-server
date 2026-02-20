@@ -1,6 +1,7 @@
 package com.ject.studytrip.trip.application.service
 
 import com.ject.studytrip.BaseUnitTest
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.studylog.fixture.StudyLogFixture
@@ -44,7 +45,7 @@ class TripReportCommandServiceTest : BaseUnitTest() {
         val dailyGoal = DailyGoalFixture(trip).create()
         val studyLog1 = StudyLogFixture(member, dailyGoal).createWithId(1L)
         val studyLog2 = StudyLogFixture(member, dailyGoal).createWithId(2L)
-        studyLogIds = listOf(studyLog1.id, studyLog2.id)
+        studyLogIds = listOf(studyLog1.id.requireId(), studyLog2.id.requireId())
         tripReport = TripReportFixture(member).create()
     }
 
@@ -183,7 +184,7 @@ class TripReportCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 여행 리포트가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenTripReportsOwnedByMemberExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripReportCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

@@ -8,7 +8,6 @@ data class LoadTripReportsResponse(
     val tripReports: List<LoadTripReportInfoResponse>,
 ) {
     companion object {
-        @JvmStatic
         fun of(tripReportInfos: List<TripReportInfo>): LoadTripReportsResponse =
             LoadTripReportsResponse(
                 TripReportSummary.of(tripReportInfos),

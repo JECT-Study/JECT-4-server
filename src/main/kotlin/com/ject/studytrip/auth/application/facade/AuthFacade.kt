@@ -9,6 +9,7 @@ import com.ject.studytrip.auth.infra.dto.KakaoUserInfoResponse
 import com.ject.studytrip.auth.presentation.dto.request.KakaoLoginRequest
 import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest
 import com.ject.studytrip.auth.presentation.dto.request.LogoutRequest
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.application.dto.CreateMemberCommand
 import com.ject.studytrip.member.application.service.MemberCommandService
 import com.ject.studytrip.member.application.service.MemberQueryService
@@ -28,7 +29,7 @@ class AuthFacade(
         request: KakaoSignupRequest,
     ): TokenInfo {
         val profile = kakaoSignupProfileService.getSignupProfileByKey(signupKey)
-        val command = CreateMemberCommand.of(profile.socialId, profile.email, profile.profileImageUrl, request.nickname, request.category)
+        val command = CreateMemberCommand(profile.socialId, profile.email, profile.profileImageUrl, request.nickname, request.category)
 
         val member = memberCommandService.createMemberFromKakao(command)
         kakaoSignupProfileService.deleteBySignupKey(signupKey)
@@ -45,7 +46,7 @@ class AuthFacade(
         return memberQueryService
             .getMemberBySocialProviderAndSocialId(SocialProvider.KAKAO, info.kakaoId)
             .orElse(null)
-            ?.let { member -> createLoginOutcomeWithIssuedTokens(member.id, member.role.name) } // 가입되어 있는 사용자인 경우 토큰 발급
+            ?.let { member -> createLoginOutcomeWithIssuedTokens(member.id.requireId(), member.role.name) } // 가입되어 있는 사용자인 경우 토큰 발급
             ?: createSignupRequiredOutcomeWithIssuedSignupKey(info) // 가입이 필요할 경우 가입 키 발급
     }
 

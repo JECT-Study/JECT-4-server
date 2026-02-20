@@ -1,6 +1,7 @@
 package com.ject.studytrip.member.application.dto
 
 import com.ject.studytrip.global.util.DateUtil
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.MemberCategory
 import com.ject.studytrip.member.domain.model.MemberRole
@@ -20,10 +21,9 @@ data class MemberInfo(
     val deletedAt: String?,
 ) {
     companion object {
-        @JvmStatic
         fun from(member: Member): MemberInfo =
             MemberInfo(
-                member.id,
+                member.id.requireId(),
                 member.socialProvider,
                 member.socialId,
                 member.email,
@@ -31,8 +31,8 @@ data class MemberInfo(
                 member.profileImage,
                 member.category,
                 member.role,
-                DateUtil.formatDateTime(member.createdAt),
-                DateUtil.formatDateTime(member.updatedAt),
+                DateUtil.formatDateTime(requireNotNull(member.createdAt)),
+                DateUtil.formatDateTime(requireNotNull(member.updatedAt)),
                 member.deletedAt?.let { DateUtil.formatDateTime(it) },
             )
     }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class DummyMissionCommandService {
     fun createDummyMission(stamp: Stamp): Mission {
-        val command = CreateDummyMissionCommand.of("testMission")
+        val command = CreateDummyMissionCommand("testMission")
 
         return MissionFactory.create(stamp, command.name)
     }

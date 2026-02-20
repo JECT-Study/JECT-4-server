@@ -5,6 +5,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode
 import com.ject.studytrip.auth.fixture.TokenFixture
 import com.ject.studytrip.auth.helper.TokenTestHelper
 import com.ject.studytrip.global.exception.error.CommonErrorCode
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.image.domain.error.ImageErrorCode
 import com.ject.studytrip.image.infra.s3.provider.S3ImageStorageProvider
 import com.ject.studytrip.member.domain.model.Member
@@ -130,10 +131,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // given
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions("", trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions("", trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -148,10 +149,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripIdTypeMismatch() {
             // given
             val tripId = "abc"
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id, request)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -166,10 +167,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenDailyGoalIdTypeMismatch() {
             // given
             val dailyGoalId = "abc"
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId, request)
 
             // then
             resultActions
@@ -183,14 +184,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("요청이 유효하지 않으면 400 Bad Request를 반환한다.")
         fun shouldReturnBadRequestWhenRequestIsInvalid() {
             // given
-            val request =
-                fixture
-                    .withTotalFocusTimeInMinutes(-30)
-                    .withSelectedDailyMissionIds(listOf())
-                    .build()
+            val request = fixture.withTotalFocusTimeInMinutes(-30).withSelectedDailyMissionIds(listOf()).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -205,10 +202,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnNotFoundWhenTripDoesNotExist() {
             // given
             val tripId = -1L
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, tripId, dailyGoal.id, request)
+            val resultActions = getResultActions(token, tripId, dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -224,10 +221,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
             val newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, newTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -242,10 +239,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripAlreadyDeleted() {
             // given
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -260,10 +257,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenTripAlreadyCompleted() {
             // given
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -278,10 +275,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnNotFoundWhenDailyGoalDoesNotExist() {
             // given
             val dailyGoalId = -1L
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoalId, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoalId, request)
 
             // then
             resultActions
@@ -297,10 +294,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newTrip = tripTestHelper.saveTrip(member, TripCategory.COURSE)
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(newTrip)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -315,10 +312,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenDailyGoalAlreadyDeleted() {
             // given
             val deletedDailyGoal = dailyGoalTestHelper.saveDeletedDailyGoal(trip)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, deletedDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), deletedDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -332,10 +329,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("선택한 데일리 미션 ID 목록 중 존재하지 않는 값이 포함되어 있다면 404 NotFound를 반환한다.")
         fun shouldReturnNotFoundWhenSelectedDailyMissionIdsContainInvalidId() {
             // given
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id, 1000L)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId(), 1000L)).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -350,10 +347,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnForbiddenWhenDailyMissionNotBelongToDailyGoal() {
             // given
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(trip)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -368,10 +365,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         fun shouldReturnBadRequestWhenDailyMissionAlreadyDeleted() {
             // given
             val deletedDailyMission = dailyMissionTestHelper.saveDeletedDailyMission(mission, dailyGoal)
-            val request = fixture.withSelectedDailyMissionIds(listOf(deletedDailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(deletedDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -387,10 +384,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(trip)
             val dailyMission = dailyMissionTestHelper.saveDailyMission(mission, newDailyGoal)
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -407,10 +404,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val newDailyGoal = dailyGoalTestHelper.saveDailyGoal(trip)
             val newDailyMission = dailyMissionTestHelper.saveDailyMission(mission, newDailyGoal)
             pomodoroTestHelper.saveDeletedPomodoro(newDailyGoal)
-            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, newDailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), newDailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -426,10 +423,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val deletedMission = missionTestHelper.saveDeletedMission(stamp)
             val newDailyMission = dailyMissionTestHelper.saveDailyMission(deletedMission, dailyGoal)
-            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -445,10 +442,10 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val completedMission = missionTestHelper.saveCompletedMission(stamp)
             val newDailyMission = dailyMissionTestHelper.saveDailyMission(completedMission, dailyGoal)
-            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(newDailyMission.id.requireId())).build()
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -462,11 +459,11 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("유효한 요청이 들어오면 학습 로그를 생성하고 반환한다.")
         fun shouldCreateAndReturnStudyLogWhenRequestIsValid() {
             // given
-            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id)).build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId())).build()
             val initialCompletedMissions = stamp.completedMissions
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -475,7 +472,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
                 .andExpect(jsonPath("$.data.studyLogId").isNumber)
 
             // 스탬프의 완료된 미션 수 증가 확인
-            val updatedStamp = stampTestHelper.getStamp(stamp.id)
+            val updatedStamp = stampTestHelper.getStamp(stamp.id.requireId())
             assertThat(updatedStamp.completedMissions).isEqualTo(initialCompletedMissions + 1)
         }
 
@@ -485,14 +482,11 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newMission = missionTestHelper.saveMission(stamp)
             val newDailyMission = dailyMissionTestHelper.saveDailyMission(newMission, dailyGoal)
-            val request =
-                fixture
-                    .withSelectedDailyMissionIds(listOf(dailyMission.id, newDailyMission.id))
-                    .build()
+            val request = fixture.withSelectedDailyMissionIds(listOf(dailyMission.id.requireId(), newDailyMission.id.requireId())).build()
             val initialCompletedMissions = stamp.completedMissions
 
             // when
-            val resultActions = getResultActions(token, trip.id, dailyGoal.id, request)
+            val resultActions = getResultActions(token, trip.id.requireId(), dailyGoal.id.requireId(), request)
 
             // then
             resultActions
@@ -501,7 +495,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
                 .andExpect(jsonPath("$.data.studyLogId").isNumber)
 
             // 스탬프의 완료된 미션 수 증가 확인
-            val updatedStamp = stampTestHelper.getStamp(stamp.id)
+            val updatedStamp = stampTestHelper.getStamp(stamp.id.requireId())
             assertThat(updatedStamp.completedMissions).isEqualTo(initialCompletedMissions + 2)
         }
     }
@@ -528,7 +522,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("인증되지 않은 사용자라면 401 Unauthorized를 반환한다.")
         fun shouldReturnUnauthorizedWhenUnauthenticated() {
             // when
-            val resultActions = getResultActions("", trip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
+            val resultActions = getResultActions("", trip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
 
             // then
             resultActions
@@ -563,7 +557,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val size = "abc"
 
             // when
-            val resultActions = getResultActions(token, trip.id, page, size, ORDER_LATEST)
+            val resultActions = getResultActions(token, trip.id.requireId(), page, size, ORDER_LATEST)
 
             // then
             resultActions
@@ -581,7 +575,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val size = "-1"
 
             // when
-            val resultActions = getResultActions(token, trip.id, page, size, ORDER_LATEST)
+            val resultActions = getResultActions(token, trip.id.requireId(), page, size, ORDER_LATEST)
 
             // then
             resultActions
@@ -614,8 +608,9 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             // given
             val newMember = memberTestHelper.saveNewMember("test@gmail.com", "test")
             val newTrip = tripTestHelper.saveTrip(newMember, TripCategory.COURSE)
+
             // when
-            val resultActions = getResultActions(token, newTrip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
+            val resultActions = getResultActions(token, newTrip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
 
             // then
             resultActions
@@ -632,7 +627,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val deletedTrip = tripTestHelper.saveDeletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, deletedTrip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
+            val resultActions = getResultActions(token, deletedTrip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
 
             // then
             resultActions
@@ -649,7 +644,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val completedTrip = tripTestHelper.saveCompletedTrip(member, TripCategory.COURSE)
 
             // when
-            val resultActions = getResultActions(token, completedTrip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
+            val resultActions = getResultActions(token, completedTrip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
 
             // then
             resultActions
@@ -666,7 +661,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val order = "INVALID"
 
             // when
-            val resultActions = getResultActions(token, trip.id, DEFAULT_PAGE, DEFAULT_SIZE, order)
+            val resultActions = getResultActions(token, trip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, order)
 
             // then
             resultActions
@@ -683,7 +678,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             studyLogDailyMissionTestHelper.saveStudyLogDailyMissions(studyLog, dailyMission)
 
             // when
-            val resultActions = getResultActions(token, trip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
+            val resultActions = getResultActions(token, trip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_LATEST)
 
             // then
             resultActions
@@ -702,7 +697,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             studyLogDailyMissionTestHelper.saveStudyLogDailyMissions(studyLog, dailyMission)
 
             // when
-            val resultActions = getResultActions(token, trip.id, DEFAULT_PAGE, DEFAULT_SIZE, ORDER_OLDEST)
+            val resultActions = getResultActions(token, trip.id.requireId(), DEFAULT_PAGE, DEFAULT_SIZE, ORDER_OLDEST)
 
             // then
             resultActions
@@ -739,7 +734,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", studyLog.id, request)
+            val resultActions = getResultActions("", studyLog.id.requireId(), request)
 
             // then
             resultActions
@@ -774,7 +769,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withOriginFilename("").build()
 
             // when
-            val resultActions = getResultActions(token, studyLog.id, request)
+            val resultActions = getResultActions(token, studyLog.id.requireId(), request)
 
             // then
             resultActions
@@ -791,7 +786,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withOriginFilename("test.pdf").build()
 
             // when
-            val resultActions = getResultActions(token, studyLog.id, request)
+            val resultActions = getResultActions(token, studyLog.id.requireId(), request)
 
             // then
             resultActions
@@ -809,7 +804,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             given(s3ImageStorageProvider.issuePresignedUrl(anyString())).willReturn("https://mocked-presigned-url.com")
 
             // when
-            val resultActions = getResultActions(token, studyLog.id, request)
+            val resultActions = getResultActions(token, studyLog.id.requireId(), request)
 
             // then
             resultActions
@@ -849,7 +844,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.build()
 
             // when
-            val resultActions = getResultActions("", studyLog.id, request)
+            val resultActions = getResultActions("", studyLog.id.requireId(), request)
 
             // then
             resultActions
@@ -884,7 +879,7 @@ class StudyLogControllerIntegrationTest : BaseIntegrationTest() {
             val request = fixture.withTmpKey("").build()
 
             // when
-            val resultActions = getResultActions(token, studyLog.id, request)
+            val resultActions = getResultActions(token, studyLog.id.requireId(), request)
 
             // then
             resultActions

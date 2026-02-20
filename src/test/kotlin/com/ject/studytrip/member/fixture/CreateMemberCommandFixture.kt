@@ -15,8 +15,5 @@ class CreateMemberCommandFixture(
     fun withNickname(nickname: String): CreateMemberCommandFixture =
         CreateMemberCommandFixture(socialId, email, profileImage, nickname, category)
 
-    fun withCategory(category: String): CreateMemberCommandFixture =
-        CreateMemberCommandFixture(socialId, email, profileImage, nickname, category)
-
     fun build(): CreateMemberCommand = CreateMemberCommand(socialId, email, profileImage, nickname, category)
 }

@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.trip.domain.error.TripErrorCode
@@ -62,7 +63,7 @@ class TripQueryServiceTest : BaseUnitTest() {
             given(tripRepository.findById(tripId)).willReturn(Optional.empty())
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_NOT_FOUND.message)
@@ -73,7 +74,7 @@ class TripQueryServiceTest : BaseUnitTest() {
         fun shouldThrowExceptionWhenMemberIsNotTripOwner() {
             // given
             val memberId = -1L
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
@@ -87,12 +88,12 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenTripAlreadyDeleted() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             trip.updateDeletedAt()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_ALREADY_DELETED.message)
@@ -102,12 +103,12 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 이미 완료되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenTripAlreadyCompleted() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             trip.updateCompleted()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_ALREADY_COMPLETED.message)
@@ -117,11 +118,11 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 존재하면 여행을 반환한다.")
         fun shouldReturnTripWhenTripExists() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val result = tripQueryService.getValidTrip(member.id, tripId)
+            val result = tripQueryService.getValidTrip(member.id.requireId(), tripId)
 
             // then
             assertThat(result).isEqualTo(trip)
@@ -135,7 +136,7 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버에 대한 여행 목록을 페이징 처리하여 반환한다.")
         fun shouldReturnTripsSliceByMemberIdPaged() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             val trips = listOf(trip)
             val mockSlice = SliceImpl(trips, pageable, false)
             given(tripQueryRepository.findSliceByMemberIdAndCompletedFalseAndDeletedAtIsNull(memberId, pageable)).willReturn(mockSlice)
@@ -156,7 +157,7 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버의 여행이 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenTripDoesNotExistForMember() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.COURSE)).willReturn(0L)
             given(tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.EXPLORE)).willReturn(0L)
 
@@ -172,7 +173,7 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버의 코스형, 탐험형 여행 개수를 TripCount에 담아서 반환한다.")
         fun shouldReturnTripCountByMemberId() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.COURSE)).willReturn(3L)
             given(tripQueryRepository.countActiveTripsByMemberIdAndCategory(memberId, TripCategory.EXPLORE)).willReturn(2L)
 
@@ -196,7 +197,7 @@ class TripQueryServiceTest : BaseUnitTest() {
             given(tripRepository.findById(tripId)).willReturn(Optional.empty())
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_NOT_FOUND.message)
@@ -207,7 +208,7 @@ class TripQueryServiceTest : BaseUnitTest() {
         fun shouldThrowExceptionWhenMemberIsNotTripOwner() {
             // given
             val memberId = -1L
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
@@ -221,12 +222,12 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenTripAlreadyDeleted() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             trip.updateDeletedAt()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_ALREADY_DELETED.message)
@@ -236,11 +237,11 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 아직 완료되지 않았다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenTripIsNotCompleted() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id, tripId) }
+            val exception = assertThrows<CustomException> { tripQueryService.getValidCompletedTrip(member.id.requireId(), tripId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripErrorCode.TRIP_NOT_COMPLETED.message)
@@ -250,12 +251,12 @@ class TripQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행이 이미 완료되었다면 여행을 반환한다.")
         fun shouldReturnTripWhenTripAlreadyCompleted() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             trip.updateCompleted()
             given(tripRepository.findById(tripId)).willReturn(Optional.of(trip))
 
             // when
-            val result = tripQueryService.getValidCompletedTrip(member.id, tripId)
+            val result = tripQueryService.getValidCompletedTrip(member.id.requireId(), tripId)
 
             // then
             assertThat(result).isEqualTo(trip)

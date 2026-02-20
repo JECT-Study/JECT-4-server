@@ -8,12 +8,4 @@ data class LoadTripsSliceResponse(
     val tripInfos: List<TripInfo>,
     @field:Schema(description = "다음 데이터 존재 여부")
     val hasNext: Boolean,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            tripInfos: List<TripInfo>,
-            hasNext: Boolean,
-        ): LoadTripsSliceResponse = LoadTripsSliceResponse(tripInfos, hasNext)
-    }
-}
+)

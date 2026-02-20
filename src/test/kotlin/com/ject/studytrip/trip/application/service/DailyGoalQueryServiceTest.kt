@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.trip.domain.error.DailyGoalErrorCode
@@ -52,7 +53,7 @@ class DailyGoalQueryServiceTest : BaseUnitTest() {
             given(dailyGoalRepository.findById(dailyGoalId)).willReturn(Optional.empty())
 
             // when
-            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId) }
+            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(trip.id.requireId(), dailyGoalId) }
 
             // then
             assertThat(exception.message).isEqualTo(DailyGoalErrorCode.DAILY_GOAL_NOT_FOUND.message)
@@ -62,12 +63,12 @@ class DailyGoalQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 데일리 목표가 다른 여행에 속한다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyGoalNotBelongToTrip() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             val newTrip = TripFixture(member, TripCategory.COURSE).createWithId(2L)
             given(dailyGoalRepository.findById(dailyGoalId)).willReturn(Optional.of(dailyGoal))
 
             // when
-            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(newTrip.id, dailyGoalId) }
+            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(newTrip.id.requireId(), dailyGoalId) }
 
             // then
             assertThat(exception.message).isEqualTo(DailyGoalErrorCode.DAILY_GOAL_NOT_BELONGS_TO_TRIP.message)
@@ -77,12 +78,12 @@ class DailyGoalQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 목표가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenDailyGoalAlreadyDeleted() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             dailyGoal.updateDeletedAt()
             given(dailyGoalRepository.findById(dailyGoalId)).willReturn(Optional.of(dailyGoal))
 
             // when
-            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId) }
+            val exception = assertThrows<CustomException> { dailyGoalQueryService.getValidDailyGoal(trip.id.requireId(), dailyGoalId) }
 
             // then
             assertThat(exception.message).isEqualTo(DailyGoalErrorCode.DAILY_GOAL_ALREADY_DELETED.message)
@@ -92,11 +93,11 @@ class DailyGoalQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 속한 데일리 목표가 존재하면 데일리 목표를 조회하고 반환한다.")
         fun shouldReturnDailyGoalWhenDailyGoalBelongsToTrip() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             given(dailyGoalRepository.findById(dailyGoalId)).willReturn(Optional.of(dailyGoal))
 
             // when
-            val result = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
+            val result = dailyGoalQueryService.getValidDailyGoal(trip.id.requireId(), dailyGoalId)
 
             // then
             assertThat(result).isEqualTo(dailyGoal)

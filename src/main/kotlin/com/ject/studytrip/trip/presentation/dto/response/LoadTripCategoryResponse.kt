@@ -10,7 +10,6 @@ data class LoadTripCategoryResponse(
     val value: String,
 ) {
     companion object {
-        @JvmStatic
         fun of(tripCategoryInfo: TripCategoryInfo): LoadTripCategoryResponse =
             LoadTripCategoryResponse(tripCategoryInfo.name, tripCategoryInfo.value)
     }

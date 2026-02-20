@@ -33,7 +33,6 @@ data class LoadTripDetailResponse(
     val stamps: List<LoadStampInfoResponse>,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             tripInfo: TripInfo,
             stampInfos: List<StampInfo>,

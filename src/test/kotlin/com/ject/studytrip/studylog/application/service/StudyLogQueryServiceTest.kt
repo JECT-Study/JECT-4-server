@@ -2,6 +2,7 @@ package com.ject.studytrip.studylog.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.studylog.domain.error.StudyLogErrorCode
@@ -72,7 +73,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버에 대한 학습 기록이 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenStudyLogForMemberDoesNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(studyLogQueryRepository.countActiveStudyLogsByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -86,7 +87,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버에 대한 학습 기록이 존재하면 그 개수를 반환한다.")
         fun shouldReturnCountWhenStudyLogForMemberExists() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(studyLogQueryRepository.countActiveStudyLogsByMemberId(memberId)).willReturn(2L)
 
             // when
@@ -104,7 +105,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 대한 학습 로그 목록을 페이징 처리와 최신순으로 정렬하여 반환한다.")
         fun shouldReturnStudyLogsByTripIdPagedAndSortedByLatest() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             val order = "LATEST"
             val studyLogs = listOf(studyLog1, studyLog2)
             val mockSlice = SliceImpl(studyLogs, pageable, false)
@@ -122,7 +123,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 대한 학습 로그 목록을 페이징 처리와 과거순으로 정렬하여 반환한다.")
         fun shouldReturnStudyLogsByTripIdPagedAndSortedByOldest() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             val order = "OLDEST"
             val studyLogs = listOf(studyLog2, studyLog1) // 과거순이므로 순서 반대
             val mockSlice = SliceImpl(studyLogs, pageable, false)
@@ -158,7 +159,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("학습 로그가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenStudyLogAlreadyDeleted() {
             // given
-            val studyLogId = studyLog1.id
+            val studyLogId = studyLog1.id.requireId()
             studyLog1.updateDeletedAt()
             given(studyLogRepository.findById(studyLogId)).willReturn(Optional.of(studyLog1))
 
@@ -173,7 +174,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("학습 로그가 존재하면 학습 로그를 반환한다.")
         fun shouldReturnStudyLogWhenStudyLogExists() {
             // given
-            val studyLogId = studyLog1.id
+            val studyLogId = studyLog1.id.requireId()
             given(studyLogRepository.findById(studyLogId)).willReturn(Optional.of(studyLog1))
 
             // when
@@ -205,7 +206,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 대한 데일리 목표가 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenDailyGoalForTripDoesNotExist() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             dailyGoal.updateDeletedAt()
             given(studyLogQueryRepository.countStudyLogsByTripId(tripId)).willReturn(0L)
 
@@ -220,7 +221,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행에 대한 학습 로그가 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenStudyLogForTripExists() {
             // given
-            val tripId = courseTrip.id
+            val tripId = courseTrip.id.requireId()
             given(studyLogQueryRepository.countStudyLogsByTripId(tripId)).willReturn(2L)
 
             // when
@@ -238,7 +239,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("특정 여행 리포트에 대한 학습 로그 목록을 페이징 처리와 최신순으로 정렬하여 반환한다.")
         fun shouldReturnStudyLogsByTripReportIdPagedAndSortedByLatest() {
             // given
-            val tripReportId = tripReport.id
+            val tripReportId = tripReport.id.requireId()
             val studyLogs = listOf(studyLog1, studyLog2)
             val mockSlice = SliceImpl(studyLogs, pageable, false)
             given(studyLogQueryRepository.findSliceByTripReportIdOrderByCreatedAtDesc(tripReportId, pageable)).willReturn(mockSlice)
@@ -273,9 +274,9 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("학습 로그가 하나라도 존재하면 학습 로그 ID 목록을 반환한다.")
         fun shouldReturnStudyLogIdsWhenStudyLogExists() {
             // given
-            val tripId = courseTrip.id
-            val studyLogId1 = studyLog1.id
-            val studyLogId2 = studyLog2.id
+            val tripId = courseTrip.id.requireId()
+            val studyLogId1 = studyLog1.id.requireId()
+            val studyLogId2 = studyLog2.id.requireId()
             val studyLogIds = listOf(studyLogId1, studyLogId2)
             given(studyLogQueryRepository.findAllIdsByTripIdOrderByCreatedDesc(tripId)).willReturn(studyLogIds)
 
@@ -295,7 +296,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("이미지가 존재하지 않으면 빈 리스트를 반환한다.")
         fun shouldReturnEmptyListWhenImagesDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(studyLogQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(emptyList())
 
             // when
@@ -309,7 +310,7 @@ class StudyLogQueryServiceTest : BaseUnitTest() {
         @DisplayName("이미지가 존재하면 학습 로그 이미지 URL 목록을 반환한다.")
         fun shouldReturnStudyLogImageUrlsWhenImagesExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             val imageUrls = listOf("https://cdn.example.com/studylogs/1.jpg", "https://cdn.example.com/studylogs/2.jpg")
             given(studyLogQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(imageUrls)
 

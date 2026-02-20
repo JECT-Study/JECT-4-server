@@ -128,7 +128,7 @@ class MemberController(
             .body(
                 StandardResponse.success(
                     HttpStatus.OK.value(),
-                    PresignProfileImageResponse.of(result.memberId, result.tmpKey, result.presignedUrl),
+                    PresignProfileImageResponse(result.memberId, result.tmpKey, result.presignedUrl),
                 ),
             )
     }

@@ -16,11 +16,7 @@ class DailyMissionCommandService(
     fun createDailyMissions(
         dailyGoal: DailyGoal,
         missions: List<Mission>,
-    ): List<DailyMission> {
-        val dailyMissions = missions.map { DailyMissionFactory.create(it, dailyGoal) }
-
-        return dailyMissionRepository.saveAll(dailyMissions)
-    }
+    ): List<DailyMission> = dailyMissionRepository.saveAll(missions.map { DailyMissionFactory.create(it, dailyGoal) })
 
     fun deleteDailyMission(dailyMission: DailyMission) = dailyMission.updateDeletedAt()
 

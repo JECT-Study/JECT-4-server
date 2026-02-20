@@ -13,7 +13,7 @@ data class LoadStampDetailResponse(
     @field:Schema(description = "스탬프 순서")
     val stampOrder: Int,
     @field:Schema(description = "스탬프 종료일")
-    val endDate: String,
+    val endDate: String?,
     @field:Schema(description = "스탬프에 속한 총 미션 수")
     val totalMissions: Int,
     @field:Schema(description = "스탬프에 속한 완료된 미션 수")
@@ -24,7 +24,6 @@ data class LoadStampDetailResponse(
     val missions: List<LoadMissionInfoResponse>,
 ) {
     companion object {
-        @JvmStatic
         fun of(
             stampInfo: StampInfo,
             missionInfos: List<MissionInfo>,

@@ -8,7 +8,6 @@ data class CreateDailyGoalResponse(
     val dailyGoalId: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(dailyGoalInfo: DailyGoalInfo): CreateDailyGoalResponse = CreateDailyGoalResponse(dailyGoalInfo.dailyGoalId)
     }
 }

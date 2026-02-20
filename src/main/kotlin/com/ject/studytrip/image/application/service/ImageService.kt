@@ -42,7 +42,7 @@ class ImageService(
         ImagePolicy.validateExtension(ext)
 
         // 새로운 파일명 생성
-        val filename = FilenameUtil.createNewFilename(ext)
+        val filename = FilenameUtil.createNewFilename(requireNotNull(ext))
 
         // 임시 키 생성
         val tmpKey = ImageKeyFactory.createTmpKey(keyPrefix, id, filename)

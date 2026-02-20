@@ -2,6 +2,7 @@ package com.ject.studytrip.pomodoro.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode
@@ -55,12 +56,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
         @DisplayName("유효한 요청이 들어오면 뽀모도로를 생성하고 반환한다.")
         fun shouldCreateAndReturnPomodoroWhenRequestIsValid() {
             // given
-            val request =
-                CreatePomodoroRequestFixture()
-                    .apply {
-                        focusDurationInMinute = 30
-                        focusSessionCount = 1
-                    }.build()
+            val request = CreatePomodoroRequestFixture().withFocusDurationInMinute(30).withFocusSessionCount(1).build()
             given(pomodoroRepository.save(any())).willReturn(pomodoro)
 
             // when
@@ -84,10 +80,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
             pomodoro.updateDeletedAt()
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    pomodoroCommandService.updateTotalFocusTime(pomodoro, totalFocusTimeInSeconds)
-                }
+            val exception = assertThrows<CustomException> { pomodoroCommandService.updateTotalFocusTime(pomodoro, totalFocusTimeInSeconds) }
 
             // then
             assertThat(exception.message).isEqualTo(PomodoroErrorCode.POMODORO_ALREADY_DELETED.message)
@@ -100,10 +93,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
             val totalFocusTimeInSeconds = -30
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    pomodoroCommandService.updateTotalFocusTime(pomodoro, totalFocusTimeInSeconds)
-                }
+            val exception = assertThrows<CustomException> { pomodoroCommandService.updateTotalFocusTime(pomodoro, totalFocusTimeInSeconds) }
 
             // then
             assertThat(exception.message).isEqualTo(PomodoroErrorCode.POMODORO_NEGATIVE_FOCUS_TIME.message)
@@ -133,10 +123,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
             pomodoro.updateDeletedAt()
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    pomodoroCommandService.deletePomodoro(pomodoro)
-                }
+            val exception = assertThrows<CustomException> { pomodoroCommandService.deletePomodoro(pomodoro) }
 
             // then
             assertThat(exception.message).isEqualTo(PomodoroErrorCode.POMODORO_ALREADY_DELETED.message)
@@ -220,7 +207,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 뽀모도로가 하나라도 존재하지 않으면 0을 반환한다.")
         fun shouldReturnZeroWhenPomodorosOwnedByMemberDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(0L)
 
             // when
@@ -234,7 +221,7 @@ class PomodoroCommandServiceTest : BaseUnitTest() {
         @DisplayName("특정 멤버가 소유한 뽀모도로가 하나라도 존재하면 해당 개수를 반환한다.")
         fun shouldReturnCountWhenPomodorosOwnedByMemberExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(pomodoroCommandRepository.deleteAllByMemberId(memberId)).willReturn(5L)
 
             // when

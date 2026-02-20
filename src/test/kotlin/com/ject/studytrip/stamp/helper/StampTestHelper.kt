@@ -23,12 +23,7 @@ class StampTestHelper(
     fun saveCompletedStamp(
         trip: Trip,
         order: Int,
-    ): Stamp =
-        stampRepository.save(
-            StampFixture(trip, order).create().also {
-                it.updateCompleted()
-            },
-        )
+    ): Stamp = stampRepository.save(StampFixture(trip, order).create().also { it.updateCompleted() })
 
     fun getStamp(stampId: Long): Stamp = stampRepository.findById(stampId).orElseThrow()
 }

@@ -4,8 +4,8 @@ import com.ject.studytrip.global.exception.error.ErrorCode
 import org.springframework.http.HttpStatus
 
 enum class AuthErrorCode(
-    private val status: HttpStatus,
-    private val message: String,
+    override val status: HttpStatus,
+    override val message: String,
 ) : ErrorCode {
     // 400
     INVALID_KAKAO_AUTHORIZATION_CODE(HttpStatus.BAD_REQUEST, "잘못된 카카오 인가 코드입니다."),
@@ -27,11 +27,4 @@ enum class AuthErrorCode(
 
     // 502
     KAKAO_SERVER_ERROR(HttpStatus.BAD_GATEWAY, "카카오 서버에서 오류가 발생했습니다."),
-    ;
-
-    override fun getName(): String = name
-
-    override fun getStatus(): HttpStatus = status
-
-    override fun getMessage(): String = message
 }

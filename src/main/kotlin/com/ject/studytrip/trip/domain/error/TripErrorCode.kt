@@ -4,8 +4,8 @@ import com.ject.studytrip.global.exception.error.ErrorCode
 import org.springframework.http.HttpStatus
 
 enum class TripErrorCode(
-    private val status: HttpStatus,
-    private val message: String,
+    override val status: HttpStatus,
+    override val message: String,
 ) : ErrorCode {
     // 400
     TRIP_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 여행입니다."),
@@ -19,11 +19,4 @@ enum class TripErrorCode(
 
     // 404
     TRIP_NOT_FOUND(HttpStatus.NOT_FOUND, "요창한 여행을 찾을 수 없습니다."),
-    ;
-
-    override fun getName(): String = name
-
-    override fun getStatus(): HttpStatus = status
-
-    override fun getMessage(): String = message
 }

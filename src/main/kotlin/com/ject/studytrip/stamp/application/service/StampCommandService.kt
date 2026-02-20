@@ -1,5 +1,6 @@
 package com.ject.studytrip.stamp.application.service
 
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.stamp.domain.factory.StampFactory
 import com.ject.studytrip.stamp.domain.model.Stamp
 import com.ject.studytrip.stamp.domain.policy.StampPolicy
@@ -65,11 +66,14 @@ class StampCommandService(
         stamp: Stamp,
         request: UpdateStampRequest,
     ) {
-        stamp.updateName(request.name)
+        request.name?.let {
+            stamp.updateName(it)
+        }
 
-        StampPolicy.validateNotStampEndDateAfterTripEndDate(trip.endDate, request.endDate)
-
-        stamp.updateEndDate(request.endDate)
+        request.endDate?.let {
+            StampPolicy.validateNotStampEndDateAfterTripEndDate(trip.endDate, it)
+            stamp.updateEndDate(it)
+        }
     }
 
     fun updateStampOrders(
@@ -81,7 +85,7 @@ class StampCommandService(
 
         StampPolicy.validateUpdateStampOrders(trip.category, request.orderedStampIds, stamps)
         stamps.forEach { stamp ->
-            StampPolicy.validateStampBelongsToTrip(trip.id, stamp)
+            StampPolicy.validateStampBelongsToTrip(trip.id.requireId(), stamp)
             StampPolicy.validateNotDeleted(stamp)
             StampPolicy.validateNotCompleted(stamp)
         }

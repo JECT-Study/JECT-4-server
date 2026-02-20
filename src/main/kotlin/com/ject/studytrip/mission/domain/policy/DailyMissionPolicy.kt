@@ -6,7 +6,7 @@ import com.ject.studytrip.mission.domain.model.DailyMission
 
 object DailyMissionPolicy {
     fun validateNotDeleted(dailyMission: DailyMission) {
-        if (dailyMission.isDeleted) {
+        if (dailyMission.isDeleted()) {
             throw CustomException(DailyMissionErrorCode.DAILY_MISSION_ALREADY_DELETED)
         }
     }

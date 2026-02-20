@@ -9,10 +9,8 @@ data class LoginResponse(
     val accessToken: String?,
 ) {
     companion object {
-        @JvmStatic
         fun success(accessToken: String): LoginResponse = LoginResponse(false, accessToken)
 
-        @JvmStatic
         fun requiredSignup(): LoginResponse = LoginResponse(true, null)
     }
 }

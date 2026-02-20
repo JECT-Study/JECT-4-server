@@ -5,6 +5,7 @@ import com.ject.studytrip.auth.domain.error.AuthErrorCode
 import com.ject.studytrip.auth.fixture.TokenFixture
 import com.ject.studytrip.auth.helper.TokenTestHelper
 import com.ject.studytrip.global.exception.error.CommonErrorCode
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.image.domain.error.ImageErrorCode
 import com.ject.studytrip.image.infra.s3.provider.S3ImageStorageProvider
 import com.ject.studytrip.member.domain.error.MemberErrorCode
@@ -271,7 +272,7 @@ class MemberControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("멤버가 삭제되지 않았다면 400 Bad Request를 반환한다.")
         fun shouldReturnBadRequestWhenMemberIsNotDeleted() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
 
             // when
             val resultActions = getResultActions(memberId)
@@ -288,7 +289,7 @@ class MemberControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("삭제된 멤버를 복구한다.")
         fun shouldRestoreMember() {
             // given
-            val memberId = deletedMember.id
+            val memberId = deletedMember.id.requireId()
 
             // when
             val resultActions = getResultActions(memberId)

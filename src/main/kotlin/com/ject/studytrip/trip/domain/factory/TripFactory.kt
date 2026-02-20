@@ -6,7 +6,6 @@ import com.ject.studytrip.trip.domain.model.TripCategory
 import java.time.LocalDate
 
 object TripFactory {
-    @JvmStatic
     fun create(
         member: Member,
         name: String,

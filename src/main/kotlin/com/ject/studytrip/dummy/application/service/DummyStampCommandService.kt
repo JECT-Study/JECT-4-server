@@ -16,8 +16,8 @@ class DummyStampCommandService {
     ): Stamp {
         val command =
             when (trip.category) {
-                TripCategory.COURSE -> CreateDummyStampCommand.of("testStamp", stampOrder, LocalDate.now().plusDays(10))
-                TripCategory.EXPLORE -> CreateDummyStampCommand.of("testStamp", 0, null)
+                TripCategory.COURSE -> CreateDummyStampCommand("testStamp", stampOrder, LocalDate.now().plusDays(10))
+                TripCategory.EXPLORE -> CreateDummyStampCommand("testStamp", 0, null)
             }
 
         return StampFactory.create(trip, command.name, command.stampOrder, command.endDate)

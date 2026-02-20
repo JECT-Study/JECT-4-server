@@ -1,6 +1,7 @@
 package com.ject.studytrip.trip.application.dto
 
 import com.ject.studytrip.global.util.DateUtil
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.trip.domain.model.Trip
 import com.ject.studytrip.trip.domain.model.TripCategory
 
@@ -21,16 +22,15 @@ data class TripInfo(
     val deletedAt: String?,
 ) {
     companion object {
-        @JvmStatic
         fun from(
             trip: Trip,
             dDay: Int?,
             progress: Int?,
         ): TripInfo =
             TripInfo(
-                trip.id,
-                trip.name,
-                trip.memo,
+                trip.id.requireId(),
+                requireNotNull(trip.name),
+                requireNotNull(trip.memo),
                 trip.category,
                 DateUtil.formatDate(trip.startDate),
                 trip.endDate?.let { DateUtil.formatDate(it) },
@@ -38,9 +38,9 @@ data class TripInfo(
                 trip.totalStamps,
                 trip.completedStamps,
                 progress,
-                trip.isCompleted,
-                DateUtil.formatDateTime(trip.createdAt),
-                DateUtil.formatDateTime(trip.updatedAt),
+                trip.isCompleted(),
+                DateUtil.formatDateTime(requireNotNull(trip.createdAt)),
+                DateUtil.formatDateTime(requireNotNull(trip.updatedAt)),
                 trip.deletedAt?.let { DateUtil.formatDateTime(it) },
             )
     }

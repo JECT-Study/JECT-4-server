@@ -2,6 +2,7 @@ package com.ject.studytrip.trip.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.trip.domain.error.TripReportErrorCode
@@ -65,7 +66,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행 리포트가 존재하면 여행을 반환한다.")
         fun shouldReturnTripWhenTripReportExists() {
             // given
-            val tripReportId = tripReport1.id
+            val tripReportId = tripReport1.id.requireId()
             given(tripReportRepository.findById(tripReportId)).willReturn(Optional.of(tripReport1))
 
             // when
@@ -87,7 +88,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
             given(tripReportRepository.findById(tripReportId)).willReturn(Optional.empty())
 
             // when
-            val exception = assertThrows<CustomException> { tripReportQueryService.getValidTripReport(member.id, tripReportId) }
+            val exception = assertThrows<CustomException> { tripReportQueryService.getValidTripReport(member.id.requireId(), tripReportId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripReportErrorCode.TRIP_REPORT_NOT_FOUND.message)
@@ -98,7 +99,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         fun shouldThrowExceptionWhenMemberIsNotTripReportOwner() {
             // given
             val memberId = -1L
-            val tripReportId = tripReport1.id
+            val tripReportId = tripReport1.id.requireId()
             given(tripReportRepository.findById(tripReportId)).willReturn(Optional.of(tripReport1))
 
             // when
@@ -112,12 +113,12 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행 리포트가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenTripReportAlreadyDeleted() {
             // given
-            val tripReportId = tripReport1.id
+            val tripReportId = tripReport1.id.requireId()
             tripReport1.updateDeletedAt()
             given(tripReportRepository.findById(tripReportId)).willReturn(Optional.of(tripReport1))
 
             // when
-            val exception = assertThrows<CustomException> { tripReportQueryService.getValidTripReport(member.id, tripReportId) }
+            val exception = assertThrows<CustomException> { tripReportQueryService.getValidTripReport(member.id.requireId(), tripReportId) }
 
             // then
             assertThat(exception.message).isEqualTo(TripReportErrorCode.TRIP_REPORT_ALREADY_DELETED.message)
@@ -127,11 +128,11 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행 리포트가 존재하면 여행을 반환한다.")
         fun shouldReturnTripWhenTripReportExists() {
             // given
-            val tripReportId = tripReport1.id
+            val tripReportId = tripReport1.id.requireId()
             given(tripReportRepository.findById(tripReportId)).willReturn(Optional.of(tripReport1))
 
             // when
-            val result = tripReportQueryService.getValidTripReport(member.id, tripReportId)
+            val result = tripReportQueryService.getValidTripReport(member.id.requireId(), tripReportId)
 
             // then
             assertThat(result).isEqualTo(tripReport1)
@@ -145,7 +146,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행 리포트가 존재하지 않으면 빈 리스트를 반환한다.")
         fun shouldReturnEmptyListWhenTripReportDoesNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripReportQueryRepository.findAllActiveByMemberId(memberId)).willReturn(emptyList())
 
             // when
@@ -159,7 +160,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("여행 리포트가 하나라도 존재하면 특정 멤버가 생성한 여행 리포트 목록을 반환한다.")
         fun shouldReturnTripReports() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripReportQueryRepository.findAllActiveByMemberId(memberId)).willReturn(tripReports)
 
             // when
@@ -178,7 +179,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("이미지가 존재하지 않으면 빈 리스트를 반환한다.")
         fun shouldReturnEmptyListWhenImagesDoNotExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(tripReportQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(emptyList())
 
             // when
@@ -192,7 +193,7 @@ class TripReportQueryServiceTest : BaseUnitTest() {
         @DisplayName("이미지가 존재하면 여행 리포트 이미지 URL 목록을 반환한다.")
         fun shouldReturnTripReportImageUrlsWhenImagesExist() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             val imageUrls = listOf("https://cdn.example.com/reports/1.jpg", "https://cdn.example.com/reports/2.jpg")
             given(tripReportQueryRepository.findImageUrlsByMemberId(memberId)).willReturn(imageUrls)
 

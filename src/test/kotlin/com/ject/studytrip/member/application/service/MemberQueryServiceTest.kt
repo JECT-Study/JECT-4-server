@@ -2,6 +2,7 @@ package com.ject.studytrip.member.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.error.MemberErrorCode
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.domain.model.SocialProvider
@@ -92,7 +93,7 @@ class MemberQueryServiceTest : BaseUnitTest() {
         @DisplayName("멤버가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMemberAlreadyDeleted() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             member.updateDeletedAt()
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member))
 
@@ -107,7 +108,7 @@ class MemberQueryServiceTest : BaseUnitTest() {
         @DisplayName("멤버가 존재하면 멤버를 반환한다.")
         fun shouldReturnTripWhenMemberExists() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member))
 
             // when
@@ -139,7 +140,7 @@ class MemberQueryServiceTest : BaseUnitTest() {
         @DisplayName("멤버가 삭제되지 않았다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenMemberIsNotDeleted() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member))
 
             // when
@@ -153,7 +154,7 @@ class MemberQueryServiceTest : BaseUnitTest() {
         @DisplayName("멤버가 이미 삭제되었다면 멤버를 반환한다.")
         fun shouldReturnMemberWhenMemberAlreadyDeleted() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             member.updateDeletedAt()
             given(memberRepository.findById(memberId)).willReturn(Optional.of(member))
 
@@ -186,9 +187,9 @@ class MemberQueryServiceTest : BaseUnitTest() {
         @DisplayName("멤버 ID에 대한 멤버가 존재하면 MemberRole을 반환한다.")
         fun shouldReturnMemberRoleWhenMemberIdExists() {
             // given
-            val memberId = member.id
+            val memberId = member.id.requireId()
             val memberRole = member.role
-            given(memberQueryRepository.findMemberRoleById(memberId.toLong())).willReturn(Optional.of(memberRole))
+            given(memberQueryRepository.findMemberRoleById(memberId)).willReturn(Optional.of(memberRole))
 
             // when
             val result = memberQueryService.getMemberRoleByMemberId(memberId)

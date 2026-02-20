@@ -9,9 +9,8 @@ import org.springframework.test.util.ReflectionTestUtils
 class StudyLogFixture(
     private val member: Member,
     private val dailyGoal: DailyGoal,
+    private val content: String = "TEST 학습 로그 내용",
 ) {
-    var content: String = "TEST 학습 로그 내용"
-
     fun create(): StudyLog = StudyLogFactory.create(member, dailyGoal, content)
 
     fun createWithId(id: Long): StudyLog =

@@ -8,7 +8,6 @@ data class CreateStudyLogResponse(
     val studyLogId: Long,
 ) {
     companion object {
-        @JvmStatic
         fun of(studyLogInfo: StudyLogInfo): CreateStudyLogResponse = CreateStudyLogResponse(studyLogInfo.studyLogId)
     }
 }

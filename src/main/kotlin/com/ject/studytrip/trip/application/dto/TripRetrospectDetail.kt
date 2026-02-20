@@ -6,13 +6,4 @@ data class TripRetrospectDetail(
     val summary: TripRetrospectSummary,
     val tripInfo: TripInfo,
     val studyLogSliceInfo: StudyLogSliceInfo,
-) {
-    companion object {
-        @JvmStatic
-        fun from(
-            summary: TripRetrospectSummary,
-            tripInfo: TripInfo,
-            studyLogSliceInfo: StudyLogSliceInfo,
-        ): TripRetrospectDetail = TripRetrospectDetail(summary, tripInfo, studyLogSliceInfo)
-    }
-}
+)

@@ -9,13 +9,4 @@ data class PresignProfileImageResponse(
     val tmpKey: String,
     @field:Schema(description = "멤버 프로필 이미지 업로드용 Presigned URL")
     val presignedUrl: String,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            memberId: Long,
-            tmpKey: String,
-            presignedUrl: String,
-        ): PresignProfileImageResponse = PresignProfileImageResponse(memberId, tmpKey, presignedUrl)
-    }
-}
+)

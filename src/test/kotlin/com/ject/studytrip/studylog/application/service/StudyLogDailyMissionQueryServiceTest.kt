@@ -1,6 +1,7 @@
 package com.ject.studytrip.studylog.application.service
 
 import com.ject.studytrip.BaseUnitTest
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.mission.fixture.DailyMissionFixture
 import com.ject.studytrip.mission.fixture.MissionFixture
@@ -59,8 +60,8 @@ class StudyLogDailyMissionQueryServiceTest : BaseUnitTest() {
         @DisplayName("학습 로그 ID 목록으로 그룹화된 StudyLogDailyMission Map을 반환한다.")
         fun shouldReturnGroupedStudyLogDailyMissionMapByStudyLogIds() {
             // given
-            val studyLogId1 = studyLog1.id
-            val studyLogId2 = studyLog2.id
+            val studyLogId1 = studyLog1.id.requireId()
+            val studyLogId2 = studyLog2.id.requireId()
             val studyLogIds = listOf(studyLogId1, studyLogId2)
             val studyLogDailyMissionMap =
                 mapOf(

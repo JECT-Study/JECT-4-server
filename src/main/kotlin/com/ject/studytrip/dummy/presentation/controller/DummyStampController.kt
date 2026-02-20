@@ -1,7 +1,7 @@
 package com.ject.studytrip.dummy.presentation.controller
 
 import com.ject.studytrip.dummy.application.facade.DummyStampFacade
-import com.ject.studytrip.dummy.presentation.response.dto.LoadDummyStampInfoResponse
+import com.ject.studytrip.dummy.presentation.dto.response.LoadDummyStampInfoResponse
 import com.ject.studytrip.global.common.response.StandardResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

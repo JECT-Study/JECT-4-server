@@ -7,9 +7,8 @@ import org.springframework.test.util.ReflectionTestUtils
 
 class MissionFixture(
     private val stamp: Stamp,
+    private val name: String = "TEST 미션 이름",
 ) {
-    var name: String = "TEST 미션 이름"
-
     fun create(): Mission = MissionFactory.create(stamp, name)
 
     fun createWithId(id: Long): Mission =

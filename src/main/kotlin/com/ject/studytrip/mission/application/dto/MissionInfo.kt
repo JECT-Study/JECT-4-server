@@ -1,6 +1,7 @@
 package com.ject.studytrip.mission.application.dto
 
 import com.ject.studytrip.global.util.DateUtil
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.mission.domain.model.Mission
 
 data class MissionInfo(
@@ -12,15 +13,14 @@ data class MissionInfo(
     val deletedAt: String?,
 ) {
     companion object {
-        @JvmStatic
         fun from(mission: Mission): MissionInfo =
             MissionInfo(
-                mission.getId(),
-                mission.getName(),
+                mission.id.requireId(),
+                mission.name,
                 mission.isCompleted(),
-                DateUtil.formatDateTime(mission.getCreatedAt()),
-                DateUtil.formatDateTime(mission.getUpdatedAt()),
-                mission.getDeletedAt()?.let { DateUtil.formatDateTime(it) },
+                DateUtil.formatDateTime(requireNotNull(mission.createdAt)),
+                DateUtil.formatDateTime(requireNotNull(mission.updatedAt)),
+                mission.deletedAt?.let { DateUtil.formatDateTime(it) },
             )
     }
 }

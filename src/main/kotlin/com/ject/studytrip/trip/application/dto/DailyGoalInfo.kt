@@ -1,6 +1,7 @@
 package com.ject.studytrip.trip.application.dto
 
 import com.ject.studytrip.global.util.DateUtil
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.trip.domain.model.DailyGoal
 
 data class DailyGoalInfo(
@@ -12,14 +13,13 @@ data class DailyGoalInfo(
     val deletedAt: String?,
 ) {
     companion object {
-        @JvmStatic
         fun from(dailyGoal: DailyGoal): DailyGoalInfo =
             DailyGoalInfo(
-                dailyGoal.id,
+                dailyGoal.id.requireId(),
                 dailyGoal.title,
-                dailyGoal.isCompleted,
-                DateUtil.formatDateTime(dailyGoal.createdAt),
-                DateUtil.formatDateTime(dailyGoal.updatedAt),
+                dailyGoal.isCompleted(),
+                DateUtil.formatDateTime(requireNotNull(dailyGoal.createdAt)),
+                DateUtil.formatDateTime(requireNotNull(dailyGoal.updatedAt)),
                 dailyGoal.deletedAt?.let { DateUtil.formatDateTime(it) },
             )
     }

@@ -6,13 +6,13 @@ import com.ject.studytrip.mission.domain.model.Mission
 
 object MissionPolicy {
     fun validateNotDeleted(mission: Mission) {
-        if (mission.isDeleted) {
+        if (mission.isDeleted()) {
             throw CustomException(MissionErrorCode.MISSION_ALREADY_DELETED)
         }
     }
 
     fun validateNotCompleted(mission: Mission) {
-        if (mission.isCompleted) {
+        if (mission.isCompleted()) {
             throw CustomException(MissionErrorCode.MISSION_ALREADY_COMPLETED)
         }
     }

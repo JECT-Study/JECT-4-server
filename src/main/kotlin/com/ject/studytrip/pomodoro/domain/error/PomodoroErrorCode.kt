@@ -4,8 +4,8 @@ import com.ject.studytrip.global.exception.error.ErrorCode
 import org.springframework.http.HttpStatus
 
 enum class PomodoroErrorCode(
-    private val status: HttpStatus,
-    private val message: String,
+    override val status: HttpStatus,
+    override val message: String,
 ) : ErrorCode {
     // 400
     POMODORO_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 뽀모도로입니다."),
@@ -13,11 +13,4 @@ enum class PomodoroErrorCode(
 
     // 404
     POMODORO_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 뽀모도로를 찾을 수 없습니다."),
-    ;
-
-    override fun getName(): String = name
-
-    override fun getStatus(): HttpStatus = status
-
-    override fun getMessage(): String = message
 }

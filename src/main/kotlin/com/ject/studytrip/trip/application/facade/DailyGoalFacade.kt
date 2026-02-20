@@ -1,6 +1,7 @@
 package com.ject.studytrip.trip.application.facade
 
 import com.ject.studytrip.global.common.constants.CacheNameConstants.DAILY_GOAL
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.mission.application.dto.DailyMissionInfo
 import com.ject.studytrip.mission.application.service.DailyMissionCommandService
 import com.ject.studytrip.mission.application.service.DailyMissionQueryService
@@ -71,11 +72,11 @@ class DailyGoalFacade(
         request: UpdateDailyGoalRequest,
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
+        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(tripId, dailyGoalId)
 
         // 삭제할 데일리 미션이 있을 경우
         if (request.deleteDailyMissionIds.isNotEmpty()) {
-            val deleteDailyMissions = dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoal.id, request.deleteDailyMissionIds)
+            val deleteDailyMissions = dailyMissionQueryService.getValidDailyMissionsByIds(dailyGoalId, request.deleteDailyMissionIds)
             deleteDailyMissions.forEach { dailyMissionCommandService.deleteDailyMission(it) }
         }
 
@@ -97,14 +98,14 @@ class DailyGoalFacade(
         dailyGoalId: Long,
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
-        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.id)
+        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id.requireId(), dailyGoalId)
+        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
 
         // 뽀모도로 삭제
         pomodoroCommandService.deletePomodoro(pomodoro)
 
         // 데일리 미션 삭제
-        val dailyMissions = dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoal.id)
+        val dailyMissions = dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoalId)
         dailyMissions.forEach { dailyMissionCommandService.deleteDailyMission(it) }
 
         // 데일리 목표 삭제
@@ -122,27 +123,24 @@ class DailyGoalFacade(
         dailyGoalId: Long,
     ): DailyGoalDetail {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
-        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.id)
-        val dailyMissions = dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoal.id)
+        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id.requireId(), dailyGoalId)
+        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
+        val dailyMissions = dailyMissionQueryService.getDailyMissionsByDailyGoalId(dailyGoalId)
 
-        return DailyGoalDetail.from(
-            DailyGoalInfo.from(dailyGoal),
-            PomodoroInfo.from(pomodoro),
-            dailyMissions.map(DailyMissionInfo::from),
-        )
+        return DailyGoalDetail(DailyGoalInfo.from(dailyGoal), PomodoroInfo.from(pomodoro), dailyMissions.map(DailyMissionInfo::from))
     }
 
     private fun getValidMissionsByTripCategory(
         trip: Trip,
         missionIds: List<Long>,
     ): List<Mission> {
+        val tripId = trip.id.requireId()
         val missions = missionQueryService.getValidMissionsByIds(missionIds)
-        missions.forEach { stampCommandService.validateStampBelongsToTrip(trip.id, it.stamp) }
+        missions.forEach { stampCommandService.validateStampBelongsToTrip(tripId, it.stamp) }
 
         if (trip.category == TripCategory.COURSE) {
-            val stampId = stampQueryService.getFirstInProcessingStampsForCourseTrip(trip.id).id
-            missionCommandService.validateMissionsBelongToStamp(stampId, missions)
+            val stamp = stampQueryService.getFirstInProcessingStampsForCourseTrip(tripId)
+            missionCommandService.validateMissionsBelongToStamp(stamp.id.requireId(), missions)
         }
 
         return missions

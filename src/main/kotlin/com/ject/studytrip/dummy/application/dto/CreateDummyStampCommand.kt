@@ -6,13 +6,4 @@ data class CreateDummyStampCommand(
     val name: String,
     val stampOrder: Int,
     val endDate: LocalDate?,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            name: String,
-            stampOrder: Int,
-            endDate: LocalDate?,
-        ): CreateDummyStampCommand = CreateDummyStampCommand(name, stampOrder, endDate)
-    }
-}
+)

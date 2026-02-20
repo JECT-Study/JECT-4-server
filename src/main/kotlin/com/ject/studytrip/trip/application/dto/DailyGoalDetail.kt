@@ -7,13 +7,4 @@ data class DailyGoalDetail(
     val dailyGoalInfo: DailyGoalInfo,
     val pomodoroInfo: PomodoroInfo,
     val dailyMissionInfos: List<DailyMissionInfo>,
-) {
-    companion object {
-        @JvmStatic
-        fun from(
-            dailyGoalInfo: DailyGoalInfo,
-            pomodoroInfo: PomodoroInfo,
-            dailyMissionInfos: List<DailyMissionInfo>,
-        ): DailyGoalDetail = DailyGoalDetail(dailyGoalInfo, pomodoroInfo, dailyMissionInfos)
-    }
-}
+)

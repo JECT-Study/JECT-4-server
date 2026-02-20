@@ -18,6 +18,7 @@ import com.ject.studytrip.auth.presentation.dto.request.KakaoSignupRequest
 import com.ject.studytrip.auth.presentation.dto.request.LogoutRequest
 import com.ject.studytrip.global.common.constants.CookieConstants.AUTH_REFRESH_TOKEN
 import com.ject.studytrip.global.common.constants.CookieConstants.OAUTH_SIGNUP_KEY
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.domain.error.MemberErrorCode
 import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.member.helper.MemberTestHelper
@@ -66,7 +67,8 @@ class AuthControllerIntegrationTest : BaseIntegrationTest() {
         member = memberTestHelper.saveMember()
         accessToken = tokenTestHelper.createAccessToken(member.id.toString(), member.role.name)
         refreshToken = tokenTestHelper.createRefreshToken()
-        signupKey = kakaoSignupProfileRedisRepository.saveAndIssueSignupKey(member.socialId, member.email, member.profileImage)
+        signupKey =
+            kakaoSignupProfileRedisRepository.saveAndIssueSignupKey(member.socialId, member.email, requireNotNull(member.profileImage))
 
         refreshTokenRedisRepository.saveRefreshToken(member.id.toString(), refreshToken, Duration.ofSeconds(30).toMillis())
     }
@@ -97,7 +99,7 @@ class AuthControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("회원가입 요청 시 signupKey 쿠키가 존재하지 않으면 400 Bad Request를 반환한다.")
         fun shouldReturnBadRequestWhenSignupKeyCookieDoesNotExist() {
             // given
-            memberTestHelper.deleteMemberById(member.id)
+            memberTestHelper.deleteMemberById(member.id.requireId())
             val request = fixture.build()
             val cookie = authCookieTestHelper.createKakaoSignupProfileCookie("NULL_COOKIE", signupKey)
 
@@ -116,7 +118,7 @@ class AuthControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("회원가입 요청 시 signupKey가 유효하지 않으면 400 Bad Request를 반환한다.")
         fun shouldReturnBadRequestWhenSignupKeyIsInvalid() {
             // given
-            memberTestHelper.deleteMemberById(member.id)
+            memberTestHelper.deleteMemberById(member.id.requireId())
             val request = fixture.build()
             val cookie = authCookieTestHelper.createKakaoSignupProfileCookie(OAUTH_SIGNUP_KEY, "invalid.pending.key")
 
@@ -152,7 +154,7 @@ class AuthControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("회원가입 성공 시 토큰이 발급된다.")
         fun shouldReturnTokenResponseWhenSignupIsSuccessful() {
             // given
-            memberTestHelper.deleteMemberById(member.id)
+            memberTestHelper.deleteMemberById(member.id.requireId())
             val request = fixture.build()
             val cookie = authCookieTestHelper.createKakaoSignupProfileCookie(OAUTH_SIGNUP_KEY, signupKey)
 
@@ -213,7 +215,7 @@ class AuthControllerIntegrationTest : BaseIntegrationTest() {
         @DisplayName("가입되지 않은 사용자 인가 코드로 로그인 시 회원가입 필요 응답을 반환한다.")
         fun shouldReturnSignupRequiredWhenMemberDoesNotExist() {
             // given
-            memberTestHelper.deleteMemberById(member.id)
+            memberTestHelper.deleteMemberById(member.id.requireId())
             val request = kakaoLoginRequestFixture.build()
             val kakaoTokenResponse = kakaoTokenResponseFixture.build()
             val kakaoUserInfoResponse = kakaoUserInfoResponseFixture.build()

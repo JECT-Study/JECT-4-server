@@ -2,6 +2,7 @@ package com.ject.studytrip.pomodoro.application.service
 
 import com.ject.studytrip.BaseUnitTest
 import com.ject.studytrip.global.exception.CustomException
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.fixture.MemberFixture
 import com.ject.studytrip.pomodoro.domain.error.PomodoroErrorCode
 import com.ject.studytrip.pomodoro.domain.model.Pomodoro
@@ -58,10 +59,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
             given(pomodoroRepository.findByDailyGoalId(dailyGoalId)).willReturn(Optional.empty())
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
-                }
+            val exception = assertThrows<CustomException> { pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId) }
 
             // then
             assertThat(exception.message).isEqualTo(PomodoroErrorCode.POMODORO_NOT_FOUND.message)
@@ -71,15 +69,12 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
         @DisplayName("뽀모도로가 이미 삭제되었다면 예외가 발생한다.")
         fun shouldThrowExceptionWhenPomodoroAlreadyDeleted() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             pomodoro.updateDeletedAt()
             given(pomodoroRepository.findByDailyGoalId(dailyGoalId)).willReturn(Optional.of(pomodoro))
 
             // when
-            val exception =
-                assertThrows<CustomException> {
-                    pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
-                }
+            val exception = assertThrows<CustomException> { pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId) }
 
             // then
             assertThat(exception.message).isEqualTo(PomodoroErrorCode.POMODORO_ALREADY_DELETED.message)
@@ -89,7 +84,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
         @DisplayName("데일리 목표 ID로 뽀모도로를 조회하고 반환한다.")
         fun shouldReturnPomodoroByDailyGoalId() {
             // given
-            val dailyGoalId = dailyGoal.id
+            val dailyGoalId = dailyGoal.id.requireId()
             given(pomodoroRepository.findByDailyGoalId(dailyGoalId)).willReturn(Optional.of(pomodoro))
 
             // when
@@ -122,7 +117,7 @@ class PomodoroQueryServiceTest : BaseUnitTest() {
         @DisplayName("유효한 여행 ID가 들어오면 총 집중 시간(시간 단위)을 반환한다.")
         fun shouldReturnTotalFocusHoursWhenTripIdIsValid() {
             // given
-            val tripId = trip.id
+            val tripId = trip.id.requireId()
             given(pomodoroQueryRepository.sumFocusHoursByTripId(tripId)).willReturn(100L)
 
             // when

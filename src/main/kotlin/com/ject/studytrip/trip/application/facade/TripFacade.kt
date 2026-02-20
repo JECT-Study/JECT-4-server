@@ -4,6 +4,7 @@ import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMPS
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.TRIPS
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.member.application.service.MemberQueryService
 import com.ject.studytrip.stamp.application.dto.StampInfo
 import com.ject.studytrip.stamp.application.service.StampCommandService
@@ -75,7 +76,7 @@ class TripFacade(
         tripCommandService.updateTrip(trip, request)
 
         if (request.category != null) {
-            stampCommandService.updateStampOrdersByTripCategoryChange(trip.id, TripCategory.from(request.category))
+            stampCommandService.updateStampOrdersByTripCategoryChange(trip.id.requireId(), TripCategory.from(request.category))
         }
     }
 
@@ -122,7 +123,7 @@ class TripFacade(
     ) {
         val trip = tripQueryService.getValidTrip(memberId, tripId)
 
-        stampCommandService.validateAllStampsCompletedByTripId(trip.id)
+        stampCommandService.validateAllStampsCompletedByTripId(trip.id.requireId())
 
         tripCommandService.completeTrip(trip)
     }
@@ -150,7 +151,7 @@ class TripFacade(
                     TripInfo.from(trip, dDay, progress)
                 }.sortedWith(compareBy(nullsLast()) { it.dDay })
 
-        return TripSliceInfo.of(tripInfos, tripSlice.hasNext())
+        return TripSliceInfo(tripInfos, tripSlice.hasNext())
     }
 
     @Cacheable(
@@ -163,15 +164,15 @@ class TripFacade(
         tripId: Long,
     ): TripDetail {
         val member = memberQueryService.getValidMember(memberId)
-        val trip = tripQueryService.getValidTrip(member.id, tripId)
+        val trip = tripQueryService.getValidTrip(member.id.requireId(), tripId)
 
         val dDay = calculateDDay(trip.endDate)
         val progress: Int = calculateProgress(trip.totalStamps, trip.completedStamps)
 
-        val stamps = stampQueryService.getStampsByTripId(trip.id)
+        val stamps = stampQueryService.getStampsByTripId(trip.id.requireId())
         val stampInfos = stamps.map { StampInfo.from(it) }
 
-        return TripDetail.from(TripInfo.from(trip, dDay, progress), stampInfos)
+        return TripDetail(TripInfo.from(trip, dDay, progress), stampInfos)
     }
 
     private fun calculateDDay(endDate: LocalDate?): Int? {

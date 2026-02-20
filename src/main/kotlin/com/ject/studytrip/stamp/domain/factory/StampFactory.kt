@@ -5,7 +5,6 @@ import com.ject.studytrip.trip.domain.model.Trip
 import java.time.LocalDate
 
 object StampFactory {
-    @JvmStatic
     fun create(
         trip: Trip,
         name: String,

@@ -16,9 +16,7 @@ class TripReportStudyLogCommandService(
         tripReport: TripReport,
         studyLogs: List<StudyLog>,
     ) {
-        val tripReportStudyLogs = studyLogs.map { TripReportStudyLogFactory.create(tripReport, it) }
-
-        tripReportStudyLogRepository.saveAll(tripReportStudyLogs)
+        tripReportStudyLogRepository.saveAll(studyLogs.map { TripReportStudyLogFactory.create(tripReport, it) })
     }
 
     fun hardDeleteTripReportStudyLogsOwnedByDeletedMember(): Long = tripReportStudyLogCommandRepository.deleteAllByDeletedMemberOwner()

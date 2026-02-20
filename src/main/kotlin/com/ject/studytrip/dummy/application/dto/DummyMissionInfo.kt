@@ -7,11 +7,6 @@ data class DummyMissionInfo(
     val completed: Boolean,
 ) {
     companion object {
-        @JvmStatic
-        fun from(mission: Mission): DummyMissionInfo =
-            DummyMissionInfo(
-                mission.name,
-                mission.isCompleted,
-            )
+        fun from(mission: Mission): DummyMissionInfo = DummyMissionInfo(mission.name, mission.isCompleted())
     }
 }

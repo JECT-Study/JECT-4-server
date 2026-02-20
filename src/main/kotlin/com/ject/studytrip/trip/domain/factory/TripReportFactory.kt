@@ -4,7 +4,6 @@ import com.ject.studytrip.member.domain.model.Member
 import com.ject.studytrip.trip.domain.model.TripReport
 
 object TripReportFactory {
-    @JvmStatic
     fun create(
         member: Member,
         title: String,

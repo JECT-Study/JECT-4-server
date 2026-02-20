@@ -6,13 +6,13 @@ import com.ject.studytrip.member.domain.model.Member
 
 object MemberPolicy {
     fun validateNotDeleted(member: Member) {
-        if (member.isDeleted) {
+        if (member.isDeleted()) {
             throw CustomException(MemberErrorCode.MEMBER_ALREADY_DELETED)
         }
     }
 
     fun validateDeleted(member: Member) {
-        if (!member.isDeleted) {
+        if (!member.isDeleted()) {
             throw CustomException(MemberErrorCode.MEMBER_NOT_DELETED)
         }
     }

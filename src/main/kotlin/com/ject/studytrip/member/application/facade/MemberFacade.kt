@@ -1,6 +1,7 @@
 package com.ject.studytrip.member.application.facade
 
 import com.ject.studytrip.global.common.constants.CacheNameConstants.MEMBER
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.image.application.service.ImageService
 import com.ject.studytrip.member.application.dto.MemberDetail
 import com.ject.studytrip.member.application.dto.MemberInfo
@@ -114,7 +115,7 @@ class MemberFacade(
 
         val memberInfo = MemberInfo.from(member)
 
-        return MemberDetail.from(memberInfo, tripCount, studyLogCount)
+        return MemberDetail(memberInfo, tripCount, studyLogCount)
     }
 
     @Transactional(readOnly = true)
@@ -126,7 +127,7 @@ class MemberFacade(
 
         val info = imageService.presign(MEMBER_PROFILE_IMAGE_KEY_PREFIX, member.id.toString(), request.originFilename)
 
-        return PresignedProfileImageInfo.of(member.id, info.tmpKey, info.presignedUrl)
+        return PresignedProfileImageInfo(member.id.requireId(), info.tmpKey, info.presignedUrl)
     }
 
     @CacheEvict(
@@ -148,18 +149,19 @@ class MemberFacade(
         memberCommandService.updateProfileImage(member, finalKey)
     }
 
-    private fun collectImageUrlsForMember(member: Member): List<String> =
-        buildList {
-            // TripReport 이미지 목록 조회
-            addAll(tripReportQueryService.getTripReportImageUrlsByMemberId(member.id))
+    private fun collectImageUrlsForMember(member: Member): List<String> {
+        val memberId = member.id.requireId()
 
-            // StudyLog 이미지 목록 조회
-            addAll(studyLogQueryService.getStudyLogImageUrlsByMemberId(member.id))
+        val tripReportImages = tripReportQueryService.getTripReportImageUrlsByMemberId(memberId)
+        val studyLogImages = studyLogQueryService.getStudyLogImageUrlsByMemberId(memberId)
+        val profileImage = member.profileImage?.takeUnless { it.isBlank() }
 
-            member.profileImage
-                ?.takeIf { it.isNotBlank() }
-                ?.let { add(it) }
+        return buildList {
+            addAll(tripReportImages)
+            addAll(studyLogImages)
+            profileImage?.let { add(it) }
         }
+    }
 
     private fun cascadeHardDeleteByMemberId(memberId: Long) {
         // 자식 -> 부모 순으로 삭제 진행

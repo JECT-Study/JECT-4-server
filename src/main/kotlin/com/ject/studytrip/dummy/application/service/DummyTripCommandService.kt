@@ -19,8 +19,8 @@ class DummyTripCommandService {
 
         val command =
             when (tripCategory) {
-                TripCategory.COURSE -> CreateDummyTripCommand.of("testTrip", "testMemo", tripCategory, LocalDate.now().plusDays(10))
-                TripCategory.EXPLORE -> CreateDummyTripCommand.of("testTrip", "testMemo", tripCategory, null)
+                TripCategory.COURSE -> CreateDummyTripCommand("testTrip", "testMemo", tripCategory, LocalDate.now().plusDays(10))
+                TripCategory.EXPLORE -> CreateDummyTripCommand("testTrip", "testMemo", tripCategory, null)
             }
 
         return TripFactory.create(member, command.name, command.memo, command.tripCategory, command.endDate, count)

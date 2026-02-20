@@ -9,13 +9,4 @@ data class PresignedTripReportImageResponse(
     val tmpKey: String,
     @field:Schema(description = "여행 리포트 이미지 업로드용 Presigned URL")
     val presignedUrl: String,
-) {
-    companion object {
-        @JvmStatic
-        fun of(
-            tripReportId: Long,
-            tmpKey: String,
-            presignedUrl: String,
-        ): PresignedTripReportImageResponse = PresignedTripReportImageResponse(tripReportId, tmpKey, presignedUrl)
-    }
-}
+)

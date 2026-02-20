@@ -4,6 +4,7 @@ import com.ject.studytrip.global.common.constants.CacheNameConstants.MISSIONS
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMP
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STAMPS
 import com.ject.studytrip.global.common.constants.CacheNameConstants.STUDY_LOGS
+import com.ject.studytrip.global.util.EntityExtensions.requireId
 import com.ject.studytrip.image.application.service.ImageService
 import com.ject.studytrip.mission.application.service.DailyMissionQueryService
 import com.ject.studytrip.mission.application.service.MissionCommandService
@@ -75,13 +76,13 @@ class StudyLogFacade(
     ): StudyLogInfo {
         // 1. 유효성 검증 및 엔티티 조회
         val trip = tripQueryService.getValidTrip(memberId, tripId)
-        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(trip.id, dailyGoalId)
+        val dailyGoal = dailyGoalQueryService.getValidDailyGoal(tripId, dailyGoalId)
         val selectedDailyMissions =
             dailyMissionQueryService.getValidDailyMissionsWithMissionAndStampByIds(
-                dailyGoal.id,
+                dailyGoalId,
                 request.selectedDailyMissionIds,
             )
-        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoal.id)
+        val pomodoro = pomodoroQueryService.getValidPomodoroByDailyGoalId(dailyGoalId)
 
         // 2. 학습 로그 생성
         val studyLog = studyLogCommandService.createStudyLog(trip.member, dailyGoal, request.content)
@@ -111,7 +112,7 @@ class StudyLogFacade(
         val trip = tripQueryService.getValidTrip(memberId, tripId)
 
         // 2. 페이징된 학습 로그 목록 조회
-        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripId(trip.id, page, size, order)
+        val studyLogSlice = studyLogQueryService.getStudyLogsSliceByTripId(trip.id.requireId(), page, size, order)
 
         // 3. 학습 로그 상세 정보 구성
         return buildStudyLogDetailsSlice(studyLogSlice)
@@ -125,7 +126,7 @@ class StudyLogFacade(
         val studyLog = studyLogQueryService.getValidStudyLog(studyLogId)
         val info = imageService.presign(STUDY_LOG_IMAGE_KEY_PREFIX, studyLog.id.toString(), request.originFilename)
 
-        return PresignedStudyLogImageInfo.of(studyLog.id, info.tmpKey, info.presignedUrl)
+        return PresignedStudyLogImageInfo(studyLog.id.requireId(), info.tmpKey, info.presignedUrl)
     }
 
     @CacheEvict(cacheNames = [STUDY_LOGS], allEntries = true)
@@ -156,9 +157,11 @@ class StudyLogFacade(
 
         missions.forEach { mission ->
             val stamp = mission.stamp
-            stampById.putIfAbsent(stamp.id, stamp)
+            val stampId = stamp.id.requireId()
+
+            stampById.putIfAbsent(stampId, stamp)
             missionCommandService.completeMission(mission) // 미션 완료 처리
-            completeMissionCountByStampId.merge(stamp.id, 1) { a, b -> a + b } // 스탬프별 완료한 미션 개수 누적(없으면 1, 있으면 +1)
+            completeMissionCountByStampId.merge(stampId, 1) { a, b -> a + b } // 스탬프별 완료한 미션 개수 누적(없으면 1, 있으면 +1)
         }
 
         // 스탬프별 완료된 미션 수 증가
@@ -173,12 +176,12 @@ class StudyLogFacade(
     }
 
     private fun buildStudyLogDetailsSlice(studyLogSlice: Slice<StudyLog>): StudyLogSliceInfo {
-        val studyLogIds = studyLogSlice.content.map { it.id }
+        val studyLogIds = studyLogSlice.content.map { it.id.requireId() }
 
         // 학습 로그별 학습 로그 데일리 미션 목록 그룹화
         val groupedStudyLogDailyMissions = studyLogDailyMissionQueryService.getGroupedStudyLogDailyMissionsByStudyLogIds(studyLogIds)
         val studyLogDetails = studyLogSlice.content.map { StudyLogDetail.from(it, groupedStudyLogDailyMissions[it.id]) }
 
-        return StudyLogSliceInfo.of(studyLogDetails, studyLogSlice.hasNext())
+        return StudyLogSliceInfo(studyLogDetails, studyLogSlice.hasNext())
     }
 }
